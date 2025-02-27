@@ -6,7 +6,10 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+
+import { CommonModule } from '@common/common.module';
 
 import { AdminModule } from '@iam/admin/admin.module';
 import { AuthenticationResponseAdapter } from '@iam/authentication/application/adapter/authentication-response.adapter';
@@ -27,7 +30,16 @@ const authenticationRepositoryProvider: Provider = {
 };
 
 @Module({
-  imports: [PassportModule, UserModule, AdminModule],
+  imports: [
+    PassportModule,
+    UserModule,
+    AdminModule,
+    CommonModule,
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+    }),
+  ],
   controllers: [AuthenticationController],
   providers: [
     JwtStrategy,
