@@ -1,5 +1,15 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
+import {
+  ITransactionRepository,
+  TRANSACTION_REPOSITORY_KEY,
+} from '@common/application/repository/transaction.repository';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { ISuccessfulOperationResponse } from '@common/base/application/interface/successful-operation-response.interface';
 
@@ -14,12 +24,15 @@ import { AuthenticationResponseAdapter } from '@iam/authentication/application/a
 import { IConfirmPasswordDto } from '@iam/authentication/application/dto/confirm-password.dto.interface';
 import { IConfirmUserDto } from '@iam/authentication/application/dto/confirm-user.dto.interface';
 import { IForgotPasswordDto } from '@iam/authentication/application/dto/forgot-password.dto.interface';
+import { JWTPayloadDto } from '@iam/authentication/application/dto/jwt-payload.dto';
 import { IRefreshSessionResponse } from '@iam/authentication/application/dto/refresh-session-response.interface';
 import { IRefreshSessionDto } from '@iam/authentication/application/dto/refresh-session.dto.interface';
 import { IResendConfirmationCodeDto } from '@iam/authentication/application/dto/resend-confirmation-code.dto.interface';
 import { ISignInResponse } from '@iam/authentication/application/dto/sign-in-response.interface';
+import { SignInWithTransactionDto } from '@iam/authentication/application/dto/sign-in-with-transaction.dto';
 import { ISignInDto } from '@iam/authentication/application/dto/sign-in.dto.interface';
 import { ISignUpDto } from '@iam/authentication/application/dto/sign-up.dto.interface';
+import { TransactionChallengeResponseDto } from '@iam/authentication/application/dto/transaction-challenge-response.dto';
 import {
   USER_ALREADY_CONFIRMED_ERROR,
   USER_ALREADY_SIGNED_UP_ERROR,
@@ -53,6 +66,9 @@ export class AuthenticationService {
     private readonly adminRepository: IAdminRepository,
     private readonly adminMapper: AdminMapper,
     private readonly authenticationResponseAdapter: AuthenticationResponseAdapter,
+    @Inject(TRANSACTION_REPOSITORY_KEY)
+    private readonly transactionRepository: ITransactionRepository,
+    private readonly jwtService: JwtService,
   ) {}
 
   async handleSignUp(
@@ -151,22 +167,31 @@ export class AuthenticationService {
     );
   }
 
-  async handleSignIn(
-    signInDto: ISignInDto,
-  ): Promise<OneSerializedResponseDto<ISignInResponse>> {
-    const { username, password } = signInDto;
-    const existingUser =
-      await this.userRepository.getOneByUsernameOrFail(username);
+  async handleSignIn(signInWithTransaction: SignInWithTransactionDto) {
+    try {
+      const { transactionSigned, publicKey, nonce } = signInWithTransaction;
 
-    const response = await this.identityProviderService.signIn(
-      existingUser.username,
-      password,
-    );
+      await this.transactionRepository.verifySignature(
+        publicKey,
+        transactionSigned,
+        nonce,
+      );
 
-    return this.authenticationResponseAdapter.oneEntityResponseAuth<ISignInResponse>(
-      AUTHENTICATION_NAME,
-      response,
-    );
+      return this.signJwt({
+        publicKey,
+        transactionSigned,
+        nonce,
+      });
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  private signJwt(payload: JWTPayloadDto) {
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    return { accessToken, refreshToken };
   }
 
   async handleAdminSignIn(
@@ -385,5 +410,17 @@ export class AuthenticationService {
       AUTHENTICATION_NAME,
       response,
     );
+  }
+
+  async getTransactionChallenge(
+    publicKey: string,
+  ): Promise<TransactionChallengeResponseDto> {
+    try {
+      return await this.transactionRepository.getTransactionChallenge(
+        publicKey,
+      );
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }
