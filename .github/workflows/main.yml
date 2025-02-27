@@ -25,6 +25,9 @@ jobs:
       COGNITO_ENDPOINT: http://localhost:9229 # Mocked, can be any value that complies with the amazon-cognito-identity-js library
       BASE_APP_URL: http://localhost:9229/api/v1 # Mocked, can be any value but it must contain /api/v1
       AUTH_ALLOWED_EMAIL_DOMAINS: ${{ secrets.AUTH_ALLOWED_EMAIL_DOMAINS }}
+      STELLAR_SERVER_URL: test_url
+      STELLAR_NETWORK_PASSPHRASE: test_passphrase
+      JWT_SECRET: secret
 
     strategy:
       matrix:
