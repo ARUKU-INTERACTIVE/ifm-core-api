@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 
+import { CommonModule } from '@common/common.module';
+
 import { environmentConfig } from '@config/environment.config';
 import { datasourceOptions } from '@config/orm.config';
 
@@ -40,6 +42,7 @@ import { PaymentModule } from '@/module/payment/payment.module';
     GenreModule,
     DiscoveryModule,
     PaymentModule,
+    CommonModule,
   ],
   providers: [AppService, ResponseSerializerService],
   exports: [AppService, ResponseSerializerService],
