@@ -281,7 +281,7 @@ describe('Authentication Module', () => {
       });
     });
     describe('POST - /auth/sign-in', () => {
-      it('Should allow users to sign in when provided a correct username and password', async () => {
+      it('Should allow users to sign in with transaction data', async () => {
         const signInDto: SignInWithTransactionDto = {
           publicKey: 'publicKey',
           transactionSigned: 'transactionSigned',
