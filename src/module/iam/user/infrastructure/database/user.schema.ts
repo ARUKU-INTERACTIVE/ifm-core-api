@@ -12,6 +12,7 @@ export const UserSchema = new EntitySchema<User>({
     username: {
       type: String,
       unique: true,
+      nullable: true,
     },
     externalId: {
       type: String,
@@ -20,10 +21,15 @@ export const UserSchema = new EntitySchema<User>({
     },
     roles: {
       type: 'simple-array',
+      nullable: true,
     },
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    publicKey: {
+      type: String,
+      unique: true,
     },
   }),
 });
