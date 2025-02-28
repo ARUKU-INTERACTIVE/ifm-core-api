@@ -9,8 +9,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { CommonModule } from '@common/common.module';
-
 import { AdminModule } from '@iam/admin/admin.module';
 import { AuthenticationResponseAdapter } from '@iam/authentication/application/adapter/authentication-response.adapter';
 import { AuthenticationService } from '@iam/authentication/application/service/authentication.service';
@@ -22,6 +20,7 @@ import { JwtStrategy } from '@iam/authentication/infrastructure/passport/jwt.str
 import { AuthenticationController } from '@iam/authentication/interface/authentication.controller';
 import { UserModule } from '@iam/user/user.module';
 
+import { StellarModule } from '../../stellar/stellar.module';
 import { EmailDomainMiddleware } from './infrastructure/middleware/email-domain.middleware';
 
 const authenticationRepositoryProvider: Provider = {
@@ -34,7 +33,7 @@ const authenticationRepositoryProvider: Provider = {
     PassportModule,
     UserModule,
     AdminModule,
-    CommonModule,
+    StellarModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
