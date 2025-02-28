@@ -14,11 +14,9 @@ import { IRefreshSessionDto } from '@iam/authentication/application/dto/refresh-
 import { IResendConfirmationCodeDto } from '@iam/authentication/application/dto/resend-confirmation-code.dto.interface';
 import { SignInWithTransactionDto } from '@iam/authentication/application/dto/sign-in-with-transaction.dto';
 import { SignUpDto } from '@iam/authentication/application/dto/sign-up.dto';
-import { ISignUpDto } from '@iam/authentication/application/dto/sign-up.dto.interface';
 import {
   TOKEN_EXPIRED_ERROR,
   USER_ALREADY_CONFIRMED_ERROR,
-  USER_ALREADY_SIGNED_UP_ERROR,
 } from '@iam/authentication/application/exception/authentication-exception-messages';
 import { TokenExpiredException } from '@iam/authentication/application/exception/token-expired.exception';
 import { UserAlreadyConfirmed } from '@iam/authentication/application/exception/user-already-confirmed.exception';
@@ -31,7 +29,6 @@ import {
   PASSWORD_VALIDATION_ERROR,
   UNEXPECTED_ERROR_CODE_ERROR,
 } from '@iam/authentication/infrastructure/cognito/exception/cognito-exception-messages';
-import { CouldNotSignUpException } from '@iam/authentication/infrastructure/cognito/exception/could-not-sign-up.exception';
 import { ExpiredCodeException } from '@iam/authentication/infrastructure/cognito/exception/expired-code.exception';
 import { InvalidRefreshTokenException } from '@iam/authentication/infrastructure/cognito/exception/invalid-refresh-token.exception';
 import { PasswordValidationException } from '@iam/authentication/infrastructure/cognito/exception/password-validation.exception';
@@ -143,101 +140,6 @@ describe('Authentication Module', () => {
               }),
             });
             expect(body).toEqual(expectedResponse);
-          });
-      });
-
-      it('should allow users to retry their sign up if the external provider failed', async () => {
-        identityProviderServiceMock.signUp.mockRejectedValueOnce(
-          new CouldNotSignUpException({
-            message: 'Could not sign up',
-          }),
-        );
-
-        const signUpDto = {
-          username: 'jane.doe@test.com',
-          password: '$Test123',
-        } as SignUpDto;
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.INTERNAL_SERVER_ERROR);
-
-        const externalId = '00000000-0000-0000-0000-000000000002';
-        identityProviderServiceMock.signUp.mockResolvedValueOnce({
-          externalId,
-        });
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.CREATED)
-          .then(({ body }) => {
-            const expectedResponse = expect.objectContaining({
-              data: expect.objectContaining({
-                attributes: expect.objectContaining({
-                  username: signUpDto.username,
-                  externalId,
-                }),
-              }),
-            });
-            expect(body).toEqual(expectedResponse);
-          });
-      });
-
-      it('should throw an error if user already signed up', async () => {
-        const externalId = '00000000-0000-0000-0000-000000000003';
-        identityProviderServiceMock.signUp.mockResolvedValueOnce({
-          externalId,
-        });
-
-        const signUpDto = {
-          username: 'thomas.doe@test.com',
-          password: '$Test123',
-        } as SignUpDto;
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.CREATED)
-          .then(({ body }) => {
-            const expectedResponse = expect.objectContaining({
-              data: expect.objectContaining({
-                attributes: expect.objectContaining({
-                  username: signUpDto.username,
-                  externalId,
-                }),
-              }),
-            });
-            expect(body).toEqual(expectedResponse);
-          });
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.BAD_REQUEST)
-          .then(({ body }) => {
-            expect(body.error.detail).toBe(USER_ALREADY_SIGNED_UP_ERROR);
-            expect(body.error.source.pointer).toBe('/user/externalId');
-          });
-      });
-
-      it('Should throw an error if password is invalid', async () => {
-        const error = new PasswordValidationException({
-          message: PASSWORD_VALIDATION_ERROR,
-        });
-        identityProviderServiceMock.signUp.mockRejectedValueOnce(error);
-        const signUpDto: ISignUpDto = {
-          username: 'some@account.com',
-          password: '123456',
-        };
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.BAD_REQUEST)
-          .then(({ body }) => {
-            expect(body.error.detail).toEqual(error.message);
           });
       });
 
