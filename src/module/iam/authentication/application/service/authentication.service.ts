@@ -112,7 +112,9 @@ export class AuthenticationService {
 
     if (!userToSaveId) {
       userToSaveId = (
-        await this.userRepository.saveOne(new User(username, [AppRole.Regular]))
+        await this.userRepository.saveOne(
+          new User('', username, [AppRole.Regular]),
+        )
       ).id;
     }
 
@@ -140,7 +142,9 @@ export class AuthenticationService {
 
     if (!userToSaveId) {
       userToSaveId = (
-        await this.adminRepository.saveOne(new User(username, [AppRole.Admin]))
+        await this.adminRepository.saveOne(
+          new User('', username, [AppRole.Admin]),
+        )
       ).id;
     }
 
@@ -159,6 +163,14 @@ export class AuthenticationService {
     );
   }
 
+  private async validateUser(publicKey: string): Promise<void> {
+    const existingUser = await this.userRepository.getOneByPublicKey(publicKey);
+
+    if (!existingUser) {
+      await this.userRepository.saveOne(new User(publicKey));
+    }
+  }
+
   async handleSignIn(
     signInWithTransaction: SignInWithTransactionDto,
   ): Promise<OneSerializedResponseDto<ISignInResponse>> {
@@ -169,6 +181,8 @@ export class AuthenticationService {
       transactionSigned,
       nonce,
     );
+
+    await this.validateUser(publicKey);
 
     const tokensResponse = this.signJwt({
       publicKey,
