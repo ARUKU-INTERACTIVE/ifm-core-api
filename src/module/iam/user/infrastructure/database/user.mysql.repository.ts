@@ -63,6 +63,12 @@ export class UserMysqlRepository implements IUserRepository {
     return user;
   }
 
+  async getOneByPublicKey(publicKey: string): Promise<User> {
+    return this.repository.findOne({
+      where: { publicKey },
+    });
+  }
+
   async saveOne(user: User): Promise<User> {
     return this.repository.save(user);
   }
