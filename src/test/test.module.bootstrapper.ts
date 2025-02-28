@@ -2,16 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
 import {
-  ITransactionRepository,
-  TRANSACTION_REPOSITORY_KEY,
-} from '@common/application/repository/transaction.repository';
-
-import {
   IDENTITY_PROVIDER_SERVICE_KEY,
   IIdentityProviderService,
 } from '@iam/authentication/application/service/identity-provider.service.interface';
 
 import { AppModule } from '@/module/app/app.module';
+
+import { StellarService } from '../module/stellar/application/service/stellar.service';
 
 export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderService> =
   {
@@ -24,11 +21,10 @@ export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderSer
     refreshSession: jest.fn(),
   };
 
-export const transactionRepositoryMock: jest.MockedObject<ITransactionRepository> =
-  {
-    getTransactionChallenge: jest.fn(),
-    verifySignature: jest.fn(),
-  };
+export const stellarServiceMock = {
+  getTransactionChallenge: jest.fn(),
+  verifySignature: jest.fn(),
+};
 
 export const testModuleBootstrapper = (): Promise<TestingModule> => {
   initializeTransactionalContext();
@@ -38,7 +34,7 @@ export const testModuleBootstrapper = (): Promise<TestingModule> => {
   })
     .overrideProvider(IDENTITY_PROVIDER_SERVICE_KEY)
     .useValue(identityProviderServiceMock)
-    .overrideProvider(TRANSACTION_REPOSITORY_KEY)
-    .useValue(transactionRepositoryMock)
+    .overrideProvider(StellarService)
+    .useValue(stellarServiceMock)
     .compile();
 };

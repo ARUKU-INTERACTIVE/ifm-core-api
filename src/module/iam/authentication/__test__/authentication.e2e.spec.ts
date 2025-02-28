@@ -3,8 +3,6 @@ import request from 'supertest';
 
 import { loadFixtures } from '@data/util/fixture-loader';
 
-import { STELLAR_ERROR } from '@common/application/exceptions/stellar.error';
-
 import { setupApp } from '@config/app.config';
 import { datasourceOptions } from '@config/orm.config';
 
@@ -42,10 +40,15 @@ import { UsernameNotFoundException } from '@iam/user/infrastructure/database/exc
 
 import {
   identityProviderServiceMock,
+  stellarServiceMock,
   testModuleBootstrapper,
-  transactionRepositoryMock,
 } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
+
+import { IncorrectNonceException } from '../../../stellar/application/exceptions/incorrect-nonce.exception';
+import { IncorrectSignException } from '../../../stellar/application/exceptions/incorrect-sign.exception';
+import { InvalidPublicKeyException } from '../../../stellar/application/exceptions/invalid-public-key.exception';
+import { STELLAR_ERROR } from '../../../stellar/application/exceptions/stellar.error';
 
 describe('Authentication Module', () => {
   let app: INestApplication;
@@ -288,7 +291,7 @@ describe('Authentication Module', () => {
           nonce: 'nonce',
         };
 
-        transactionRepositoryMock.verifySignature.mockResolvedValueOnce({});
+        stellarServiceMock.verifySignature.mockResolvedValueOnce({});
 
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
@@ -296,8 +299,16 @@ describe('Authentication Module', () => {
           .expect(HttpStatus.OK)
           .then(({ body }) => {
             const expectedResponse = expect.objectContaining({
-              accessToken: expect.any(String),
-              refreshToken: expect.any(String),
+              data: expect.objectContaining({
+                type: AUTHENTICATION_NAME,
+                attributes: expect.objectContaining({
+                  accessToken: expect.any(String),
+                  refreshToken: expect.any(String),
+                }),
+              }),
+              links: expect.objectContaining({
+                self: expect.any(String),
+              }),
             });
             expect(body).toEqual(expectedResponse);
           });
@@ -310,8 +321,10 @@ describe('Authentication Module', () => {
           nonce: 'invalidNonce',
         };
 
-        transactionRepositoryMock.verifySignature.mockRejectedValueOnce(
-          new Error(STELLAR_ERROR.INCORRECT_NONCE),
+        stellarServiceMock.verifySignature.mockRejectedValueOnce(
+          new IncorrectNonceException({
+            message: STELLAR_ERROR.INCORRECT_NONCE,
+          }),
         );
 
         await request(app.getHttpServer())
@@ -330,8 +343,8 @@ describe('Authentication Module', () => {
           nonce: 'nonce',
         };
 
-        transactionRepositoryMock.verifySignature.mockRejectedValueOnce(
-          new Error(STELLAR_ERROR.INCORRECT_SIGN),
+        stellarServiceMock.verifySignature.mockRejectedValueOnce(
+          new IncorrectSignException({ message: STELLAR_ERROR.INCORRECT_SIGN }),
         );
 
         await request(app.getHttpServer())
@@ -783,20 +796,26 @@ describe('Authentication Module', () => {
       it('Should return a transaction challenge', async () => {
         const queryParam = '?publicKey=publicKey';
 
-        transactionRepositoryMock.getTransactionChallenge.mockResolvedValueOnce(
-          {
-            transactionXDR: 'transactionXDR',
-            nonce: 'nonce',
-          },
-        );
+        stellarServiceMock.getTransactionChallenge.mockResolvedValueOnce({
+          transactionXDR: 'transactionXDR',
+          nonce: 'nonce',
+        });
 
         return request(app.getHttpServer())
           .get(`/api/v1/auth/challenge${queryParam}`)
           .expect(HttpStatus.OK)
           .then(({ body }) => {
             const expectedResponse = expect.objectContaining({
-              transactionXDR: expect.any(String),
-              nonce: expect.any(String),
+              data: expect.objectContaining({
+                type: AUTHENTICATION_NAME,
+                attributes: expect.objectContaining({
+                  transactionXdr: expect.any(String),
+                  nonce: expect.any(String),
+                }),
+              }),
+              links: expect.objectContaining({
+                self: expect.any(String),
+              }),
             });
             expect(body).toEqual(expectedResponse);
           });
@@ -805,8 +824,10 @@ describe('Authentication Module', () => {
       it('Should throw an error if the public key is invalid', async () => {
         const queryParam = '?publicKey=invalidPublicKey';
 
-        transactionRepositoryMock.getTransactionChallenge.mockRejectedValueOnce(
-          new Error(STELLAR_ERROR.INVALID_PUBLIC_KEY),
+        stellarServiceMock.getTransactionChallenge.mockRejectedValueOnce(
+          new InvalidPublicKeyException({
+            message: STELLAR_ERROR.INVALID_PUBLIC_KEY,
+          }),
         );
 
         return request(app.getHttpServer())
