@@ -1,15 +1,6 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import {
-  ITransactionRepository,
-  TRANSACTION_REPOSITORY_KEY,
-} from '@common/application/repository/transaction.repository';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { ISuccessfulOperationResponse } from '@common/base/application/interface/successful-operation-response.interface';
 
@@ -54,6 +45,8 @@ import {
 import { User } from '@iam/user/domain/user.entity';
 import { USER_ENTITY_NAME } from '@iam/user/domain/user.name';
 
+import { StellarService } from '../../../../stellar/application/service/stellar.service';
+
 @Injectable()
 export class AuthenticationService {
   constructor(
@@ -66,8 +59,7 @@ export class AuthenticationService {
     private readonly adminRepository: IAdminRepository,
     private readonly adminMapper: AdminMapper,
     private readonly authenticationResponseAdapter: AuthenticationResponseAdapter,
-    @Inject(TRANSACTION_REPOSITORY_KEY)
-    private readonly transactionRepository: ITransactionRepository,
+    private readonly stellarService: StellarService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -167,24 +159,27 @@ export class AuthenticationService {
     );
   }
 
-  async handleSignIn(signInWithTransaction: SignInWithTransactionDto) {
-    try {
-      const { transactionSigned, publicKey, nonce } = signInWithTransaction;
+  async handleSignIn(
+    signInWithTransaction: SignInWithTransactionDto,
+  ): Promise<OneSerializedResponseDto<ISignInResponse>> {
+    const { transactionSigned, publicKey, nonce } = signInWithTransaction;
 
-      await this.transactionRepository.verifySignature(
-        publicKey,
-        transactionSigned,
-        nonce,
-      );
+    await this.stellarService.verifySignature(
+      publicKey,
+      transactionSigned,
+      nonce,
+    );
 
-      return this.signJwt({
-        publicKey,
-        transactionSigned,
-        nonce,
-      });
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    const tokensResponse = this.signJwt({
+      publicKey,
+      transactionSigned,
+      nonce,
+    });
+
+    return this.authenticationResponseAdapter.oneEntityResponseAuth<ISignInResponse>(
+      AUTHENTICATION_NAME,
+      tokensResponse,
+    );
   }
 
   private signJwt(payload: JWTPayloadDto) {
@@ -414,13 +409,13 @@ export class AuthenticationService {
 
   async getTransactionChallenge(
     publicKey: string,
-  ): Promise<TransactionChallengeResponseDto> {
-    try {
-      return await this.transactionRepository.getTransactionChallenge(
-        publicKey,
-      );
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+  ): Promise<OneSerializedResponseDto<TransactionChallengeResponseDto>> {
+    const transactionChallenge =
+      await this.stellarService.getTransactionChallenge(publicKey);
+
+    return this.authenticationResponseAdapter.oneEntityResponseAuth<TransactionChallengeResponseDto>(
+      AUTHENTICATION_NAME,
+      transactionChallenge,
+    );
   }
 }

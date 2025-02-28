@@ -22,6 +22,7 @@ import { ISignInResponse } from '@iam/authentication/application/dto/sign-in-res
 import { SignInWithTransactionDto } from '@iam/authentication/application/dto/sign-in-with-transaction.dto';
 import { SignInDto } from '@iam/authentication/application/dto/sign-in.dto';
 import { SignUpDto } from '@iam/authentication/application/dto/sign-up.dto';
+import { TransactionChallengeResponseDto } from '@iam/authentication/application/dto/transaction-challenge-response.dto';
 import { AuthenticationService } from '@iam/authentication/application/service/authentication.service';
 import { AuthType } from '@iam/authentication/domain/auth-type.enum';
 import { Auth } from '@iam/authentication/infrastructure/decorator/auth.decorator';
@@ -51,7 +52,7 @@ export class AuthenticationController {
   @HttpCode(HttpStatus.OK)
   async handleSignIn(
     @Body() signInWithTransactionDto: SignInWithTransactionDto,
-  ) {
+  ): Promise<OneSerializedResponseDto<ISignInResponse>> {
     return this.authenticationService.handleSignIn(signInWithTransactionDto);
   }
 
@@ -154,7 +155,9 @@ export class AuthenticationController {
   }
 
   @Get('/challenge')
-  async getTransactionChallenge(@Query('publicKey') publicKey: string) {
+  async getTransactionChallenge(
+    @Query('publicKey') publicKey: string,
+  ): Promise<OneSerializedResponseDto<TransactionChallengeResponseDto>> {
     return this.authenticationService.getTransactionChallenge(publicKey);
   }
 }
