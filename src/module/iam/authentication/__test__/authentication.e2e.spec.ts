@@ -42,7 +42,7 @@ import {
 } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
 
-import { IncorrectNonceException } from '../../../stellar/application/exceptions/incorrect-nonce.exception';
+import { IncorrectMemoException } from '../../../stellar/application/exceptions/incorrect-memo.exception';
 import { IncorrectSignException } from '../../../stellar/application/exceptions/incorrect-sign.exception';
 import { InvalidPublicKeyException } from '../../../stellar/application/exceptions/invalid-public-key.exception';
 import { STELLAR_ERROR } from '../../../stellar/application/exceptions/stellar.error';
@@ -190,7 +190,7 @@ describe('Authentication Module', () => {
         const signInDto: SignInWithTransactionDto = {
           publicKey: 'publicKey',
           transactionSigned: 'transactionSigned',
-          nonce: 'nonce',
+          memo: 'memo',
         };
 
         stellarServiceMock.verifySignature.mockResolvedValueOnce({});
@@ -216,16 +216,16 @@ describe('Authentication Module', () => {
           });
       });
 
-      it('Should throw an error if the nonce is invalid', async () => {
+      it('Should throw an error if the memo is invalid', async () => {
         const signInDto: SignInWithTransactionDto = {
           publicKey: 'publicKey',
           transactionSigned: 'transactionSigned',
-          nonce: 'invalidNonce',
+          memo: 'invalidMemo',
         };
 
         stellarServiceMock.verifySignature.mockRejectedValueOnce(
-          new IncorrectNonceException({
-            message: STELLAR_ERROR.INCORRECT_NONCE,
+          new IncorrectMemoException({
+            message: STELLAR_ERROR.INCORRECT_MEMO,
           }),
         );
 
@@ -234,7 +234,7 @@ describe('Authentication Module', () => {
           .send(signInDto)
           .expect(HttpStatus.BAD_REQUEST)
           .then(({ body }) => {
-            expect(body.error.detail).toBe(STELLAR_ERROR.INCORRECT_NONCE);
+            expect(body.error.detail).toBe(STELLAR_ERROR.INCORRECT_MEMO);
           });
       });
 
@@ -242,7 +242,7 @@ describe('Authentication Module', () => {
         const signInDto: SignInWithTransactionDto = {
           publicKey: 'publicKey',
           transactionSigned: 'invalidTransactionSigned',
-          nonce: 'nonce',
+          memo: 'memo',
         };
 
         stellarServiceMock.verifySignature.mockRejectedValueOnce(
@@ -700,7 +700,7 @@ describe('Authentication Module', () => {
 
         stellarServiceMock.getTransactionChallenge.mockResolvedValueOnce({
           transactionXDR: 'transactionXDR',
-          nonce: 'nonce',
+          memo: 'memo',
         });
 
         return request(app.getHttpServer())
@@ -712,7 +712,7 @@ describe('Authentication Module', () => {
                 type: AUTHENTICATION_NAME,
                 attributes: expect.objectContaining({
                   transactionXdr: expect.any(String),
-                  nonce: expect.any(String),
+                  memo: expect.any(String),
                 }),
               }),
               links: expect.objectContaining({

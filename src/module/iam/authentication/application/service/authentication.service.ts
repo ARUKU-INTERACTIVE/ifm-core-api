@@ -174,12 +174,12 @@ export class AuthenticationService {
   async handleSignIn(
     signInWithTransaction: SignInWithTransactionDto,
   ): Promise<OneSerializedResponseDto<ISignInResponse>> {
-    const { transactionSigned, publicKey, nonce } = signInWithTransaction;
+    const { transactionSigned, publicKey, memo } = signInWithTransaction;
 
     await this.stellarService.verifySignature(
       publicKey,
       transactionSigned,
-      nonce,
+      memo,
     );
 
     await this.validateUser(publicKey);
@@ -187,7 +187,7 @@ export class AuthenticationService {
     const tokensResponse = this.signJwt({
       publicKey,
       transactionSigned,
-      nonce,
+      memo,
     });
 
     return this.authenticationResponseAdapter.oneEntityResponseAuth<ISignInResponse>(

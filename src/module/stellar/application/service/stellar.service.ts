@@ -14,7 +14,7 @@ import {
 
 import { TransactionChallengeResponseDto } from '@iam/authentication/application/dto/transaction-challenge-response.dto';
 
-import { IncorrectNonceException } from '../exceptions/incorrect-nonce.exception';
+import { IncorrectMemoException } from '../exceptions/incorrect-memo.exception';
 import { IncorrectSignException } from '../exceptions/incorrect-sign.exception';
 import { InvalidPublicKeyException } from '../exceptions/invalid-public-key.exception';
 import { STELLAR_ERROR } from '../exceptions/stellar.error';
@@ -43,35 +43,35 @@ export class StellarService {
     }
 
     const account = await this.server.loadAccount(publicKey);
-    const nonce = Math.random().toString(36).substring(2);
+    const memo = Math.random().toString(36).substring(2);
 
     const transaction = new TransactionBuilder(account, {
       fee: BASE_FEE,
       networkPassphrase: this.networkPassphrase,
     })
-      .addMemo(Memo.text(nonce))
+      .addMemo(Memo.text(memo))
       .setTimeout(30)
       .build();
 
     return {
       transactionXDR: transaction.toXDR(),
-      nonce,
+      memo,
     };
   }
 
   async verifySignature(
     publicKey: string,
     signedXDR: string,
-    nonce: string,
+    memo: string,
   ): Promise<boolean> {
     const transaction = TransactionBuilder.fromXDR(
       signedXDR,
       this.networkPassphrase,
     ) as Transaction<Memo<MemoType>, Operation[]>;
 
-    if (!transaction.memo || transaction.memo.value.toString() !== nonce) {
-      throw new IncorrectNonceException({
-        message: STELLAR_ERROR.INCORRECT_NONCE,
+    if (!transaction.memo || transaction.memo.value.toString() !== memo) {
+      throw new IncorrectMemoException({
+        message: STELLAR_ERROR.INCORRECT_MEMO,
       });
     }
 

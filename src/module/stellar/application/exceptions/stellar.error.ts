@@ -1,5 +1,5 @@
 export enum STELLAR_ERROR {
   INVALID_PUBLIC_KEY = 'Invalid public key',
-  INCORRECT_NONCE = 'Incorrect nonce',
+  INCORRECT_MEMO = 'Incorrect memo',
   INCORRECT_SIGN = 'Incorrect sign',
 }

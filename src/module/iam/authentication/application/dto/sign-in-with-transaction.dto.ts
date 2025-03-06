@@ -11,5 +11,5 @@ export class SignInWithTransactionDto {
 
   @IsString()
   @IsNotEmpty()
-  nonce: string;
+  memo: string;
 }
