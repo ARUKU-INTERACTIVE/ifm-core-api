@@ -158,6 +158,6 @@ export class AuthenticationController {
   async getTransactionChallenge(
     @Query('publicKey') publicKey: string,
   ): Promise<OneSerializedResponseDto<TransactionChallengeResponseDto>> {
-    return this.authenticationService.getTransactionChallenge(publicKey);
+    return await this.authenticationService.getTransactionChallenge(publicKey);
   }
 }
