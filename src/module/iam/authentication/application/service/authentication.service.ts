@@ -184,7 +184,7 @@ export class AuthenticationService {
 
     await this.validateUser(publicKey);
 
-    const tokensResponse = this.signJwt({
+    const tokenResponse = this.signJwt({
       publicKey,
       transactionSigned,
       memo,
@@ -192,7 +192,7 @@ export class AuthenticationService {
 
     return this.authenticationResponseAdapter.oneEntityResponseAuth<ISignInResponse>(
       AUTHENTICATION_NAME,
-      tokensResponse,
+      tokenResponse,
     );
   }
 
