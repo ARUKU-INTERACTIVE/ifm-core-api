@@ -59,11 +59,7 @@ export class StellarService {
     };
   }
 
-  async verifySignature(
-    publicKey: string,
-    signedXDR: string,
-    memo: string,
-  ): Promise<boolean> {
+  verifySignature(publicKey: string, signedXDR: string, memo: string): boolean {
     const transaction = TransactionBuilder.fromXDR(
       signedXDR,
       this.networkPassphrase,

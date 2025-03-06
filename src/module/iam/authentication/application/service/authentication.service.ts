@@ -176,11 +176,7 @@ export class AuthenticationService {
   ): Promise<OneSerializedResponseDto<ISignInResponse>> {
     const { transactionSigned, publicKey, memo } = signInWithTransaction;
 
-    await this.stellarService.verifySignature(
-      publicKey,
-      transactionSigned,
-      memo,
-    );
+    this.stellarService.verifySignature(publicKey, transactionSigned, memo);
 
     await this.validateUser(publicKey);
 
