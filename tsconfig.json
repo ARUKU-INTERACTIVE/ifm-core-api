@@ -26,6 +26,7 @@
       "@book/*": ["src/module/book/*"],
       "@genre/*": ["src/module/genre/*"],
       "@iam/*": ["src/module/iam/*"],
+      "@/stellar/*": ["src/module/stellar/*"],
       "@test/*": ["src/test/*"],
       "@module/*": ["src/module/*"],
       "@/*": ["src/*"],

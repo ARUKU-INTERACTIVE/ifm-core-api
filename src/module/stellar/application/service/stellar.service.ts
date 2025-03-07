@@ -14,10 +14,10 @@ import {
 
 import { TransactionChallengeResponseDto } from '@iam/authentication/application/dto/transaction-challenge-response.dto';
 
-import { IncorrectMemoException } from '../exceptions/incorrect-memo.exception';
-import { IncorrectSignException } from '../exceptions/incorrect-sign.exception';
-import { InvalidPublicKeyException } from '../exceptions/invalid-public-key.exception';
-import { STELLAR_ERROR } from '../exceptions/stellar.error';
+import { IncorrectMemoException } from '@/stellar/application/exceptions/incorrect-memo.exception';
+import { IncorrectSignException } from '@/stellar/application/exceptions/incorrect-sign.exception';
+import { InvalidPublicKeyException } from '@/stellar/application/exceptions/invalid-public-key.exception';
+import { STELLAR_ERROR } from '@/stellar/application/exceptions/stellar.error';
 
 @Injectable()
 export class StellarService {

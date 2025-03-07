@@ -20,7 +20,7 @@ module.exports = {
     },
   },
   coveragePathIgnorePatterns: [
-    "<rootDir>/module/iam/authentication/infrastructure/cognito/cognito.service.ts"
+    '<rootDir>/module/iam/authentication/infrastructure/cognito/cognito.service.ts',
   ],
   testEnvironment: 'node',
   // Keep these mappings synchronized with the ones in tsconfig.json as you add new modules
@@ -31,6 +31,7 @@ module.exports = {
     '^@book/(.*)$': '<rootDir>/module/book/$1',
     '^@genre/(.*)$': '<rootDir>/module/genre/$1',
     '^@iam/(.*)$': '<rootDir>/module/iam/$1',
+    '^@/stellar/(.*)$': '<rootDir>/module/stellar/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
     '^@/(.*)$': '<rootDir>/../src/$1',
     '^@root/(.*)$': '<rootDir>/../$1',

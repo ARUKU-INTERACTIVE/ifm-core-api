@@ -7,8 +7,7 @@ import {
 } from '@iam/authentication/application/service/identity-provider.service.interface';
 
 import { AppModule } from '@/module/app/app.module';
-
-import { StellarService } from '../module/stellar/application/service/stellar.service';
+import { StellarService } from '@/stellar/application/service/stellar.service';
 
 export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderService> =
   {
