@@ -2,16 +2,15 @@ version: '3'
 
 services:
   db:
-    image: mysql:8.0
-    cap_add:
-      - SYS_NICE
-    environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
+    image: postgres:14-alpine
     ports:
-      - '${DB_PORT}:3306'
+      - '${DB_PORT}:5432'
     volumes:
-      - ./data/docker/volumes/mysql/:/var/lib/mysql
+      - ./data/docker/volumes/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
 
   cognito:
     image: jagregory/cognito-local
