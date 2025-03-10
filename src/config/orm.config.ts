@@ -7,33 +7,36 @@ import { ENVIRONMENT } from '@config/environment.enum';
 dotenv.config();
 
 const production: DataSourceOptions = {
-  type: 'mysql',
+  type: 'postgres',
   host: process.env.DB_HOST,
   port: +process.env.DB_PORT,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
+  schema: process.env.DB_SCHEMA,
   database: process.env.DB_NAME,
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
 };
 
 const staging: DataSourceOptions = {
-  type: 'mysql',
+  type: 'postgres',
   host: process.env.DB_HOST,
   port: +process.env.DB_PORT,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
+  schema: process.env.DB_SCHEMA,
   database: process.env.DB_NAME,
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
 };
 
 const development: DataSourceOptions = {
-  type: 'mysql',
+  type: 'postgres',
   host: process.env.DB_HOST,
   port: +process.env.DB_PORT,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
+  schema: process.env.DB_SCHEMA,
   database: process.env.DB_NAME,
   synchronize: true,
   namingStrategy: new SnakeNamingStrategy(),
