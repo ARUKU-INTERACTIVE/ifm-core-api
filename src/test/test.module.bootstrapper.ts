@@ -7,6 +7,7 @@ import {
 } from '@iam/authentication/application/service/identity-provider.service.interface';
 
 import { AppModule } from '@/module/app/app.module';
+import { StellarService } from '@/stellar/application/service/stellar.service';
 
 export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderService> =
   {
@@ -19,6 +20,11 @@ export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderSer
     refreshSession: jest.fn(),
   };
 
+export const stellarServiceMock = {
+  getTransactionChallenge: jest.fn(),
+  verifySignature: jest.fn(),
+};
+
 export const testModuleBootstrapper = (): Promise<TestingModule> => {
   initializeTransactionalContext();
 
@@ -27,5 +33,7 @@ export const testModuleBootstrapper = (): Promise<TestingModule> => {
   })
     .overrideProvider(IDENTITY_PROVIDER_SERVICE_KEY)
     .useValue(identityProviderServiceMock)
+    .overrideProvider(StellarService)
+    .useValue(stellarServiceMock)
     .compile();
 };

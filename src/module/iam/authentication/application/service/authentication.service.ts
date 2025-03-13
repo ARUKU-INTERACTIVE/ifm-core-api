@@ -1,4 +1,5 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { ISuccessfulOperationResponse } from '@common/base/application/interface/successful-operation-response.interface';
@@ -14,12 +15,15 @@ import { AuthenticationResponseAdapter } from '@iam/authentication/application/a
 import { IConfirmPasswordDto } from '@iam/authentication/application/dto/confirm-password.dto.interface';
 import { IConfirmUserDto } from '@iam/authentication/application/dto/confirm-user.dto.interface';
 import { IForgotPasswordDto } from '@iam/authentication/application/dto/forgot-password.dto.interface';
+import { JWTPayloadDto } from '@iam/authentication/application/dto/jwt-payload.dto';
 import { IRefreshSessionResponse } from '@iam/authentication/application/dto/refresh-session-response.interface';
 import { IRefreshSessionDto } from '@iam/authentication/application/dto/refresh-session.dto.interface';
 import { IResendConfirmationCodeDto } from '@iam/authentication/application/dto/resend-confirmation-code.dto.interface';
 import { ISignInResponse } from '@iam/authentication/application/dto/sign-in-response.interface';
+import { SignInWithTransactionDto } from '@iam/authentication/application/dto/sign-in-with-transaction.dto';
 import { ISignInDto } from '@iam/authentication/application/dto/sign-in.dto.interface';
 import { ISignUpDto } from '@iam/authentication/application/dto/sign-up.dto.interface';
+import { TransactionChallengeResponseDto } from '@iam/authentication/application/dto/transaction-challenge-response.dto';
 import {
   USER_ALREADY_CONFIRMED_ERROR,
   USER_ALREADY_SIGNED_UP_ERROR,
@@ -41,6 +45,8 @@ import {
 import { User } from '@iam/user/domain/user.entity';
 import { USER_ENTITY_NAME } from '@iam/user/domain/user.name';
 
+import { StellarService } from '../../../../stellar/application/service/stellar.service';
+
 @Injectable()
 export class AuthenticationService {
   constructor(
@@ -53,6 +59,8 @@ export class AuthenticationService {
     private readonly adminRepository: IAdminRepository,
     private readonly adminMapper: AdminMapper,
     private readonly authenticationResponseAdapter: AuthenticationResponseAdapter,
+    private readonly stellarService: StellarService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async handleSignUp(
@@ -104,7 +112,9 @@ export class AuthenticationService {
 
     if (!userToSaveId) {
       userToSaveId = (
-        await this.userRepository.saveOne(new User(username, [AppRole.Regular]))
+        await this.userRepository.saveOne(
+          new User('', username, [AppRole.Regular]),
+        )
       ).id;
     }
 
@@ -132,7 +142,9 @@ export class AuthenticationService {
 
     if (!userToSaveId) {
       userToSaveId = (
-        await this.adminRepository.saveOne(new User(username, [AppRole.Admin]))
+        await this.adminRepository.saveOne(
+          new User('', username, [AppRole.Admin]),
+        )
       ).id;
     }
 
@@ -151,22 +163,40 @@ export class AuthenticationService {
     );
   }
 
-  async handleSignIn(
-    signInDto: ISignInDto,
-  ): Promise<OneSerializedResponseDto<ISignInResponse>> {
-    const { username, password } = signInDto;
-    const existingUser =
-      await this.userRepository.getOneByUsernameOrFail(username);
+  private async validateUser(publicKey: string): Promise<void> {
+    const existingUser = await this.userRepository.getOneByPublicKey(publicKey);
 
-    const response = await this.identityProviderService.signIn(
-      existingUser.username,
-      password,
-    );
+    if (!existingUser) {
+      await this.userRepository.saveOne(new User(publicKey));
+    }
+  }
+
+  async handleSignIn(
+    signInWithTransaction: SignInWithTransactionDto,
+  ): Promise<OneSerializedResponseDto<ISignInResponse>> {
+    const { transactionSigned, publicKey, memo } = signInWithTransaction;
+
+    this.stellarService.verifySignature(publicKey, transactionSigned, memo);
+
+    await this.validateUser(publicKey);
+
+    const tokenResponse = this.signJwt({
+      publicKey,
+      transactionSigned,
+      memo,
+    });
 
     return this.authenticationResponseAdapter.oneEntityResponseAuth<ISignInResponse>(
       AUTHENTICATION_NAME,
-      response,
+      tokenResponse,
     );
+  }
+
+  private signJwt(payload: JWTPayloadDto) {
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    return { accessToken, refreshToken };
   }
 
   async handleAdminSignIn(
@@ -384,6 +414,18 @@ export class AuthenticationService {
     return this.authenticationResponseAdapter.oneEntityResponseAuth<IRefreshSessionResponse>(
       AUTHENTICATION_NAME,
       response,
+    );
+  }
+
+  async getTransactionChallenge(
+    publicKey: string,
+  ): Promise<OneSerializedResponseDto<TransactionChallengeResponseDto>> {
+    const transactionChallenge =
+      await this.stellarService.getTransactionChallenge(publicKey);
+
+    return this.authenticationResponseAdapter.oneEntityResponseAuth<TransactionChallengeResponseDto>(
+      AUTHENTICATION_NAME,
+      transactionChallenge,
     );
   }
 }

@@ -12,14 +12,11 @@ import { IForgotPasswordDto } from '@iam/authentication/application/dto/forgot-p
 import { IRefreshSessionResponse } from '@iam/authentication/application/dto/refresh-session-response.interface';
 import { IRefreshSessionDto } from '@iam/authentication/application/dto/refresh-session.dto.interface';
 import { IResendConfirmationCodeDto } from '@iam/authentication/application/dto/resend-confirmation-code.dto.interface';
-import { ISignInResponse } from '@iam/authentication/application/dto/sign-in-response.interface';
-import { ISignInDto } from '@iam/authentication/application/dto/sign-in.dto.interface';
+import { SignInWithTransactionDto } from '@iam/authentication/application/dto/sign-in-with-transaction.dto';
 import { SignUpDto } from '@iam/authentication/application/dto/sign-up.dto';
-import { ISignUpDto } from '@iam/authentication/application/dto/sign-up.dto.interface';
 import {
   TOKEN_EXPIRED_ERROR,
   USER_ALREADY_CONFIRMED_ERROR,
-  USER_ALREADY_SIGNED_UP_ERROR,
 } from '@iam/authentication/application/exception/authentication-exception-messages';
 import { TokenExpiredException } from '@iam/authentication/application/exception/token-expired.exception';
 import { UserAlreadyConfirmed } from '@iam/authentication/application/exception/user-already-confirmed.exception';
@@ -28,28 +25,27 @@ import { CodeMismatchException } from '@iam/authentication/infrastructure/cognit
 import {
   CODE_MISMATCH_ERROR,
   EXPIRED_CODE_ERROR,
-  INVALID_PASSWORD_ERROR,
   INVALID_REFRESH_TOKEN_ERROR,
-  NEW_PASSWORD_REQUIRED_ERROR,
   PASSWORD_VALIDATION_ERROR,
   UNEXPECTED_ERROR_CODE_ERROR,
-  USER_NOT_CONFIRMED_ERROR,
 } from '@iam/authentication/infrastructure/cognito/exception/cognito-exception-messages';
-import { CouldNotSignUpException } from '@iam/authentication/infrastructure/cognito/exception/could-not-sign-up.exception';
 import { ExpiredCodeException } from '@iam/authentication/infrastructure/cognito/exception/expired-code.exception';
-import { InvalidPasswordException } from '@iam/authentication/infrastructure/cognito/exception/invalid-password.exception';
 import { InvalidRefreshTokenException } from '@iam/authentication/infrastructure/cognito/exception/invalid-refresh-token.exception';
-import { NewPasswordRequiredException } from '@iam/authentication/infrastructure/cognito/exception/new-password-required.exception';
 import { PasswordValidationException } from '@iam/authentication/infrastructure/cognito/exception/password-validation.exception';
 import { UnexpectedErrorCodeException } from '@iam/authentication/infrastructure/cognito/exception/unexpected-code.exception';
-import { UserNotConfirmedException } from '@iam/authentication/infrastructure/cognito/exception/user-not-confirmed.exception';
 import { UsernameNotFoundException } from '@iam/user/infrastructure/database/exception/username-not-found.exception';
 
 import {
   identityProviderServiceMock,
+  stellarServiceMock,
   testModuleBootstrapper,
 } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
+
+import { IncorrectMemoException } from '../../../stellar/application/exceptions/incorrect-memo.exception';
+import { IncorrectSignException } from '../../../stellar/application/exceptions/incorrect-sign.exception';
+import { InvalidPublicKeyException } from '../../../stellar/application/exceptions/invalid-public-key.exception';
+import { STELLAR_ERROR } from '../../../stellar/application/exceptions/stellar.error';
 
 describe('Authentication Module', () => {
   let app: INestApplication;
@@ -147,101 +143,6 @@ describe('Authentication Module', () => {
           });
       });
 
-      it('should allow users to retry their sign up if the external provider failed', async () => {
-        identityProviderServiceMock.signUp.mockRejectedValueOnce(
-          new CouldNotSignUpException({
-            message: 'Could not sign up',
-          }),
-        );
-
-        const signUpDto = {
-          username: 'jane.doe@test.com',
-          password: '$Test123',
-        } as SignUpDto;
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.INTERNAL_SERVER_ERROR);
-
-        const externalId = '00000000-0000-0000-0000-000000000002';
-        identityProviderServiceMock.signUp.mockResolvedValueOnce({
-          externalId,
-        });
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.CREATED)
-          .then(({ body }) => {
-            const expectedResponse = expect.objectContaining({
-              data: expect.objectContaining({
-                attributes: expect.objectContaining({
-                  username: signUpDto.username,
-                  externalId,
-                }),
-              }),
-            });
-            expect(body).toEqual(expectedResponse);
-          });
-      });
-
-      it('should throw an error if user already signed up', async () => {
-        const externalId = '00000000-0000-0000-0000-000000000003';
-        identityProviderServiceMock.signUp.mockResolvedValueOnce({
-          externalId,
-        });
-
-        const signUpDto = {
-          username: 'thomas.doe@test.com',
-          password: '$Test123',
-        } as SignUpDto;
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.CREATED)
-          .then(({ body }) => {
-            const expectedResponse = expect.objectContaining({
-              data: expect.objectContaining({
-                attributes: expect.objectContaining({
-                  username: signUpDto.username,
-                  externalId,
-                }),
-              }),
-            });
-            expect(body).toEqual(expectedResponse);
-          });
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.BAD_REQUEST)
-          .then(({ body }) => {
-            expect(body.error.detail).toBe(USER_ALREADY_SIGNED_UP_ERROR);
-            expect(body.error.source.pointer).toBe('/user/externalId');
-          });
-      });
-
-      it('Should throw an error if password is invalid', async () => {
-        const error = new PasswordValidationException({
-          message: PASSWORD_VALIDATION_ERROR,
-        });
-        identityProviderServiceMock.signUp.mockRejectedValueOnce(error);
-        const signUpDto: ISignUpDto = {
-          username: 'some@account.com',
-          password: '123456',
-        };
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-up')
-          .send(signUpDto)
-          .expect(HttpStatus.BAD_REQUEST)
-          .then(({ body }) => {
-            expect(body.error.detail).toEqual(error.message);
-          });
-      });
-
       it('should throw error when email domain is not allowed', async () => {
         const invalidDomainEmail = 'test@invalid-domain.com';
         const allowedDomains =
@@ -285,19 +186,14 @@ describe('Authentication Module', () => {
       });
     });
     describe('POST - /auth/sign-in', () => {
-      it('Should allow users to sign in when provided a correct username and password', async () => {
-        const serviceResponse: ISignInResponse = {
-          accessToken: 'accessToken',
-          refreshToken: 'refreshToken',
+      it('Should allow users to sign in with transaction data', async () => {
+        const signInDto: SignInWithTransactionDto = {
+          publicKey: 'publicKey',
+          transactionSigned: 'transactionSigned',
+          memo: 'memo',
         };
-        identityProviderServiceMock.signIn.mockResolvedValueOnce(
-          serviceResponse,
-        );
 
-        const signInDto: ISignInDto = {
-          username: 'admin@test.com',
-          password: 'password',
-        };
+        stellarServiceMock.verifySignature.mockResolvedValueOnce({});
 
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
@@ -308,7 +204,8 @@ describe('Authentication Module', () => {
               data: expect.objectContaining({
                 type: AUTHENTICATION_NAME,
                 attributes: expect.objectContaining({
-                  ...serviceResponse,
+                  accessToken: expect.any(String),
+                  refreshToken: expect.any(String),
                 }),
               }),
               links: expect.objectContaining({
@@ -319,96 +216,47 @@ describe('Authentication Module', () => {
           });
       });
 
-      it('Should send an UserNotFound error when provided an invalid username', async () => {
-        const signInDto: ISignInDto = {
-          username: 'fakeUsername',
-          password: 'fakePassword',
+      it('Should throw an error if the memo is invalid', async () => {
+        const signInDto: SignInWithTransactionDto = {
+          publicKey: 'publicKey',
+          transactionSigned: 'transactionSigned',
+          memo: 'invalidMemo',
         };
-        const error = new UsernameNotFoundException({
-          username: signInDto.username,
+
+        stellarServiceMock.verifySignature.mockImplementationOnce(() => {
+          throw new IncorrectMemoException({
+            message: STELLAR_ERROR.INCORRECT_MEMO,
+          });
         });
+
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
           .send(signInDto)
-          .expect(HttpStatus.NOT_FOUND)
+          .expect(HttpStatus.BAD_REQUEST)
           .then(({ body }) => {
-            expect(body.error.detail).toEqual(error.message);
+            expect(body.error.detail).toBe(STELLAR_ERROR.INCORRECT_MEMO);
           });
       });
 
-      it('Should send an InvalidPassword error provided a valid user but invalid password', async () => {
-        const error = new InvalidPasswordException({
-          message: INVALID_PASSWORD_ERROR,
-        });
-        const signInDto: ISignInDto = {
-          username: 'admin@test.com',
-          password: 'fakePassword',
+      it('Should throw an error if the signature is invalid', async () => {
+        const signInDto: SignInWithTransactionDto = {
+          publicKey: 'publicKey',
+          transactionSigned: 'invalidTransactionSigned',
+          memo: 'memo',
         };
 
-        identityProviderServiceMock.signIn.mockRejectedValueOnce(error);
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-in')
-          .send(signInDto)
-          .expect(HttpStatus.UNAUTHORIZED)
-          .then(({ body }) => {
-            expect(body.error.detail).toEqual(error.message);
+        stellarServiceMock.verifySignature.mockImplementationOnce(() => {
+          throw new IncorrectSignException({
+            message: STELLAR_ERROR.INCORRECT_SIGN,
           });
-      });
-
-      it('Should send an UnconfirmedUser error when user is not confirmed', async () => {
-        const error = new UserNotConfirmedException({
-          message: USER_NOT_CONFIRMED_ERROR,
         });
-        identityProviderServiceMock.signIn.mockRejectedValueOnce(error);
-        const signInDto: ISignInDto = {
-          username: 'admin@test.com',
-          password: 'password',
-        };
 
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
           .send(signInDto)
-          .expect(HttpStatus.FORBIDDEN)
+          .expect(HttpStatus.BAD_REQUEST)
           .then(({ body }) => {
-            expect(body.error.detail).toEqual(error.message);
-          });
-      });
-
-      it('Should send an UnexpectedErrorCode error when receiving uncovered error codes', async () => {
-        const error = new UnexpectedErrorCodeException({
-          code: UNEXPECTED_ERROR_CODE_ERROR,
-        });
-        identityProviderServiceMock.signIn.mockRejectedValueOnce(error);
-        const signInDto: ISignInDto = {
-          username: 'admin@test.com',
-          password: 'password',
-        };
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-in')
-          .send(signInDto)
-          .expect(HttpStatus.INTERNAL_SERVER_ERROR)
-          .then(({ body }) => {
-            expect(body.error.detail).toEqual(error.message);
-          });
-      });
-
-      it('Should send a NewPasswordRequired error when user needs to update their password', async () => {
-        const error = new NewPasswordRequiredException({
-          message: NEW_PASSWORD_REQUIRED_ERROR,
-        });
-        identityProviderServiceMock.signIn.mockRejectedValueOnce(error);
-        const signInDto: ISignInDto = {
-          username: 'admin@test.com',
-          password: 'password',
-        };
-
-        await request(app.getHttpServer())
-          .post('/api/v1/auth/sign-in')
-          .send(signInDto)
-          .expect(HttpStatus.UNAUTHORIZED)
-          .then(({ body }) => {
-            expect(body.error.detail).toEqual(error.message);
+            expect(body.error.detail).toBe(STELLAR_ERROR.INCORRECT_SIGN);
           });
       });
     });
@@ -844,6 +692,53 @@ describe('Authentication Module', () => {
           .expect(HttpStatus.INTERNAL_SERVER_ERROR)
           .then(({ body }) => {
             expect(body.error.detail).toEqual(error.message);
+          });
+      });
+    });
+
+    describe('GET - /auth/challenge', () => {
+      it('Should return a transaction challenge', async () => {
+        const queryParam = '?publicKey=publicKey';
+
+        stellarServiceMock.getTransactionChallenge.mockResolvedValueOnce({
+          transactionXDR: 'transactionXDR',
+          memo: 'memo',
+        });
+
+        return request(app.getHttpServer())
+          .get(`/api/v1/auth/challenge${queryParam}`)
+          .expect(HttpStatus.OK)
+          .then(({ body }) => {
+            const expectedResponse = expect.objectContaining({
+              data: expect.objectContaining({
+                type: AUTHENTICATION_NAME,
+                attributes: expect.objectContaining({
+                  transactionXdr: expect.any(String),
+                  memo: expect.any(String),
+                }),
+              }),
+              links: expect.objectContaining({
+                self: expect.any(String),
+              }),
+            });
+            expect(body).toEqual(expectedResponse);
+          });
+      });
+
+      it('Should throw an error if the public key is invalid', async () => {
+        const queryParam = '?publicKey=invalidPublicKey';
+
+        stellarServiceMock.getTransactionChallenge.mockRejectedValueOnce(
+          new InvalidPublicKeyException({
+            message: STELLAR_ERROR.INVALID_PUBLIC_KEY,
+          }),
+        );
+
+        return request(app.getHttpServer())
+          .get(`/api/v1/auth/challenge${queryParam}`)
+          .expect(HttpStatus.BAD_REQUEST)
+          .then(({ body }) => {
+            expect(body.error.detail).toEqual(STELLAR_ERROR.INVALID_PUBLIC_KEY);
           });
       });
     });

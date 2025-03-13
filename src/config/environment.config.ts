@@ -14,4 +14,11 @@ export const environmentConfig = () => ({
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY,
   },
+  environment: {
+    name: process.env.NODE_ENV,
+  },
+  stellar: {
+    serverUrl: process.env.STELLAR_SERVER_URL,
+    networkPassphrase: process.env.STELLAR_NETWORK_PASSPHRASE,
+  },
 });

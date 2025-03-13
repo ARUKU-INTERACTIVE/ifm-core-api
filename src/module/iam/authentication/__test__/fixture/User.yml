@@ -1,14 +1,17 @@
 entity: User
 items:
   admin-user:
+    publicKey: 'publicKey1'
     username: 'admin@test.com'
     externalId: '00000000-0000-0000-0000-00000000000X'
     roles: admin
   confirm-user:
+    publicKey: 'publicKey2'
     username: 'confirm@test.com'
     externalId: '00000000-0000-0000-0000-00000000000Y'
     roles: admin
   error-user:
+    publicKey: 'publicKey3'
     username: 'error@test.com'
     externalId: '00000000-0000-0000-0000-00000000000Z'
     roles: admin
