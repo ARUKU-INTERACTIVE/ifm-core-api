@@ -29,6 +29,7 @@ module.exports = {
     '^@common/(.*)$': '<rootDir>/common/$1',
     '^@config/(.*)$': '<rootDir>/config/$1',
     '^@book/(.*)$': '<rootDir>/module/book/$1',
+    '^@module/(.*)$': '<rootDir>/module/$1',
     '^@genre/(.*)$': '<rootDir>/module/genre/$1',
     '^@iam/(.*)$': '<rootDir>/module/iam/$1',
     '^@/stellar/(.*)$': '<rootDir>/module/stellar/$1',

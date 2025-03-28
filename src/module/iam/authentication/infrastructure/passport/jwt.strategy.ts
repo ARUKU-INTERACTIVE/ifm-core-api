@@ -45,14 +45,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(accessTokenPayload: IAccessTokenPayload): Promise<User> {
-    const currentUser = await this.userRepository.getOneByPublicKey(
+    let currentUser: User;
+    currentUser = await this.userRepository.getOneByPublicKey(
       accessTokenPayload.publicKey,
     );
-
-    const currentAdminUser = await this.adminRepository.getOneByPublicKey(
+    if (!currentUser) {
+      currentUser = await this.userRepository.getOneByExternalId(
+        accessTokenPayload.sub,
+      );
+    }
+    let currentAdminUser = await this.adminRepository.getOneByPublicKey(
       accessTokenPayload.publicKey,
     );
-
+    if (!currentAdminUser) {
+      currentAdminUser = await this.userRepository.getOneByExternalId(
+        accessTokenPayload.sub,
+      );
+    }
     if (!currentUser && !currentAdminUser) {
       throw new ForbiddenException();
     }

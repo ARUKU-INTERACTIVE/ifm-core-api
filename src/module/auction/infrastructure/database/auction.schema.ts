@@ -19,11 +19,11 @@ export const AuctionSchema = new EntitySchema<Auction>({
       nullable: false,
     },
     status: isEnvironmentAutomatedTest
-      ? {
+      ? { type: String, default: AuctionStatus.Open }
+      : {
           type: 'enum',
           enum: AuctionStatus,
           default: AuctionStatus.Open,
-        }
-      : { type: String, default: AuctionStatus.Open },
+        },
   }),
 });

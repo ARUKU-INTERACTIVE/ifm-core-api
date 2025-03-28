@@ -43,7 +43,7 @@ export class PlayerService {
   ): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
     const { name, metadataUri } = createPlayerDto;
     const issuer = this.stellarAccountAdapter.createIssuerKeypair();
-
+    console.log(name, metadataUri, 'metadataUri', issuer);
     const issuerPublicKey = issuer.publicKey();
     const sourceAccount = await this.stellarAccountAdapter.getAccount(
       user.publicKey,
