@@ -34,8 +34,15 @@ export class PlayerService {
     private readonly userService: UserService,
   ) {}
 
-  async getOneById(id: number, relations?: PlayerRelation[]) {
-    return await this.playerRepository.getOneById(id, relations);
+  async getOneById(
+    id: number,
+    relations?: PlayerRelation[],
+  ): Promise<PlayerResponseDto> {
+    const player = await this.playerRepository.getOneById(id, relations);
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+      this.playerMapper.fromPlayerToPlayerResponseDto(player),
+      [PlayerRelation.USER],
+    );
   }
 
   async mintPlayerXDR(
@@ -44,7 +51,6 @@ export class PlayerService {
   ): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
     const { name, metadataUri } = createPlayerDto;
     const issuer = this.stellarAccountAdapter.createIssuerKeypair();
-    console.log(name, metadataUri, 'metadataUri', issuer);
     const issuerPublicKey = issuer.publicKey();
     const sourceAccount = await this.stellarAccountAdapter.getAccount(
       user.publicKey,
