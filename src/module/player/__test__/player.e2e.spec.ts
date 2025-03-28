@@ -49,23 +49,21 @@ describe('Player Module', () => {
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.OK)
         .then(({ body }) => {
-          const expectedResponse =   expect.objectContaining({
+          const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
               attributes: expect.objectContaining({
                 createdAt: expect.any(String),
-                externalId: expect.any(String),  
-                issuer: expect.any(String),      
-                metadataUri: expect.any(String), 
-                name: expect.any(String),        
-                updatedAt: expect.any(String),   
-                uuid: expect.any(String),        
+                externalId: expect.any(String),
+                issuer: expect.any(String),
+                metadataUri: expect.any(String),
+                name: expect.any(String),
+                updatedAt: expect.any(String),
+                uuid: expect.any(String),
               }),
-              id: expect.any(String),             
+              id: expect.any(String),
             }),
-          })
-          expect(body).toEqual(
-            expectedResponse
-          );
+          });
+          expect(body).toEqual(expectedResponse);
         });
     });
   });
