@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   FeeBumpTransaction,
-  Keypair,
+  Horizon,
   Memo,
   MemoType,
   Operation,
@@ -21,6 +21,7 @@ import { IGetSorobanTransactionResponse } from '@common/infrastructure/stellar/i
 @Injectable()
 export class StellarTransactionAdapter {
   private readonly sorobanServer: rpc.Server;
+  private readonly stellarServer: Horizon.Server;
   private readonly networkPassphrase: string;
 
   constructor(private readonly environmentConfig: ConfigService) {
@@ -30,6 +31,7 @@ export class StellarTransactionAdapter {
       'stellar.networkPassphrase',
     );
     this.sorobanServer = new rpc.Server(sorobanServerUrl, { allowHttp: true });
+    this.stellarServer = new Horizon.Server(serverUrl);
   }
 
   buildTransactionFromXdr(

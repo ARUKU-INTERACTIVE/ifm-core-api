@@ -7,7 +7,6 @@ import {
   Address,
   BASE_FEE,
   Contract,
-  Keypair,
   TransactionBuilder,
   nativeToScVal,
   rpc,

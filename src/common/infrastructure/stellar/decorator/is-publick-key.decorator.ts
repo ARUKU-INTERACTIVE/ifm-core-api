@@ -1,6 +1,5 @@
 import { StrKey } from '@stellar/stellar-sdk';
 import {
-  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
@@ -13,7 +12,7 @@ class IsStellarPublicKeyConstraint implements ValidatorConstraintInterface {
   validate(value: any): boolean {
     return typeof value === 'string' && isValidEd25519PublicKey(value);
   }
-  defaultMessage(validationArguments?: ValidationArguments): string {
+  defaultMessage(): string {
     return 'Invalid Stellar public key';
   }
 }
