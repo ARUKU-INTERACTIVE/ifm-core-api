@@ -4,6 +4,7 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 import {
   InvalidStellarTransactionError,
   StellarAccountNotFound,
+  StellarTransactionSubmissionError,
 } from '@common/infrastructure/stellar/exception/stellar.exception';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
@@ -32,6 +33,39 @@ export const stellarServiceMock = {
   verifySignature: jest.fn(),
 };
 
+export const stellarAccountAdapterMock = {
+  createIssuerKeypair: jest.fn().mockReturnValue({
+    publicKey: jest.fn(),
+  }),
+  getAccount: jest.fn().mockImplementation((publicKey) => {
+    if (publicKey === 'ERROR') {
+      throw new StellarAccountNotFound(publicKey);
+    }
+    return publicKey;
+  }),
+};
+
+export const sorobanContractAdapterMock = {
+  mintPlayer: jest.fn().mockImplementation((account) => {
+    if (account === 'ERROR-ACCOUNT') {
+      throw new InvalidStellarTransactionError();
+    }
+    return 'xdr';
+  }),
+  submitMintPlayer: jest.fn().mockImplementation((xdr) => {
+    if (xdr === 'ERROR') {
+      throw new StellarTransactionSubmissionError();
+    }
+    return 'xdr';
+  }),
+  getSorobanTransaction: jest.fn().mockReturnValue({
+    name: 'Jonh Doe',
+    issuer: 'Issuer',
+    externalId: 1,
+    metadataUri: 'http://example.com',
+  }),
+};
+
 export const testModuleBootstrapper = (): Promise<TestingModule> => {
   initializeTransactionalContext();
 
@@ -41,26 +75,9 @@ export const testModuleBootstrapper = (): Promise<TestingModule> => {
     .overrideProvider(IDENTITY_PROVIDER_SERVICE_KEY)
     .useValue(identityProviderServiceMock)
     .overrideProvider(StellarAccountAdapter)
-    .useValue({
-      createIssuerKeypair: jest.fn().mockReturnValue({
-        publicKey: jest.fn(),
-      }),
-      getAccount: jest.fn().mockImplementation((publicKey) => {
-        if (publicKey === 'ERROR') {
-          throw new StellarAccountNotFound(publicKey);
-        }
-        return publicKey;
-      }),
-    })
+    .useValue(stellarAccountAdapterMock)
     .overrideProvider(SorobanContractAdapter)
-    .useValue({
-      mintPlayer: jest.fn().mockImplementation((account) => {
-        if (account === 'ERROR-ACCOUNT') {
-          throw new InvalidStellarTransactionError();
-        }
-        return 'xdr';
-      }),
-    })
+    .useValue(sorobanContractAdapterMock)
     .overrideProvider(StellarService)
     .useValue(stellarServiceMock)
     .compile();

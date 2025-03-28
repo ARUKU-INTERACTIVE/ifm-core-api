@@ -1,5 +1,6 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
 import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
+import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import {
@@ -87,9 +88,13 @@ export class PlayerService {
       issuer,
       metadataUri,
     };
-
-    return await this.playerRepository.saveOne(
+    const player = await this.playerRepository.saveOne(
       this.playerMapper.fromCreatePlayerDtoToPlayer(createPlayerDto),
+    );
+
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+      this.playerMapper.fromPlayerToPlayerResponseDto(player),
+      [PlayerRelation.USER],
     );
   }
 }

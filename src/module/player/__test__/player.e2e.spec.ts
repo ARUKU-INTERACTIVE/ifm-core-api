@@ -7,6 +7,7 @@ import { loadFixtures } from '@data/util/fixture-loader';
 import {
   InvalidStellarTransactionError,
   StellarAccountNotFound,
+  StellarTransactionSubmissionError,
 } from '@common/infrastructure/stellar/exception/stellar.exception';
 
 import { setupApp } from '@config/app.config';
@@ -63,7 +64,28 @@ describe('Player Module', () => {
           });
           expect(expectedResponse).toEqual(body);
         });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/player/submit/mint')
+        .auth(adminToken, { type: 'bearer' })
+        .send({ xdr: 'xdr' })
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                externalId: expect.any(Number),
+                uuid: expect.any(String),
+                name: expect.any(String),
+                metadataUri: expect.any(String),
+                issuer: expect.any(String),
+              }),
+            }),
+          });
+          expect(expectedResponse).toEqual(body);
+        });
     });
+
     it('Should return an error message stating that the Stellar account was not found', async () => {
       const publicKey = 'ERROR';
       const adminToken = createAccessToken({
@@ -97,6 +119,25 @@ describe('Player Module', () => {
         .then(({ body }) => {
           expect(body.error.detail).toEqual(
             new InvalidStellarTransactionError().message,
+          );
+        });
+    });
+
+    it('Should return an error if the transaction submission to the Stellar network fails.', async () => {
+      const publicKey = 'ERROR';
+      const adminToken = createAccessToken({
+        publicKey,
+        sub: '00000000-0000-0000-0000-0000000000XX',
+      });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/player/submit/mint')
+        .auth(adminToken, { type: 'bearer' })
+        .send({ xdr: 'ERROR' })
+        .expect(HttpStatus.BAD_REQUEST)
+        .then(({ body }) => {
+          expect(body.error.detail).toEqual(
+            new StellarTransactionSubmissionError().message,
           );
         });
     });
