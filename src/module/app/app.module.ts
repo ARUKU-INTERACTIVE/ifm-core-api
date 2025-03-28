@@ -1,3 +1,5 @@
+import { AuctionModule } from '@module/auction/auction.module';
+import { PlayerModule } from '@module/player/player.module';
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DiscoveryModule } from '@nestjs/core';
@@ -42,6 +44,8 @@ import { StellarModule } from '@/stellar/stellar.module';
     DiscoveryModule,
     PaymentModule,
     StellarModule,
+    PlayerModule,
+    AuctionModule,
   ],
   providers: [AppService, ResponseSerializerService],
   exports: [AppService, ResponseSerializerService],

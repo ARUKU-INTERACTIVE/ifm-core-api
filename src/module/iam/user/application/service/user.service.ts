@@ -35,4 +35,8 @@ export class UserService {
 
     return this.userResponseAdapter.manyEntitiesResponse(collectionDto);
   }
+
+  async getOneByPublicKey(publicKey: string) {
+    return await this.userRepository.getOneByPublicKey(publicKey);
+  }
 }
