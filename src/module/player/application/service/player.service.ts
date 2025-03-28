@@ -1,0 +1,95 @@
+import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
+import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
+import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
+import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
+import {
+  IPlayerRepository,
+  PLAYER_REPOSITORY_KEY,
+} from '@module/player/application/repository/player.repository.interface';
+import { Player } from '@module/player/domain/player.domain';
+import { Inject, Injectable } from '@nestjs/common';
+
+import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
+import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
+import { TransactionXDRResponseDto } from '@common/infrastructure/stellar/dto/transaction-xdr-response.dto';
+import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
+import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
+import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
+
+import { UserService } from '@iam/user/application/service/user.service';
+import { User } from '@iam/user/domain/user.entity';
+import { UserNotFoundException } from '@iam/user/infrastructure/database/exception/user-not-found.exception';
+
+@Injectable()
+export class PlayerService {
+  constructor(
+    @Inject(PLAYER_REPOSITORY_KEY)
+    private readonly playerRepository: IPlayerRepository,
+    private readonly playerResponseAdapter: PlayerResponseAdapter,
+    private readonly playerMapper: PlayerMapper,
+    private readonly transactionMapper: TransactionMapper,
+    private readonly sorobanContractAdapter: SorobanContractAdapter,
+    private readonly stellarAccountAdapter: StellarAccountAdapter,
+    private readonly userService: UserService,
+  ) {}
+
+  async getOneById(id: number, relations?: PlayerRelation[]) {
+    return await this.playerRepository.getOneById(id, relations);
+  }
+
+  async mintPlayerXDR(
+    createPlayerDto: ICreatePlayerDto,
+    user: User,
+  ): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
+    const { name, metadataUri } = createPlayerDto;
+    const issuer = this.stellarAccountAdapter.createIssuerKeypair();
+
+    const issuerPublicKey = issuer.publicKey();
+    const sourceAccount = await this.stellarAccountAdapter.getAccount(
+      user.publicKey,
+    );
+    const transactionXDR = await this.sorobanContractAdapter.mintPlayer(
+      sourceAccount,
+      issuerPublicKey,
+      user.publicKey,
+      name,
+      metadataUri,
+    );
+
+    return this.playerResponseAdapter.oneEntityResponse(
+      this.transactionMapper.fromXDRToTransactionDTO(transactionXDR),
+    );
+  }
+
+  async submitMintPlayerXdr(
+    transactionXDRDto: TransactionXDRDTO,
+    currentUser: User,
+  ): Promise<Player> {
+    const publicKey = currentUser.publicKey;
+    const user = await this.userService.getOneByPublicKey(publicKey);
+
+    if (!user) {
+      throw new UserNotFoundException({
+        message: `User with ${publicKey} not found`,
+      });
+    }
+
+    const txHash = await this.sorobanContractAdapter.submitMintPlayer(
+      transactionXDRDto.xdr,
+    );
+    const { name, externalId, issuer, metadataUri } =
+      await this.sorobanContractAdapter.getSorobanTransaction(txHash);
+
+    const createPlayerDto: ICreatePlayerDto = {
+      name,
+      ownerId: currentUser.id,
+      externalId,
+      issuer,
+      metadataUri,
+    };
+
+    return await this.playerRepository.saveOne(
+      this.playerMapper.fromCreatePlayerDtoToPlayer(createPlayerDto),
+    );
+  }
+}
