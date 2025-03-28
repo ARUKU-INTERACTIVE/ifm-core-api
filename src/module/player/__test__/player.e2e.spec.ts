@@ -42,11 +42,40 @@ describe('Player Module', () => {
     await app.close();
   });
 
+  describe('GET - /player', () => {
+    it('Should return the XDR of the mintPlayer transaction.', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/player/1')
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse =   expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                createdAt: expect.any(String),
+                externalId: expect.any(String),  
+                issuer: expect.any(String),      
+                metadataUri: expect.any(String), 
+                name: expect.any(String),        
+                updatedAt: expect.any(String),   
+                uuid: expect.any(String),        
+              }),
+              id: expect.any(String),             
+            }),
+          })
+          expect(body).toEqual(
+            expectedResponse
+          );
+        });
+    });
+  });
+
   describe('POST - /player', () => {
     const createPlayerDto = {
       name: 'Jonh Doe',
       metadataUri: 'http://example.com',
     } as ICreatePlayerDto;
+
     it('Should return the XDR of the mintPlayer transaction.', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/mint')
@@ -54,7 +83,6 @@ describe('Player Module', () => {
         .send(createPlayerDto)
         .expect(HttpStatus.CREATED)
         .then(({ body }) => {
-          console.log(body, 'body');
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
               attributes: expect.objectContaining({
@@ -62,7 +90,7 @@ describe('Player Module', () => {
               }),
             }),
           });
-          expect(expectedResponse).toEqual(body);
+          expect(body).toEqual(expectedResponse);
         });
 
       await request(app.getHttpServer())
