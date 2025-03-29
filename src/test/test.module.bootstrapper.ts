@@ -17,6 +17,13 @@ import {
 import { AppModule } from '@/module/app/app.module';
 import { StellarService } from '@/stellar/application/service/stellar.service';
 
+jest.mock('@stellar/stellar-sdk', () => ({
+  ...jest.requireActual('@stellar/stellar-sdk'),
+  Horizon: {
+    Server: jest.fn(),
+  },
+}));
+
 export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderService> =
   {
     signUp: jest.fn(),
