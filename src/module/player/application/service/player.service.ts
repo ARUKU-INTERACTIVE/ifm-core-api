@@ -72,15 +72,6 @@ export class PlayerService {
     transactionXDRDto: TransactionXDRDTO,
     currentUser: User,
   ): Promise<Player> {
-    const publicKey = currentUser.publicKey;
-    const user = await this.userService.getOneByPublicKey(publicKey);
-
-    if (!user) {
-      throw new UserNotFoundException({
-        message: `User with ${publicKey} not found`,
-      });
-    }
-
     const txHash = await this.sorobanContractAdapter.submitMintPlayer(
       transactionXDRDto.xdr,
     );
