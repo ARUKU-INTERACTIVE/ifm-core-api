@@ -30,6 +30,7 @@ jobs:
       STELLAR_LOCAL_NETWORK_PASSPHRASE: Standalone Network ; February 2017
       SOROBAN_CONTRACT_ADDRESS: CXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       SOROBAN_LOCAL_SERVER_URL: http://localhost:8000/soroban/rpc
+      SOROBAN_SERVER_URL: http://localhost:8000/soroban/rpc
       JWT_SECRET: secret
 
     strategy:
