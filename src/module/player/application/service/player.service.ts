@@ -19,7 +19,6 @@ import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-ac
 
 import { UserService } from '@iam/user/application/service/user.service';
 import { User } from '@iam/user/domain/user.entity';
-import { UserNotFoundException } from '@iam/user/infrastructure/database/exception/user-not-found.exception';
 
 @Injectable()
 export class PlayerService {
