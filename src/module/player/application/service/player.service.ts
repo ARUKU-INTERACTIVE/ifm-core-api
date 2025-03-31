@@ -54,6 +54,7 @@ export class PlayerService {
     const sourceAccount = await this.stellarAccountAdapter.getAccount(
       user.publicKey,
     );
+
     const transactionXDR = await this.sorobanContractAdapter.mintPlayer(
       sourceAccount,
       issuerPublicKey,
@@ -61,7 +62,6 @@ export class PlayerService {
       name,
       metadataUri,
     );
-
     return this.playerResponseAdapter.oneEntityResponse(
       this.transactionMapper.fromXDRToTransactionDTO(transactionXDR),
     );
@@ -76,7 +76,6 @@ export class PlayerService {
     );
     const { name, externalId, issuer, metadataUri } =
       await this.sorobanContractAdapter.getSorobanTransaction(txHash);
-
     const createPlayerDto: ICreatePlayerDto = {
       name,
       ownerId: currentUser.id,

@@ -1,6 +1,6 @@
 import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   Account,
@@ -52,38 +52,34 @@ export class SorobanContractAdapter {
     name: string,
     metadataUri: string,
   ): Promise<string> {
-    try {
-      const contract = await this.getContract();
-      const sourceScAddressScVal = nativeToScVal(
-        Address.fromString(sourcePublicKey),
-      );
-      const issuerScAddressScVal = nativeToScVal(
-        Address.fromString(issuerAddress),
-      );
-      const nameScVal = nativeToScVal(name);
-      const urlScVal = nativeToScVal(metadataUri);
+    const contract = await this.getContract();
+    const sourceScAddressScVal = nativeToScVal(
+      Address.fromString(sourcePublicKey),
+    );
+    const issuerScAddressScVal = nativeToScVal(
+      Address.fromString(issuerAddress),
+    );
+    const nameScVal = nativeToScVal(name);
+    const urlScVal = nativeToScVal(metadataUri);
 
-      const buildTransaction = new TransactionBuilder(sourceAccount, {
-        fee: BASE_FEE,
-        networkPassphrase: this.networkPassphrase,
-      })
-        .addOperation(
-          contract.call(
-            'mint_player',
-            sourceScAddressScVal,
-            issuerScAddressScVal,
-            nameScVal,
-            urlScVal,
-          ),
-        )
-        .setTimeout(this.BASE_TIMEOUT)
-        .build();
-      const preparedTransaction =
-        await this.sorobanServer.prepareTransaction(buildTransaction);
-      return preparedTransaction.toXDR();
-    } catch (error) {
-      throw new InternalServerErrorException(error);
-    }
+    const buildTransaction = new TransactionBuilder(sourceAccount, {
+      fee: BASE_FEE,
+      networkPassphrase: this.networkPassphrase,
+    })
+      .addOperation(
+        contract.call(
+          'mint_player',
+          sourceScAddressScVal,
+          issuerScAddressScVal,
+          nameScVal,
+          urlScVal,
+        ),
+      )
+      .setTimeout(this.BASE_TIMEOUT)
+      .build();
+    const preparedTransaction =
+      await this.sorobanServer.prepareTransaction(buildTransaction);
+    return preparedTransaction.toXDR();
   }
 
   async submitMintPlayer(xdr: string) {

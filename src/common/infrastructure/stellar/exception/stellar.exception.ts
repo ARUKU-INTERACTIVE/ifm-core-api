@@ -16,12 +16,3 @@ export class InvalidStellarTransactionError extends HttpException {
     );
   }
 }
-
-export class StellarTransactionSubmissionError extends HttpException {
-  constructor() {
-    super(
-      'Failed to submit the transaction to Stellar',
-      HttpStatus.BAD_REQUEST,
-    );
-  }
-}

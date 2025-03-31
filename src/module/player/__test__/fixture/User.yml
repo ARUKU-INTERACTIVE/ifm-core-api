@@ -6,7 +6,7 @@ items:
     externalId: '00000000-0000-0000-0000-00000000000X'
     roles: admin
   user1:
-    publicKey: 'ERROR'
+    publicKey: 'PK-ERROR'
     username: 'user1@test.com'
     externalId: '00000000-0000-0000-0000-0000000000XX'
     roles: regular

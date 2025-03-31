@@ -1,13 +1,14 @@
 import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
 import { HttpStatus, INestApplication } from '@nestjs/common';
+import { TransactionBuilder, scValToNative } from '@stellar/stellar-sdk';
 import request from 'supertest';
 
 import { loadFixtures } from '@data/util/fixture-loader';
 
+import { UnknownErrorException } from '@common/infrastructure/exception/unknow-error.exception';
 import {
   InvalidStellarTransactionError,
   StellarAccountNotFound,
-  StellarTransactionSubmissionError,
 } from '@common/infrastructure/stellar/exception/stellar.exception';
 
 import { setupApp } from '@config/app.config';
@@ -90,6 +91,13 @@ describe('Player Module', () => {
           });
           expect(body).toEqual(expectedResponse);
         });
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue('xdr');
+      (scValToNative as jest.Mock).mockReturnValue({
+        name: 'Jonh Doe',
+        issuer: 'Issuer',
+        token_id: 1,
+        metadata_uri: 'http://example.com',
+      });
 
       await request(app.getHttpServer())
         .post('/api/v1/player/submit/mint')
@@ -113,7 +121,8 @@ describe('Player Module', () => {
     });
 
     it('Should return an error message stating that the Stellar account was not found', async () => {
-      const publicKey = 'ERROR';
+      const publicKey = 'PK-ERROR';
+
       const adminToken = createAccessToken({
         publicKey,
         sub: '00000000-0000-0000-0000-0000000000XX',
@@ -150,20 +159,23 @@ describe('Player Module', () => {
     });
 
     it('Should return an error if the transaction submission to the Stellar network fails.', async () => {
-      const publicKey = 'ERROR';
+      const publicKey = 'PK-ERROR';
       const adminToken = createAccessToken({
         publicKey,
         sub: '00000000-0000-0000-0000-0000000000XX',
       });
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue('ERROR');
 
       await request(app.getHttpServer())
         .post('/api/v1/player/submit/mint')
         .auth(adminToken, { type: 'bearer' })
         .send({ xdr: 'ERROR' })
-        .expect(HttpStatus.BAD_REQUEST)
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
         .then(({ body }) => {
           expect(body.error.detail).toEqual(
-            new StellarTransactionSubmissionError().message,
+            new UnknownErrorException({
+              message: 'Failed to submit transaction to Soroban',
+            }).message,
           );
         });
     });
