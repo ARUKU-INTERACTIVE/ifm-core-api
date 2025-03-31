@@ -24,6 +24,9 @@ module.exports = {
     '<rootDir>/module/iam/authentication/infrastructure/cognito/cognito.service.ts',
     '<rootDir>/module/book/*',
     '<rootDir>/module/genre/*',
+    '<rootDir>/common/infrastructure/stellar/*',
+    '<rootDir>/module/stellar/application/service/stellar.service.ts',
+
   ],
   testEnvironment: 'node',
   // Keep these mappings synchronized with the ones in tsconfig.json as you add new modules
