@@ -47,7 +47,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: NPM or Yarn install with caching
-        uses: npm ci
+        run: npm ci
 
       - name: Setup LCOV
         uses: hrishikesh-kadam/setup-lcov@v1
