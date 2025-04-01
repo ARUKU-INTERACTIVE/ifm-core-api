@@ -14,8 +14,17 @@ import {
 import { setupApp } from '@config/app.config';
 import { datasourceOptions } from '@config/orm.config';
 
+import {
+  getTransactionResponse,
+  loadAccountUseCases,
+  transactionUseCases,
+} from '@test/test-stellar.setup';
 import { testModuleBootstrapper } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
+
+const { MINT_PLAYER } = getTransactionResponse;
+const { ERROR_ACCOUNT, PK_ERROR } = loadAccountUseCases;
+const { ERROR } = transactionUseCases;
 
 describe('Player Module', () => {
   let app: INestApplication;
@@ -70,9 +79,10 @@ describe('Player Module', () => {
   });
 
   describe('POST - /player', () => {
+    const { name, metadataUri } = MINT_PLAYER.returnValue;
     const createPlayerDto = {
-      name: 'Jonh Doe',
-      metadataUri: 'http://example.com',
+      name,
+      metadataUri,
     } as ICreatePlayerDto;
 
     it('Should return the XDR of the mintPlayer transaction.', async () => {
@@ -92,12 +102,7 @@ describe('Player Module', () => {
           expect(body).toEqual(expectedResponse);
         });
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue('xdr');
-      (scValToNative as jest.Mock).mockReturnValue({
-        name: 'Jonh Doe',
-        issuer: 'Issuer',
-        token_id: 1,
-        metadata_uri: 'http://example.com',
-      });
+      (scValToNative as jest.Mock).mockReturnValue(MINT_PLAYER.returnValue);
 
       await request(app.getHttpServer())
         .post('/api/v1/player/submit/mint')
@@ -121,7 +126,7 @@ describe('Player Module', () => {
     });
 
     it('Should return an error message stating that the Stellar account was not found', async () => {
-      const publicKey = 'PK-ERROR';
+      const publicKey = PK_ERROR;
 
       const adminToken = createAccessToken({
         publicKey,
@@ -141,7 +146,7 @@ describe('Player Module', () => {
     });
 
     it('Should return an error indicating that there was a failure in the transaction.', async () => {
-      const publicKey = 'ERROR-ACCOUNT';
+      const publicKey = ERROR_ACCOUNT;
       const adminToken = createAccessToken({
         publicKey,
         sub: '00000000-0000-0000-0000-000000000XXX',
@@ -159,7 +164,7 @@ describe('Player Module', () => {
     });
 
     it('Should return an error if the transaction submission to the Stellar network fails.', async () => {
-      const publicKey = 'PK-ERROR';
+      const publicKey = PK_ERROR;
       const adminToken = createAccessToken({
         publicKey,
         sub: '00000000-0000-0000-0000-0000000000XX',
@@ -169,7 +174,7 @@ describe('Player Module', () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/submit/mint')
         .auth(adminToken, { type: 'bearer' })
-        .send({ xdr: 'ERROR' })
+        .send({ xdr: ERROR })
         .expect(HttpStatus.INTERNAL_SERVER_ERROR)
         .then(({ body }) => {
           expect(body.error.detail).toEqual(
