@@ -103,9 +103,9 @@ describe('Player Module', () => {
         });
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue('xdr');
       (scValToNative as jest.Mock).mockReturnValue({
+        id: externalId,
         name,
         issuer,
-        token_id: externalId,
         metadata_uri: metadataUri,
       });
 
