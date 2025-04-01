@@ -21,7 +21,9 @@ module.exports = {
   },
   coveragePathIgnorePatterns: [
     '<rootDir>/module/iam/authentication/infrastructure/cognito/cognito.service.ts',
+    '<rootDir>/test/test.module.bootstrapper.ts',
   ],
+    setupFilesAfterEnv: ['<rootDir>/test/test-stellar.setup.ts'],
   testEnvironment: 'node',
   // Keep these mappings synchronized with the ones in tsconfig.json as you add new modules
   moduleNameMapper: {

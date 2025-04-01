@@ -78,7 +78,6 @@ export class StellarTransactionAdapter {
         this.mapTransactionStatus(transaction.status) ===
         TRANSACTION_STATUS.NOT_FOUND
       );
-
       return transaction as unknown as IGetSorobanTransactionResponse;
     } catch (error) {
       if (error instanceof TransactionTimeoutException) {
@@ -104,7 +103,6 @@ export class StellarTransactionAdapter {
     try {
       const initialResponse =
         await this.sorobanServer.sendTransaction(transaction);
-
       if (initialResponse.status !== TRANSACTION_STATUS.PENDING) {
         throw initialResponse;
       }
@@ -113,7 +111,6 @@ export class StellarTransactionAdapter {
         initialResponse.hash,
         pollingOptions,
       );
-
       return this.handleTransactionStatus(finalResponse);
     } catch (error) {
       if (

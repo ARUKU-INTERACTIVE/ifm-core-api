@@ -17,9 +17,7 @@ import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transactio
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 
-import { UserService } from '@iam/user/application/service/user.service';
 import { User } from '@iam/user/domain/user.entity';
-import { UserNotFoundException } from '@iam/user/infrastructure/database/exception/user-not-found.exception';
 
 @Injectable()
 export class PlayerService {
@@ -31,7 +29,6 @@ export class PlayerService {
     private readonly transactionMapper: TransactionMapper,
     private readonly sorobanContractAdapter: SorobanContractAdapter,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
-    private readonly userService: UserService,
   ) {}
 
   async getOneById(
@@ -55,6 +52,7 @@ export class PlayerService {
     const sourceAccount = await this.stellarAccountAdapter.getAccount(
       user.publicKey,
     );
+
     const transactionXDR = await this.sorobanContractAdapter.mintPlayer(
       sourceAccount,
       issuerPublicKey,
@@ -62,7 +60,6 @@ export class PlayerService {
       name,
       metadataUri,
     );
-
     return this.playerResponseAdapter.oneEntityResponse(
       this.transactionMapper.fromXDRToTransactionDTO(transactionXDR),
     );
@@ -72,21 +69,11 @@ export class PlayerService {
     transactionXDRDto: TransactionXDRDTO,
     currentUser: User,
   ): Promise<Player> {
-    const publicKey = currentUser.publicKey;
-    const user = await this.userService.getOneByPublicKey(publicKey);
-
-    if (!user) {
-      throw new UserNotFoundException({
-        message: `User with ${publicKey} not found`,
-      });
-    }
-
     const txHash = await this.sorobanContractAdapter.submitMintPlayer(
       transactionXDRDto.xdr,
     );
     const { name, externalId, issuer, metadataUri } =
       await this.sorobanContractAdapter.getSorobanTransaction(txHash);
-
     const createPlayerDto: ICreatePlayerDto = {
       name,
       ownerId: currentUser.id,
