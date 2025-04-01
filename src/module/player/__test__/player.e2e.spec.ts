@@ -14,14 +14,18 @@ import {
 import { setupApp } from '@config/app.config';
 import { datasourceOptions } from '@config/orm.config';
 
+import {
+  getTransactionResponse,
+  loadAccountUseCases,
+  transactionUseCases,
+} from '@test/test-stellar.setup';
 import { testModuleBootstrapper } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
-import { getTransactionResponse, loadAccountUseCases, transactionUseCases } from '@test/test-stellar.setup';
 
-const {ERROR_ACCOUNT,PK_ERROR} = loadAccountUseCases
-const {MINT_PLAYER} = getTransactionResponse
-const {name,metadataUri,externalId,issuer} = MINT_PLAYER.returnValue
-const {ERROR} = transactionUseCases
+const { ERROR_ACCOUNT, PK_ERROR } = loadAccountUseCases;
+const { MINT_PLAYER } = getTransactionResponse;
+const { name, metadataUri, externalId, issuer } = MINT_PLAYER.returnValue;
+const { ERROR } = transactionUseCases;
 
 describe('Player Module', () => {
   let app: INestApplication;
@@ -78,7 +82,7 @@ describe('Player Module', () => {
   describe('POST - /player', () => {
     const createPlayerDto = {
       name,
-      metadataUri
+      metadataUri,
     } as ICreatePlayerDto;
 
     it('Should return the XDR of the mintPlayer transaction.', async () => {
