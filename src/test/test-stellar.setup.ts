@@ -4,7 +4,7 @@ import {
 } from '@common/infrastructure/stellar/exception/stellar.exception';
 
 export const loadAccountUseCases = {
-  PK_ERROR: 'PK_ERROR',
+  PK_ERROR: 'PK-ERROR',
   ERROR_ACCOUNT: 'ERROR-ACCOUNT',
   DEFAULT: 'PK',
 };

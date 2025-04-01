@@ -14,17 +14,14 @@ import {
 import { setupApp } from '@config/app.config';
 import { datasourceOptions } from '@config/orm.config';
 
-import {
-  getTransactionResponse,
-  loadAccountUseCases,
-  transactionUseCases,
-} from '@test/test-stellar.setup';
 import { testModuleBootstrapper } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
+import { getTransactionResponse, loadAccountUseCases, transactionUseCases } from '@test/test-stellar.setup';
 
-const { MINT_PLAYER } = getTransactionResponse;
-const { ERROR_ACCOUNT, PK_ERROR } = loadAccountUseCases;
-const { ERROR } = transactionUseCases;
+const {ERROR_ACCOUNT,PK_ERROR} = loadAccountUseCases
+const {MINT_PLAYER} = getTransactionResponse
+const {name,metadataUri,externalId,issuer} = MINT_PLAYER.returnValue
+const {ERROR} = transactionUseCases
 
 describe('Player Module', () => {
   let app: INestApplication;
@@ -79,10 +76,9 @@ describe('Player Module', () => {
   });
 
   describe('POST - /player', () => {
-    const { name, metadataUri } = MINT_PLAYER.returnValue;
     const createPlayerDto = {
       name,
-      metadataUri,
+      metadataUri
     } as ICreatePlayerDto;
 
     it('Should return the XDR of the mintPlayer transaction.', async () => {
@@ -102,7 +98,12 @@ describe('Player Module', () => {
           expect(body).toEqual(expectedResponse);
         });
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue('xdr');
-      (scValToNative as jest.Mock).mockReturnValue(MINT_PLAYER.returnValue);
+      (scValToNative as jest.Mock).mockReturnValue({
+        name,
+        issuer,
+        token_id: externalId,
+        metadata_uri: metadataUri,
+      });
 
       await request(app.getHttpServer())
         .post('/api/v1/player/submit/mint')
@@ -169,7 +170,7 @@ describe('Player Module', () => {
         publicKey,
         sub: '00000000-0000-0000-0000-0000000000XX',
       });
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue('ERROR');
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue(ERROR);
 
       await request(app.getHttpServer())
         .post('/api/v1/player/submit/mint')

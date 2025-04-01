@@ -9,7 +9,6 @@ import {
 import { AppModule } from '@/module/app/app.module';
 import { StellarService } from '@/stellar/application/service/stellar.service';
 
-
 export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderService> =
   {
     signUp: jest.fn(),
@@ -25,9 +24,6 @@ export const stellarServiceMock = {
   getTransactionChallenge: jest.fn(),
   verifySignature: jest.fn(),
 };
-
-
-
 
 export const testModuleBootstrapper = (): Promise<TestingModule> => {
   initializeTransactionalContext();
