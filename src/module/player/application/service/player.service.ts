@@ -17,7 +17,6 @@ import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transactio
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 
-import { UserService } from '@iam/user/application/service/user.service';
 import { User } from '@iam/user/domain/user.entity';
 
 @Injectable()
@@ -30,7 +29,6 @@ export class PlayerService {
     private readonly transactionMapper: TransactionMapper,
     private readonly sorobanContractAdapter: SorobanContractAdapter,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
-    private readonly userService: UserService,
   ) {}
 
   async getOneById(
