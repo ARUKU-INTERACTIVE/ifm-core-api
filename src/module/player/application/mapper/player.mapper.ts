@@ -46,13 +46,13 @@ export class PlayerMapper {
 
   fromSCPlayerDtoToPlayer({
     name,
-    token_id,
+    id,
     issuer,
     metadata_uri,
   }: ISCPlayerDto): ICreatePlayerDto {
     return {
       name,
-      externalId: Number(token_id),
+      externalId: Number(id),
       issuer,
       metadataUri: metadata_uri,
     };

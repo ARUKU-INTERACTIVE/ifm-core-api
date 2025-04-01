@@ -4,6 +4,6 @@ export interface ISCPlayerDto {
   last_auction: null | bigint;
   name: string;
   owner: string;
-  token_id: bigint;
+  id: bigint;
   metadata_uri: string;
 }
