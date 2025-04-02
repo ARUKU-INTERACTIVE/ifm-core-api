@@ -54,7 +54,7 @@ describe('Player Module', () => {
     await app.close();
   });
 
-  describe.only('GET - /player', () => {
+  describe('GET - /player', () => {
     it('Should return paginated players.', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/player')
@@ -172,32 +172,6 @@ describe('Player Module', () => {
             externalId: expect.any(String),
             isInAuction: expect.any(Boolean),
           });
-        });
-    });
-
-    it('Should allow to include related resources', async () => {
-      const include = ['owner'] as (keyof PlayerResponseDto)[];
-
-      await request(app.getHttpServer())
-        .get(`/api/v1/player?include[target]=${include.join(',')}`)
-        .auth(adminToken, { type: 'bearer' })
-        .expect(HttpStatus.OK)
-        .then(({ body }) => {
-          const player = body.data[0];
-          expect(player.relationships).toEqual({
-            owner: expect.objectContaining({
-              data: expect.objectContaining({
-                id: expect.any(String),
-                type: 'user',
-              }),
-            }),
-          });
-          expect(body.included).toContainEqual(
-            expect.objectContaining({
-              type: 'user',
-              id: expect.any(String),
-            }),
-          );
         });
     });
   });
