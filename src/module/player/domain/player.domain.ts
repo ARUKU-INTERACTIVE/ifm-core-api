@@ -12,4 +12,5 @@ export class Player extends Base {
   issuer: string;
   externalId: number;
   auctions: Auction[];
+  isInAuction: boolean;
 }

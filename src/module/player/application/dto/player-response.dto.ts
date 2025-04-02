@@ -35,4 +35,7 @@ export class PlayerResponseDto {
 
   @ApiPropertyOptional()
   owner?: User;
+
+  @ApiPropertyOptional()
+  isInAuction?: boolean;
 }
