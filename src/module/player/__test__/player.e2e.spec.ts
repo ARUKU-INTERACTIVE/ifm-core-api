@@ -174,6 +174,30 @@ describe('Player Module', () => {
           });
         });
     });
+
+    it('Should allow to include related resources', async () => {
+      const include = ['owner'] as (keyof PlayerResponseDto)[];
+
+      await request(app.getHttpServer())
+        .get(`/api/v1/player?include[target]=${include.join(',')}`)
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const player = body.data[0];
+          expect(player.relationships).toEqual({
+            owner: expect.objectContaining({
+              data: expect.objectContaining({
+                id: expect.any(String),
+                type: 'owner',
+              }),
+              links: expect.objectContaining({
+                self: expect.any(String),
+                related: expect.any(String),
+              }),
+            }),
+          });
+        });
+    });
   });
 
   describe('GET - /player/:id', () => {
