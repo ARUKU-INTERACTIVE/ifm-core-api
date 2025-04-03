@@ -115,7 +115,6 @@ export class SorobanContractAdapter {
       await this.sorobanServer._simulateTransaction(buildTransaction);
 
     if (!simulateResponse.results?.[0]) {
-      //TODO: agregar custom exception
       return null;
     }
 
