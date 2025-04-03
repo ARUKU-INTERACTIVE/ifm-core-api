@@ -1,3 +1,5 @@
+import { ENVIRONMENT } from '@config/environment.enum';
+
 export const environmentConfig = () => ({
   server: {
     port: Number(process.env.PORT),
@@ -19,6 +21,16 @@ export const environmentConfig = () => ({
   },
   stellar: {
     serverUrl: process.env.STELLAR_SERVER_URL,
-    networkPassphrase: process.env.STELLAR_NETWORK_PASSPHRASE,
+    networkPassphrase:
+      process.env.NODE_ENV === ENVIRONMENT.AUTOMATED_TESTS
+        ? process.env.STELLAR_LOCAL_NETWORK_PASSPHRASE
+        : process.env.STELLAR_NETWORK_PASSPHRASE,
+  },
+  soroban: {
+    serverUrl:
+      process.env.NODE_ENV === ENVIRONMENT.AUTOMATED_TESTS
+        ? process.env.SOROBAN_LOCAL_SERVER_URL
+        : process.env.SOROBAN_SERVER_URL,
+    contractAddress: process.env.SOROBAN_CONTRACT_ADDRESS,
   },
 });

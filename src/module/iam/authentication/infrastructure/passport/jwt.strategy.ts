@@ -1,7 +1,6 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ENVIRONMENT } from '@config/environment.enum';
@@ -39,30 +38,30 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         : {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            _audience: configService.get('cognito.clientId'),
-            issuer: configService.get('cognito.issuer'),
-            algorithms: ['RS256'],
-            secretOrKeyProvider: passportJwtSecret({
-              cache: true,
-              rateLimit: true,
-              jwksRequestsPerMinute: 5,
-              jwksUri:
-                configService.get('cognito.issuer') + '/.well-known/jwks.json',
-            }),
+            secretOrKey: process.env.JWT_SECRET,
           };
 
     super(options);
   }
 
   async validate(accessTokenPayload: IAccessTokenPayload): Promise<User> {
-    const currentUser = await this.userRepository.getOneByExternalId(
-      accessTokenPayload.sub,
+    let currentUser: User;
+    currentUser = await this.userRepository.getOneByPublicKey(
+      accessTokenPayload.publicKey,
     );
-
-    const currentAdminUser = await this.adminRepository.getOneByExternalId(
-      accessTokenPayload.sub,
+    if (!currentUser) {
+      currentUser = await this.userRepository.getOneByExternalId(
+        accessTokenPayload.sub,
+      );
+    }
+    let currentAdminUser = await this.adminRepository.getOneByPublicKey(
+      accessTokenPayload.publicKey,
     );
-
+    if (!currentAdminUser) {
+      currentAdminUser = await this.userRepository.getOneByExternalId(
+        accessTokenPayload.sub,
+      );
+    }
     if (!currentUser && !currentAdminUser) {
       throw new ForbiddenException();
     }

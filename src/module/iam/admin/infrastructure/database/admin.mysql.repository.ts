@@ -49,6 +49,12 @@ export class AdminMysqlRepository implements IAdminRepository {
     });
   }
 
+  async getOneByPublicKey(publicKey: string): Promise<Admin> {
+    return this.repository.findOne({
+      where: { publicKey },
+    });
+  }
+
   async getOneByAdminUsernameOrFail(username: string) {
     const admin = await this.repository.findOne({
       where: { username },
