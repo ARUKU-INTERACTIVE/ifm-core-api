@@ -18,5 +18,3 @@ services:
       - '${COGNITO_PORT:-9229}:9229'
     volumes:
       - ./data/docker/volumes/cognito:/app/.cognito
-volumes:
-  mysql_data:

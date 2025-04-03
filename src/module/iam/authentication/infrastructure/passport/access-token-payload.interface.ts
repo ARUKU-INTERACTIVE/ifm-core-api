@@ -1,7 +1,6 @@
 export interface IAccessTokenPayload {
-  publicKey: string;
-  iss: string;
   sub: string;
+  iss: string;
   client_id: string;
   origin_jti: string;
   event_id: string;

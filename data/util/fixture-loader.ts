@@ -33,5 +33,9 @@ export const loadFixtures = async (
     }
   } catch (err) {
     throw err;
-  } 
+  } finally {
+    if (dataSource) {
+      await dataSource.destroy();
+    }
+  }
 };

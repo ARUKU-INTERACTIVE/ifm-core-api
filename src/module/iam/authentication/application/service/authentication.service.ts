@@ -193,14 +193,8 @@ export class AuthenticationService {
   }
 
   private signJwt(payload: JWTPayloadDto) {
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '1h',
-      secret: process.env.JWT_SECRET,
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-      secret: process.env.JWT_SECRET,
-    });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
     return { accessToken, refreshToken };
   }
