@@ -3,7 +3,7 @@ import { IPlayerRepository } from '@module/player/application/repository/player.
 import { Player } from '@module/player/domain/player.domain';
 import { PlayerSChema } from '@module/player/infrastructure/database/player.schema';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 import { ICollection } from '@common/base/application/dto/collection.interface';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
@@ -18,9 +18,20 @@ export class PlayerRepository implements IPlayerRepository {
     options: IGetAllOptions<Player, PlayerRelation[]>,
   ): Promise<ICollection<Player>> {
     const { filter, page, sort, fields, include } = options || {};
+    const whereClause = { ...filter };
+
+    if (filter) {
+      Object.entries(filter).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          whereClause[key] = ILike(`%${value}%`);
+        } else {
+          whereClause[key] = value;
+        }
+      });
+    }
 
     const [items, itemCount] = await this.repository.findAndCount({
-      where: { ...filter },
+      where: whereClause,
       order: sort,
       select: fields,
       take: page.size,
