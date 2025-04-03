@@ -17,7 +17,6 @@ export class PlayerMapper {
     player.metadataUri = playerDto.metadataUri;
     player.issuer = playerDto.issuer;
     player.externalId = playerDto.externalId;
-    player.isInAuction = playerDto.isInAuction;
     return player;
   }
 
