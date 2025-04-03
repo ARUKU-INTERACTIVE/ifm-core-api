@@ -84,7 +84,6 @@ describe('Authentication Module', () => {
       it('should deny requests that contain an invalid token', async () => {
         const accessToken = createAccessToken({
           sub: 'non-existent-user-id',
-          publicKey: 'non-existent-publick-key',
         });
 
         await request(app.getHttpServer())

@@ -19,7 +19,7 @@ describe('Book Module', () => {
   let app: INestApplication;
 
   const adminToken = createAccessToken({
-    publicKey: '00000000-0000-0000-0000-00000000000X',
+    sub: '00000000-0000-0000-0000-00000000000X',
   });
 
   beforeAll(async () => {

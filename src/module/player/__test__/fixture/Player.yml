@@ -1,7 +1,0 @@
-entity: Player
-items:
-  player1:
-    name: 'player'
-    metadataUri: 'http://example.com.ar'
-    externalId: '{{string.uuid}}'
-    issuer: 'ISSUER'

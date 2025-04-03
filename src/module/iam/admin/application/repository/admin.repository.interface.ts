@@ -9,7 +9,6 @@ export interface IAdminRepository {
   getAll(options: IGetAllOptions<Admin>): Promise<ICollection<Admin>>;
   getOneByAdminUsername(username: string): Promise<Admin>;
   getOneByExternalId(externalId: string): Promise<Admin>;
-  getOneByPublicKey(publicKey: string): Promise<Admin>;
   getOneByAdminUsernameOrFail(username: string): Promise<Admin>;
   saveOne(admin: Admin): Promise<Admin>;
   updateOneOrFail(
