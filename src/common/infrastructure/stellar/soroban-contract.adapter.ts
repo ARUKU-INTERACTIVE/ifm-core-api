@@ -1,4 +1,4 @@
-import { IPlayerDto } from '@module/player/application/dto/create-player.dto.interface';
+import { PlayerDto } from '@module/player/application/dto/player.dto';
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -88,7 +88,7 @@ export class SorobanContractAdapter {
     return txHash;
   }
 
-  async getSorobanTransaction(txHash: string): Promise<IPlayerDto> {
+  async getPlayerFromTransaction(txHash: string): Promise<PlayerDto> {
     const { returnValue } =
       await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
     const txReturnValue = returnValue as unknown as xdr.ScVal;

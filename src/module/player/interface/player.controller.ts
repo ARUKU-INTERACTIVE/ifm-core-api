@@ -4,7 +4,9 @@ import { PlayerService } from '@module/player/application/service/player.service
 import { PLAYER_ENTITY_NAME } from '@module/player/domain/player.name';
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
+import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { ControllerEntity } from '@common/base/application/interface/decorators/endpoint-entity.decorator';
+import { TransactionXDRResponseDto } from '@common/infrastructure/stellar/dto/transaction-xdr-response.dto';
 import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
 
 import { AuthType } from '@iam/authentication/domain/auth-type.enum';
@@ -27,7 +29,7 @@ export class PlayerController {
   async mintPlayer(
     @CurrentUser() user: User,
     @Body() createPlayerDto: CreatePlayerDto,
-  ): Promise<any> {
+  ): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
     const player = await this.playerService.mintPlayerXDR(
       createPlayerDto,
       user,

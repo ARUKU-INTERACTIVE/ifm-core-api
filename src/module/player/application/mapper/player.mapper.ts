@@ -1,5 +1,6 @@
-import { IPlayerDto } from '@module/player/application/dto/create-player.dto.interface';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
+import { PlayerDto } from '@module/player/application/dto/player.dto';
+import { IPlayerDto } from '@module/player/application/dto/player.dto.interface';
 import { IUpdatePlayerDto } from '@module/player/application/dto/update-player.dto.interface';
 import { Player } from '@module/player/domain/player.domain';
 import { Injectable } from '@nestjs/common';
@@ -42,13 +43,12 @@ export class PlayerMapper {
     return playerResponseDto;
   }
 
-  fromSCPlayerDtoToPlayer(scPlayerDto: ISCPlayerDto): IPlayerDto {
-    const playerDto = {
-      name: scPlayerDto.name,
-      externalId: Number(scPlayerDto.id),
-      issuer: scPlayerDto.issuer,
-      metadataUri: scPlayerDto.metadata_uri,
-    };
+  fromSCPlayerDtoToPlayer(scPlayerDto: ISCPlayerDto): PlayerDto {
+    const playerDto = new PlayerDto();
+    playerDto.name = scPlayerDto.name;
+    playerDto.externalId = Number(scPlayerDto.id);
+    playerDto.issuer = scPlayerDto.issuer;
+    playerDto.metadataUri = scPlayerDto.metadata_uri;
     return playerDto;
   }
 }
