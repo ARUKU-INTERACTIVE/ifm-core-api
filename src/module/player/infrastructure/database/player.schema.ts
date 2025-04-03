@@ -27,6 +27,11 @@ export const PlayerSChema = new EntitySchema<Player>({
       type: String,
       nullable: false,
     },
+    isInAuction: {
+      name: 'is_in_auction',
+      type: Boolean,
+      default: false,
+    },
   }),
   relations: {
     owner: {
