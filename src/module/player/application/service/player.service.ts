@@ -1,5 +1,8 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
-import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
+import {
+  ICreatePlayerDto,
+  IPlayerDto,
+} from '@module/player/application/dto/create-player.dto.interface';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
@@ -74,7 +77,7 @@ export class PlayerService {
     );
     const { name, externalId, issuer, metadataUri } =
       await this.sorobanContractAdapter.getSorobanTransaction(txHash);
-    const createPlayerDto: ICreatePlayerDto = {
+    const createPlayerDto: IPlayerDto = {
       name,
       ownerId: currentUser.id,
       externalId,

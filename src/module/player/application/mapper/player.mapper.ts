@@ -1,4 +1,4 @@
-import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
+import { IPlayerDto } from '@module/player/application/dto/create-player.dto.interface';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { IUpdatePlayerDto } from '@module/player/application/dto/update-player.dto.interface';
 import { Player } from '@module/player/domain/player.domain';
@@ -8,9 +8,7 @@ import { ISCPlayerDto } from '@common/infrastructure/stellar/dto/player-sc.dto';
 
 @Injectable()
 export class PlayerMapper {
-  private mapDtoToPlayer(
-    playerDto: ICreatePlayerDto | IUpdatePlayerDto,
-  ): Player {
+  private mapDtoToPlayer(playerDto: IPlayerDto | IUpdatePlayerDto): Player {
     const player = new Player();
     player.name = playerDto.name;
     player.metadataUri = playerDto.metadataUri;
@@ -19,7 +17,7 @@ export class PlayerMapper {
     return player;
   }
 
-  fromCreatePlayerDtoToPlayer(playerDto: ICreatePlayerDto): Player {
+  fromCreatePlayerDtoToPlayer(playerDto: IPlayerDto): Player {
     const player = this.mapDtoToPlayer(playerDto);
     player.ownerId = playerDto.ownerId;
     return player;
@@ -44,17 +42,13 @@ export class PlayerMapper {
     return playerResponseDto;
   }
 
-  fromSCPlayerDtoToPlayer({
-    name,
-    id,
-    issuer,
-    metadata_uri,
-  }: ISCPlayerDto): ICreatePlayerDto {
-    return {
-      name,
-      externalId: Number(id),
-      issuer,
-      metadataUri: metadata_uri,
+  fromSCPlayerDtoToPlayer(scPlayerDto: ISCPlayerDto): IPlayerDto {
+    const playerDto = {
+      name: scPlayerDto.name,
+      externalId: Number(scPlayerDto.id),
+      issuer: scPlayerDto.issuer,
+      metadataUri: scPlayerDto.metadata_uri,
     };
+    return playerDto;
   }
 }

@@ -15,11 +15,13 @@ export const PlayerSChema = new EntitySchema<Player>({
       name: 'metadata_uri',
       type: String,
       nullable: true,
+      unique: true,
     },
     externalId: {
       name: 'external_id',
       type: Number,
       nullable: false,
+      unique: true,
     },
     issuer: {
       type: String,
