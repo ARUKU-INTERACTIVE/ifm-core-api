@@ -9,7 +9,9 @@ import { ISCPlayerDto } from '@common/infrastructure/stellar/dto/player-sc.dto';
 
 @Injectable()
 export class PlayerMapper {
-  private mapDtoToPlayer(playerDto: IPlayerDto | IUpdatePlayerDto): Player {
+  private mapPlayerDtoToPlayer(
+    playerDto: IPlayerDto | IUpdatePlayerDto,
+  ): Player {
     const player = new Player();
     player.name = playerDto.name;
     player.metadataUri = playerDto.metadataUri;
@@ -19,13 +21,13 @@ export class PlayerMapper {
   }
 
   fromCreatePlayerDtoToPlayer(playerDto: IPlayerDto): Player {
-    const player = this.mapDtoToPlayer(playerDto);
+    const player = this.mapPlayerDtoToPlayer(playerDto);
     player.ownerId = playerDto.ownerId;
     return player;
   }
 
   fromUpdatePlayerDtoToPlayer(PlayerDto: IUpdatePlayerDto): Player {
-    return this.mapDtoToPlayer(PlayerDto);
+    return this.mapPlayerDtoToPlayer(PlayerDto);
   }
 
   fromPlayerToPlayerResponseDto(player: Player): PlayerResponseDto {
