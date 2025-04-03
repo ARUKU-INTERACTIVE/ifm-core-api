@@ -13,6 +13,10 @@ export const AdminSchema = new EntitySchema<Admin>({
       type: String,
       unique: true,
     },
+    publicKey: {
+      type: String,
+      unique: true,
+    },
     externalId: {
       type: String,
       unique: true,

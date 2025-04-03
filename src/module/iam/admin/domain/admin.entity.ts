@@ -7,7 +7,7 @@ export class Admin extends Base {
   externalId?: string;
   roles: AppRole[];
   isVerified: boolean;
-
+  publicKey?: string;
   constructor(
     username: string,
     roles: AppRole[],
@@ -17,11 +17,13 @@ export class Admin extends Base {
     updatedAt?: string,
     deletedAt?: string,
     isVerified?: boolean,
+    publicKey?: string,
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this.username = username;
     this.externalId = externalId;
     this.roles = roles;
     this.isVerified = isVerified;
+    this.publicKey = publicKey;
   }
 }
