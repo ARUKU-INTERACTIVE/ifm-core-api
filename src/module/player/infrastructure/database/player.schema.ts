@@ -12,13 +12,11 @@ export const PlayerSChema = new EntitySchema<Player>({
       type: String,
     },
     metadataUri: {
-      name: 'metadata_uri',
       type: String,
       nullable: true,
       unique: true,
     },
     externalId: {
-      name: 'external_id',
       type: Number,
       nullable: false,
       unique: true,
@@ -28,7 +26,6 @@ export const PlayerSChema = new EntitySchema<Player>({
       nullable: false,
     },
     isInAuction: {
-      name: 'is_in_auction',
       type: Boolean,
       default: false,
     },
