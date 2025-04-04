@@ -23,6 +23,17 @@ export const getTransactionResponse = {
       metadataUri: 'http://example.com',
     },
   },
+  GET_PLAYER: {
+    returnValue: {
+      is_in_auction: false,
+      issuer: 'Issuer',
+      last_auction: null,
+      name: 'player',
+      owner: 'owner',
+      id: 1,
+      metadata_uri: 'http://example.com',
+    },
+  },
 };
 
 const transactionXDR = {
@@ -75,6 +86,13 @@ jest.mock('@stellar/stellar-sdk', () => ({
       prepareTransaction: jest.fn().mockImplementation(() => ({
         toXDR: jest.fn().mockReturnValue(xdr),
       })),
+      _simulateTransaction: jest.fn().mockReturnValue({
+        results: [
+          {
+            xdr: 'AAAAEQAAAAEAAAAFAAAADwAAAAZpc3N1ZXIAAAAAAA4AAAA4R0NFTVZVUzYyNVdURlVVMzJMWEU0Q1dTTk1DQjRHT01CTkw2Vk1FS01UM0RZSUlEWVg3NENHTDcAAAAPAAAADG1ldGFkYXRhX3VyaQAAAA4AAAALc29tZSBzdHJpbmcAAAAADwAAAARuYW1lAAAADgAAAARKb2VsAAAADwAAAAVvd25lcgAAAAAAAA4AAAA4R0M3MjRMVEhBN0ZGSVhPNFNDUExZSkdIS1AzVk1XNDNKQzNMRUFUSFBPTjVDTTQ3TkVFSjVUS0UAAAAPAAAACHRva2VuX2lkAAAACgAAAAAAAAAAAAAAAAAAAAE=',
+          },
+        ],
+      }),
       getTransaction: jest.fn().mockReturnValue({
         ...getTransactionResponse.MINT_PLAYER,
         status: SUCCESS,

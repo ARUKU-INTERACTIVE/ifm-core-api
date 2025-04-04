@@ -1,3 +1,4 @@
+import { Auction } from '@module/auction/domain/auction.domain';
 import { PLAYER_ENTITY_NAME } from '@module/player/domain/player.name';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '@sentry/nestjs';
@@ -35,4 +36,10 @@ export class PlayerResponseDto {
 
   @ApiPropertyOptional()
   owner?: User;
+
+  @ApiPropertyOptional()
+  isInAuction?: boolean;
+
+  @ApiPropertyOptional()
+  auctions?: Auction[];
 }

@@ -5,3 +5,10 @@ items:
     metadataUri: 'http://example.com.ar'
     externalId: '{{string.uuid}}'
     issuer: 'ISSUER'
+    owner: '@admin-user'
+  player2:
+    name: '{{string.alpha}}'
+    metadataUri: '{{string.alpha}}'
+    externalId: '{{string.uuid}}'
+    issuer: '{{string.alpha}}'
+    owner: '@admin-user'

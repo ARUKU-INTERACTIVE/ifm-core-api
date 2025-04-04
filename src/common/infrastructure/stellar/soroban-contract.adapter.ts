@@ -95,4 +95,31 @@ export class SorobanContractAdapter {
     const player: ISCPlayerDto = scValToNative(txReturnValue);
     return this.playerMapper.fromSCPlayerDtoToPlayer(player);
   }
+
+  async getPlayer(
+    sourceAccount: Account,
+    playerId: number,
+  ): Promise<ISCPlayerDto> {
+    const contract = await this.getContract();
+    const playerIdScVal = nativeToScVal(playerId, { type: 'i128' });
+
+    const buildTransaction = new TransactionBuilder(sourceAccount, {
+      fee: BASE_FEE,
+      networkPassphrase: this.networkPassphrase,
+    })
+      .addOperation(contract.call('get_player', playerIdScVal))
+      .setTimeout(this.BASE_TIMEOUT)
+      .build();
+
+    const simulateResponse =
+      await this.sorobanServer._simulateTransaction(buildTransaction);
+
+    if (!simulateResponse.results?.[0]) {
+      return null;
+    }
+
+    const responseXDR = simulateResponse.results[0].xdr;
+    const scVal = xdr.ScVal.fromXDR(responseXDR, 'base64');
+    return scValToNative(scVal) as ISCPlayerDto;
+  }
 }

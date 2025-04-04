@@ -1,4 +1,5 @@
 import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
+import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { TransactionBuilder, scValToNative } from '@stellar/stellar-sdk';
 import request from 'supertest';
@@ -54,6 +55,152 @@ describe('Player Module', () => {
   });
 
   describe('GET - /player', () => {
+    it('Should return paginated players.', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/player')
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse = {
+            data: expect.arrayContaining([
+              expect.objectContaining({
+                attributes: expect.objectContaining({
+                  createdAt: expect.any(String),
+                  deletedAt: null,
+                  externalId: expect.any(String),
+                  isInAuction: expect.any(Boolean),
+                  issuer: expect.any(String),
+                  metadataUri: expect.any(String),
+                  name: expect.any(String),
+                  updatedAt: expect.any(String),
+                  uuid: expect.any(String),
+                }),
+                id: expect.any(String),
+                type: 'player',
+              }),
+            ]),
+            meta: expect.objectContaining({
+              pageNumber: expect.any(Number),
+              pageSize: expect.any(Number),
+              itemCount: expect.any(Number),
+              pageCount: expect.any(Number),
+            }),
+            included: expect.any(Array),
+            links: expect.objectContaining({
+              self: expect.any(String),
+              last: expect.any(String),
+              next: null,
+            }),
+          };
+
+          expect(body).toEqual(expectedResponse);
+        });
+    });
+
+    it('Should allow to filter by attributes', async () => {
+      const name = 'player';
+
+      await request(app.getHttpServer())
+        .get(`/api/v1/player?filter[name]=${name}`)
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse = {
+            data: expect.arrayContaining([
+              expect.objectContaining({
+                attributes: expect.objectContaining({
+                  name: expect.any(String),
+                }),
+              }),
+            ]),
+            meta: expect.objectContaining({
+              pageNumber: expect.any(Number),
+              pageSize: expect.any(Number),
+              itemCount: expect.any(Number),
+              pageCount: expect.any(Number),
+            }),
+            included: expect.any(Array),
+            links: expect.objectContaining({
+              self: expect.any(String),
+              last: expect.any(String),
+              next: null,
+            }),
+          };
+
+          expect(body).toEqual(expectedResponse);
+        });
+    });
+
+    it('Should allow to sort by attributes', async () => {
+      const firstPlayer = { name: '' } as PlayerResponseDto;
+      const lastPlayer = { name: '' } as PlayerResponseDto;
+      let pageCount: number;
+
+      await request(app.getHttpServer())
+        .get('/api/v1/player?sort[name]=DESC')
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          firstPlayer.name = body.data[0].attributes.name;
+          pageCount = body.meta.pageCount;
+          firstPlayer.name = body.data[0].attributes.name;
+          pageCount = body.meta.pageCount;
+        });
+
+      await request(app.getHttpServer())
+        .get(`/api/v1/player?sort[name]=ASC&page[number]=${pageCount}`)
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const resources = body.data;
+          lastPlayer.name = resources[resources.length - 1].attributes.name;
+          expect(lastPlayer.name).toBe(firstPlayer.name);
+        });
+    });
+
+    it('Should allow to select specific attributes', async () => {
+      const attributes = ['name', 'externalId'] as (keyof PlayerResponseDto)[];
+
+      await request(app.getHttpServer())
+        .get(`/api/v1/player?fields[target]=${attributes.join(',')}`)
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const resourceAttributes = body.data[0].attributes;
+          expect(resourceAttributes).toEqual({
+            name: expect.any(String),
+            externalId: expect.any(String),
+            isInAuction: expect.any(Boolean),
+          });
+        });
+    });
+
+    it('Should allow to include related resources', async () => {
+      const include = ['owner'] as (keyof PlayerResponseDto)[];
+
+      await request(app.getHttpServer())
+        .get(`/api/v1/player?include[target]=${include.join(',')}`)
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const player = body.data[0];
+          expect(player.relationships).toEqual({
+            owner: expect.objectContaining({
+              data: expect.objectContaining({
+                id: expect.any(String),
+                type: 'owner',
+              }),
+              links: expect.objectContaining({
+                self: expect.any(String),
+                related: expect.any(String),
+              }),
+            }),
+          });
+        });
+    });
+  });
+
+  describe('GET - /player/:id', () => {
     it('Should return the XDR of the mintPlayer transaction.', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/player/1')

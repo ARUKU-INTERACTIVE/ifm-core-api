@@ -10,7 +10,11 @@ import {
 import { Player } from '@module/player/domain/player.domain';
 import { Inject, Injectable } from '@nestjs/common';
 
+import { CollectionDto } from '@common/base/application/dto/collection.dto';
+import { ICollection } from '@common/base/application/dto/collection.interface';
+import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
+import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
 import { TransactionXDRResponseDto } from '@common/infrastructure/stellar/dto/transaction-xdr-response.dto';
 import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
@@ -31,6 +35,46 @@ export class PlayerService {
     private readonly stellarAccountAdapter: StellarAccountAdapter,
   ) {}
 
+  async getAll(
+    options: IGetAllOptions<Player, PlayerRelation[]>,
+    user: User,
+  ): Promise<ManySerializedResponseDto<PlayerResponseDto>> {
+    const sourceAccount = await this.stellarAccountAdapter.getAccount(
+      user.publicKey,
+    );
+
+    const collection = await this.playerRepository.getAll(options);
+    const players: ICollection<Player> = {
+      ...collection,
+      data: await Promise.all(
+        collection.data.map(async (player) => {
+          const playerFromContract =
+            await this.sorobanContractAdapter.getPlayer(
+              sourceAccount,
+              player.externalId,
+            );
+
+          return {
+            ...player,
+            isInAuction: playerFromContract?.is_in_auction ?? false,
+          };
+        }),
+      ),
+    };
+
+    const collectionDto = new CollectionDto({
+      ...collection,
+      data: players.data.map((player) =>
+        this.playerMapper.fromPlayerToPlayerResponseDto(player),
+      ),
+    });
+
+    return this.playerResponseAdapter.manyEntitiesResponse<PlayerResponseDto>(
+      collectionDto,
+      options.include,
+    );
+  }
+
   async getOneById(
     id: number,
     relations?: PlayerRelation[],
@@ -38,7 +82,7 @@ export class PlayerService {
     const player = await this.playerRepository.getOneById(id, relations);
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
-      [PlayerRelation.USER],
+      [PlayerRelation.OWNER],
     );
   }
 
@@ -82,7 +126,7 @@ export class PlayerService {
 
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
-      [PlayerRelation.USER],
+      [PlayerRelation.OWNER],
     );
   }
 }
