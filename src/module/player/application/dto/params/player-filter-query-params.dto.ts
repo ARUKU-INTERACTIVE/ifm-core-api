@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class PlayerFilterQueryParamsDto {
@@ -30,5 +31,6 @@ export class PlayerFilterQueryParamsDto {
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => value === 'true')
   isInAuction?: boolean;
 }
