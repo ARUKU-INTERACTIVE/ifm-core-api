@@ -44,7 +44,7 @@ export class PlayerService {
     );
 
     const collection = await this.playerRepository.getAll(options);
-    const playersForSale: ICollection<Player> = {
+    const players: ICollection<Player> = {
       ...collection,
       data: await Promise.all(
         collection.data.map(async (player) => {
@@ -64,7 +64,7 @@ export class PlayerService {
 
     const collectionDto = new CollectionDto({
       ...collection,
-      data: playersForSale.data.map((player) =>
+      data: players.data.map((player) =>
         this.playerMapper.fromPlayerToPlayerResponseDto(player),
       ),
     });
