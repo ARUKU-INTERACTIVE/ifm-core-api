@@ -6,7 +6,7 @@ items:
     externalId: '{{string.uuid}}'
     issuer: 'ISSUER'
     owner: '@admin-user'
-  player{2..10}:
+  player2:
     name: '{{string.alpha}}'
     metadataUri: '{{string.alpha}}'
     externalId: '{{string.uuid}}'
