@@ -5,6 +5,8 @@ import { TransactionMapper } from '@common/infrastructure/stellar/application/ma
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
+import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.adapter';
+import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
 
 @Module({
   imports: [],
@@ -13,13 +15,16 @@ import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stella
     StellarAccountAdapter,
     SorobanContractAdapter,
     StellarTransactionAdapter,
+    StellarNftAdapter,
     TransactionMapper,
+    PinataAdapter,
     PlayerMapper,
   ],
   exports: [
     TransactionMapper,
     StellarAccountAdapter,
     StellarTransactionAdapter,
+    StellarNftAdapter,
     SorobanContractAdapter,
   ],
 })

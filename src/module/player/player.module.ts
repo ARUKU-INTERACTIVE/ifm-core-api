@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StellarModule } from '@common/infrastructure/stellar/stellar.module';
 
 import { UserModule } from '@iam/user/user.module';
+import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
 
 const playerRepositoryProvider: Provider = {
   provide: PLAYER_REPOSITORY_KEY,
@@ -22,12 +23,14 @@ const playerRepositoryProvider: Provider = {
     TypeOrmModule.forFeature([PlayerSChema]),
     StellarModule,
     UserModule,
+    
   ],
   providers: [
     playerRepositoryProvider,
     PlayerService,
     PlayerResponseAdapter,
     PlayerMapper,
+    PinataAdapter
   ],
   controllers: [PlayerController],
   exports: [

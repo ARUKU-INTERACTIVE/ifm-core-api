@@ -21,6 +21,7 @@ import { ResponseSerializerService } from '@/module/app/application/service/resp
 import { HealthController } from '@/module/health/interface/health.controller';
 import { PaymentModule } from '@/module/payment/payment.module';
 import { StellarModule } from '@/stellar/stellar.module';
+import { TomlModule } from '@module/toml/toml.module';
 
 @Global()
 @Module({
@@ -46,6 +47,7 @@ import { StellarModule } from '@/stellar/stellar.module';
     StellarModule,
     PlayerModule,
     AuctionModule,
+    TomlModule
   ],
   providers: [AppService, ResponseSerializerService],
   exports: [AppService, ResponseSerializerService],

@@ -1,6 +1,7 @@
 import {
   INestApplication,
   ValidationPipe,
+  VERSION_NEUTRAL,
   VersioningType,
 } from '@nestjs/common';
 import { BaseExceptionFilter, HttpAdapterHost } from '@nestjs/core';
@@ -23,7 +24,7 @@ export const setupApp = (app: INestApplication) => {
     new GetCurrentEndpointInterceptor(app.get(AppService)),
   );
   app.useGlobalFilters(new AppExceptionFilter());
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api',{exclude: ['.well-known/stellar.toml']});
 
   app.useGlobalPipes(
     new ValidationPipe({
