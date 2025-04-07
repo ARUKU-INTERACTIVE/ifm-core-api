@@ -11,5 +11,5 @@ export interface IPlayerRepository {
     options: IGetAllOptions<Player, PlayerRelation[]>,
   ): Promise<ICollection<Player>>;
   getOneById(id: number, relations?: PlayerRelation[]): Promise<Player>;
-  saveOne(book: Player, relations?: PlayerRelation[]): Promise<Player>;
+  saveOne(player: Player, relations?: PlayerRelation[]): Promise<Player>;
 }

@@ -5,14 +5,15 @@ import { PlayerService } from '@module/player/application/service/player.service
 import { PlayerRepository } from '@module/player/infrastructure/database/player.mysql.repository';
 import { PlayerSChema } from '@module/player/infrastructure/database/player.schema';
 import { PlayerController } from '@module/player/interface/player.controller';
-import { Module, Provider } from '@nestjs/common';
+import { Module, Provider, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 import { StellarModule } from '@common/infrastructure/stellar/stellar.module';
 
 import { UserModule } from '@iam/user/user.module';
 
-const playerRepositoryProvider: Provider = {
+export const playerRepositoryProvider: Provider = {
   provide: PLAYER_REPOSITORY_KEY,
   useClass: PlayerRepository,
 };
@@ -20,8 +21,9 @@ const playerRepositoryProvider: Provider = {
 @Module({
   imports: [
     TypeOrmModule.forFeature([PlayerSChema]),
-    StellarModule,
+    forwardRef(() => StellarModule),
     UserModule,
+    PinataModule,
   ],
   providers: [
     playerRepositoryProvider,

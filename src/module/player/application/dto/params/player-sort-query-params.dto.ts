@@ -28,9 +28,4 @@ export class PlayerSortQueryParamsDto {
   @IsEnum(SortType)
   @IsOptional()
   externalId?: SortType;
-
-  @ApiPropertyOptional()
-  @IsEnum(SortType)
-  @IsOptional()
-  isInAuction?: SortType;
 }

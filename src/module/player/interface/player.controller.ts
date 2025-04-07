@@ -1,19 +1,31 @@
-import { CreatePlayerDto } from '@module/player/application/dto/create-player.dto';
 import { PlayerFieldsQueryParamsDto } from '@module/player/application/dto/params/player-fields-query-params.dto';
 import { PlayerFilterQueryParamsDto } from '@module/player/application/dto/params/player-filter-query-params.dto';
 import { PlayerIncludeQueryParamsDto } from '@module/player/application/dto/params/player-include-query-params.dto';
 import { PlayerSortQueryParamsDto } from '@module/player/application/dto/params/player-sort-query-params.dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
+import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { PlayerService } from '@module/player/application/service/player.service';
 import { PLAYER_ENTITY_NAME } from '@module/player/domain/player.name';
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { PageQueryParamsDto } from '@common/base/application/dto/page-query-params.dto';
 import { ControllerEntity } from '@common/base/application/interface/decorators/endpoint-entity.decorator';
-import { TransactionXDRResponseDto } from '@common/infrastructure/stellar/dto/transaction-xdr-response.dto';
-import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
+import { CreateNFTDto } from '@common/infrastructure/stellar/dto/create-nft.dto';
+import { TransactionNFTDto } from '@common/infrastructure/stellar/dto/transaction-nft.dto';
+import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.adapter';
 
 import { AuthType } from '@iam/authentication/domain/auth-type.enum';
 import { Auth } from '@iam/authentication/infrastructure/decorator/auth.decorator';
@@ -24,8 +36,10 @@ import { User } from '@iam/user/domain/user.entity';
 @ControllerEntity(PLAYER_ENTITY_NAME)
 @Controller('/player')
 export class PlayerController {
-  constructor(private readonly playerService: PlayerService) {}
-
+  constructor(
+    private readonly playerService: PlayerService,
+    private readonly stellarNFTAdapter: StellarNftAdapter,
+  ) {}
   @Get()
   getAll(
     @Query('page') page: PageQueryParamsDto,
@@ -33,18 +47,14 @@ export class PlayerController {
     @Query('fields') fields: PlayerFieldsQueryParamsDto,
     @Query('sort') sort: PlayerSortQueryParamsDto,
     @Query('include') include: PlayerIncludeQueryParamsDto,
-    @CurrentUser() user: User,
   ): Promise<ManySerializedResponseDto<PlayerResponseDto>> {
-    return this.playerService.getAll(
-      {
-        page,
-        filter,
-        sort,
-        fields: fields.target,
-        include: include.target ?? [],
-      },
-      user,
-    );
+    return this.playerService.getAll({
+      page,
+      filter,
+      sort,
+      fields: fields.target,
+      include: include.target ?? [],
+    });
   }
 
   @Get('/:id')
@@ -52,25 +62,35 @@ export class PlayerController {
     return this.playerService.getOneById(id);
   }
 
+  @UseInterceptors(FileInterceptor('file'))
   @Post('/mint')
   async mintPlayer(
+    @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
-    @Body() createPlayerDto: CreatePlayerDto,
-  ): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
-    const player = await this.playerService.mintPlayerXDR(
-      createPlayerDto,
-      user,
+    @Body() createNFTDto: CreateNFTDto,
+  ): Promise<OneSerializedResponseDto<TransactionNFTDto>> {
+    if (!file || !file.mimetype.startsWith('image/')) {
+      throw new BadRequestException(
+        'Invalid file type. Only images are allowed.',
+      );
+    }
+    const createNFTDtoWithFile = {
+      ...createNFTDto,
+      file,
+    };
+    return await this.stellarNFTAdapter.createPlayerNFTTransaction(
+      createNFTDtoWithFile,
+      user.publicKey,
     );
-    return player;
   }
 
   @Post('/submit/mint')
   async submitMintPlayer(
     @CurrentUser() user: User,
-    @Body() transactionXDRDto: TransactionXDRDTO,
-  ) {
+    @Body() submitMintPlayerDto: SubmitMintPlayerDto,
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     return await this.playerService.submitMintPlayerXdr(
-      transactionXDRDto,
+      submitMintPlayerDto,
       user,
     );
   }

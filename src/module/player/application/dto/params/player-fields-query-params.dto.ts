@@ -11,14 +11,7 @@ type PlayerFields = IGetAllOptions<Player>['fields'];
 export class PlayerFieldsQueryParamsDto {
   @ApiPropertyOptional()
   @IsIn(
-    [
-      'name',
-      'metadataUri',
-      'ownerId',
-      'issuer',
-      'externalId',
-      'isInAuction',
-    ] as PlayerFields,
+    ['name', 'metadataCid', 'ownerId', 'issuer', 'description'] as PlayerFields,
     {
       each: true,
     },

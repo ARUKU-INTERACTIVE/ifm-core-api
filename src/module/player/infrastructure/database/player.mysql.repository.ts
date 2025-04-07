@@ -34,8 +34,8 @@ export class PlayerRepository implements IPlayerRepository {
       where: whereClause,
       order: sort,
       select: fields,
-      take: page.size,
-      skip: page.offset,
+      take: page?.size,
+      skip: page?.offset,
       relations: include,
     });
 

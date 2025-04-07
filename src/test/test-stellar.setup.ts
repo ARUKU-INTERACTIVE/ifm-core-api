@@ -63,18 +63,42 @@ jest.mock('@stellar/stellar-sdk', () => ({
       }),
     })),
   },
+  Operation: {
+    createAccount: jest.fn(),
+    manageData: jest.fn(),
+    changeTrust: jest.fn(),
+    payment: jest.fn(),
+    setOptions: jest.fn(),
+  },
+  Memo: { text: jest.fn() },
+  StrKey: {
+    isValidEd25519PublicKey: jest.fn().mockImplementation((publicKey) => {
+      if (publicKey == PK_ERROR) {
+        throw new Error();
+      }
+      return true;
+    }),
+  },
+  WebAuth: {
+    verifyTxSignedBy: jest.fn().mockImplementation((transaction) => {
+      if (transaction == ERROR) {
+        throw new Error();
+      }
+      return true;
+    }),
+  },
   TransactionBuilder: jest.fn().mockImplementation(() => ({
+    sign: jest.fn(),
     fromXDR: jest.fn(),
-    addMemo: jest.fn(),
-    setTimeout: jest.fn(),
-    build: jest.fn(),
-    addOperation: jest.fn().mockImplementation(() => ({
-      setTimeout: jest.fn().mockImplementation(() => ({
-        build: jest.fn().mockImplementation(() => ({
-          toXDR: jest.fn(),
-        })),
-      })),
-    })),
+    addMemo: jest.fn().mockReturnThis(),
+    setTimeout: jest.fn().mockReturnThis(),
+    build: jest.fn().mockReturnThis(),
+    addOperation: jest.fn().mockReturnThis(),
+    toXDR: jest.fn().mockReturnValue(xdr),
+  })),
+  Asset: jest.fn().mockImplementation(() => ({
+    code: 'code',
+    issuer: 'issuer',
   })),
   rpc: {
     Api: {
@@ -108,15 +132,9 @@ jest.mock('@stellar/stellar-sdk', () => ({
         .mockReturnValue({ status: SUCCESS, txHash: xdr }),
     })),
   },
-  WebAuth: {
-    verifyTxSignedBy: jest.fn(),
-  },
-  StrKey: {
-    isValidEd25519PublicKey: jest.fn(),
-  },
   Keypair: {
     random: jest.fn().mockImplementation(() => ({
-      publicKey: jest.fn(),
+      publicKey: jest.fn().mockReturnValue('GXX'),
     })),
     fromSecret: jest.fn(),
   },

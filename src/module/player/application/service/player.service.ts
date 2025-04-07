@@ -1,6 +1,6 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
-import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
+import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import {
@@ -11,15 +11,13 @@ import { Player } from '@module/player/domain/player.domain';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
-import { ICollection } from '@common/base/application/dto/collection.interface';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
-import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
-import { TransactionXDRResponseDto } from '@common/infrastructure/stellar/dto/transaction-xdr-response.dto';
-import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
+import { IPinataPlayerCid } from '@common/infrastructure/ipfs/application/interfaces/pinata-player-cid.interface';
+import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
+import { CreateNFTDtoComplete } from '@common/infrastructure/stellar/dto/create-nft.dto';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
-import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 
 import { User } from '@iam/user/domain/user.entity';
 
@@ -30,41 +28,18 @@ export class PlayerService {
     private readonly playerRepository: IPlayerRepository,
     private readonly playerResponseAdapter: PlayerResponseAdapter,
     private readonly playerMapper: PlayerMapper,
-    private readonly transactionMapper: TransactionMapper,
     private readonly sorobanContractAdapter: SorobanContractAdapter,
-    private readonly stellarAccountAdapter: StellarAccountAdapter,
+    private readonly pinataAdapter: PinataAdapter,
   ) {}
 
   async getAll(
     options: IGetAllOptions<Player, PlayerRelation[]>,
-    user: User,
   ): Promise<ManySerializedResponseDto<PlayerResponseDto>> {
-    const sourceAccount = await this.stellarAccountAdapter.getAccount(
-      user.publicKey,
-    );
-
     const collection = await this.playerRepository.getAll(options);
-    const players: ICollection<Player> = {
-      ...collection,
-      data: await Promise.all(
-        collection.data.map(async (player) => {
-          const playerFromContract =
-            await this.sorobanContractAdapter.getPlayer(
-              sourceAccount,
-              player.externalId,
-            );
-
-          return {
-            ...player,
-            isInAuction: playerFromContract?.is_in_auction ?? false,
-          };
-        }),
-      ),
-    };
 
     const collectionDto = new CollectionDto({
       ...collection,
-      data: players.data.map((player) =>
+      data: collection.data.map((player) =>
         this.playerMapper.fromPlayerToPlayerResponseDto(player),
       ),
     });
@@ -86,39 +61,15 @@ export class PlayerService {
     );
   }
 
-  async mintPlayerXDR(
-    createPlayerDto: ICreatePlayerDto,
-    user: User,
-  ): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
-    const { name, metadataUri } = createPlayerDto;
-    const issuer = this.stellarAccountAdapter.createIssuerKeypair();
-    const issuerPublicKey = issuer.publicKey();
-    const sourceAccount = await this.stellarAccountAdapter.getAccount(
-      user.publicKey,
-    );
-
-    const transactionXDR = await this.sorobanContractAdapter.mintPlayer(
-      sourceAccount,
-      issuerPublicKey,
-      user.publicKey,
-      name,
-      metadataUri,
-    );
-    return this.playerResponseAdapter.oneEntityResponse(
-      this.transactionMapper.fromXDRToTransactionDTO(transactionXDR),
-    );
-  }
-
   async submitMintPlayerXdr(
-    transactionXDRDto: TransactionXDRDTO,
+    submitMintPlayerDto: SubmitMintPlayerDto,
     currentUser: User,
-  ): Promise<Player> {
-    const txHash = await this.sorobanContractAdapter.submitMintPlayer(
-      transactionXDRDto.xdr,
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
+    await this.sorobanContractAdapter.submitMintPlayer(submitMintPlayerDto.xdr);
+    const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
+      submitMintPlayerDto,
+      currentUser.id,
     );
-    const playerDto =
-      await this.sorobanContractAdapter.getPlayerFromTransaction(txHash);
-    playerDto.ownerId = currentUser.id;
 
     const player = await this.playerRepository.saveOne(
       this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
@@ -128,5 +79,27 @@ export class PlayerService {
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
       [PlayerRelation.OWNER],
     );
+  }
+
+  async uploadPlayerMetadata(
+    createNFTDtoComplete: CreateNFTDtoComplete,
+  ): Promise<IPinataPlayerCid> {
+    const imageUploadResult = await this.pinataAdapter.uploadFIle(
+      createNFTDtoComplete.file,
+    );
+    const imageCid = imageUploadResult.cid;
+    const metadataPayload = {
+      name: createNFTDtoComplete.name,
+      description: createNFTDtoComplete.description,
+      image: `https://${this.pinataAdapter.pinataGatewayUrl}/ipfs/${imageCid}`,
+      issuer: createNFTDtoComplete.issuer,
+      code: createNFTDtoComplete.code,
+    };
+    const metadataUploadResult =
+      await this.pinataAdapter.uploadJson(metadataPayload);
+    return {
+      metadataCid: metadataUploadResult.cid,
+      imageCid: imageCid,
+    };
   }
 }

@@ -6,11 +6,11 @@ import { User } from '@iam/user/domain/user.entity';
 
 export class Player extends Base {
   name: string;
-  metadataUri: string;
+  description: string;
   owner: User;
-  ownerId: number;
   issuer: string;
-  externalId: number;
+  ownerId: number;
+  imageCid: string;
+  metadataCid: string;
   auctions: Auction[];
-  isInAuction: boolean;
 }

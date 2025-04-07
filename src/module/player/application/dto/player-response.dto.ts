@@ -14,16 +14,19 @@ export class PlayerResponseDto {
   name: string;
 
   @ApiProperty()
+  description: string;
+
+  @ApiProperty()
   uuid: string;
 
   @ApiProperty()
   metadataUri: string;
 
   @ApiProperty()
-  issuer: string;
+  imageUri: string;
 
   @ApiProperty()
-  externalId: number;
+  issuer: string;
 
   @ApiProperty()
   createdAt: string;
@@ -36,9 +39,6 @@ export class PlayerResponseDto {
 
   @ApiPropertyOptional()
   owner?: User;
-
-  @ApiPropertyOptional()
-  isInAuction?: boolean;
 
   @ApiPropertyOptional()
   auctions?: Auction[];

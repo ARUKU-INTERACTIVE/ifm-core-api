@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
+import { StrKey, TransactionBuilder, WebAuth } from '@stellar/stellar-sdk';
 import request from 'supertest';
 
 import { loadFixtures } from '@data/util/fixture-loader';
@@ -37,14 +38,10 @@ import { UsernameNotFoundException } from '@iam/user/infrastructure/database/exc
 
 import {
   identityProviderServiceMock,
-  stellarServiceMock,
   testModuleBootstrapper,
 } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
 
-import { IncorrectMemoException } from '../../../stellar/application/exceptions/incorrect-memo.exception';
-import { IncorrectSignException } from '../../../stellar/application/exceptions/incorrect-sign.exception';
-import { InvalidPublicKeyException } from '../../../stellar/application/exceptions/invalid-public-key.exception';
 import { STELLAR_ERROR } from '../../../stellar/application/exceptions/stellar.error';
 
 describe('Authentication Module', () => {
@@ -56,6 +53,7 @@ describe('Authentication Module', () => {
     const moduleRef = await testModuleBootstrapper();
     app = moduleRef.createNestApplication();
     setupApp(app);
+
     await app.init();
   });
 
@@ -188,13 +186,19 @@ describe('Authentication Module', () => {
     });
     describe('POST - /auth/sign-in', () => {
       it('Should allow users to sign in with transaction data', async () => {
+        TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+          memo: {
+            value: {
+              toString: jest.fn().mockReturnValue('memo'),
+            },
+          },
+        });
+
         const signInDto: SignInWithTransactionDto = {
           publicKey: 'publicKey',
           transactionSigned: 'transactionSigned',
           memo: 'memo',
         };
-
-        stellarServiceMock.verifySignature.mockResolvedValueOnce({});
 
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
@@ -224,12 +228,6 @@ describe('Authentication Module', () => {
           memo: 'invalidMemo',
         };
 
-        stellarServiceMock.verifySignature.mockImplementationOnce(() => {
-          throw new IncorrectMemoException({
-            message: STELLAR_ERROR.INCORRECT_MEMO,
-          });
-        });
-
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
           .send(signInDto)
@@ -245,12 +243,15 @@ describe('Authentication Module', () => {
           transactionSigned: 'invalidTransactionSigned',
           memo: 'memo',
         };
-
-        stellarServiceMock.verifySignature.mockImplementationOnce(() => {
-          throw new IncorrectSignException({
-            message: STELLAR_ERROR.INCORRECT_SIGN,
-          });
+        TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+          memo: {
+            value: {
+              toString: jest.fn().mockReturnValue('memo'),
+            },
+          },
         });
+        StrKey.isValidEd25519PublicKey = jest.fn().mockReturnValue(false);
+        WebAuth.verifyTxSignedBy = jest.fn().mockReturnValue(false);
 
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
@@ -700,12 +701,7 @@ describe('Authentication Module', () => {
     describe('GET - /auth/challenge', () => {
       it('Should return a transaction challenge', async () => {
         const queryParam = '?publicKey=publicKey';
-
-        stellarServiceMock.getTransactionChallenge.mockResolvedValueOnce({
-          transactionXDR: 'transactionXDR',
-          memo: 'memo',
-        });
-
+        StrKey.isValidEd25519PublicKey = jest.fn().mockReturnValue(true);
         return request(app.getHttpServer())
           .get(`/api/v1/auth/challenge${queryParam}`)
           .expect(HttpStatus.OK)
@@ -728,12 +724,7 @@ describe('Authentication Module', () => {
 
       it('Should throw an error if the public key is invalid', async () => {
         const queryParam = '?publicKey=invalidPublicKey';
-
-        stellarServiceMock.getTransactionChallenge.mockRejectedValueOnce(
-          new InvalidPublicKeyException({
-            message: STELLAR_ERROR.INVALID_PUBLIC_KEY,
-          }),
-        );
+        StrKey.isValidEd25519PublicKey = jest.fn().mockReturnValue(false);
 
         return request(app.getHttpServer())
           .get(`/api/v1/auth/challenge${queryParam}`)
