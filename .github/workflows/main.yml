@@ -38,7 +38,7 @@ jobs:
       HOME_DOMAIN: example.com
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [20.x]
 
     steps:
       - name: Checkout repository
