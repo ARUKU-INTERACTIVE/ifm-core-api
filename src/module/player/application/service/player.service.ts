@@ -1,5 +1,4 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
-import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
@@ -15,10 +14,7 @@ import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
-import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
-import { TransactionXDRResponseDto } from '@common/infrastructure/stellar/dto/transaction-xdr-response.dto';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
-import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 
 import { User } from '@iam/user/domain/user.entity';
 
@@ -29,9 +25,7 @@ export class PlayerService {
     private readonly playerRepository: IPlayerRepository,
     private readonly playerResponseAdapter: PlayerResponseAdapter,
     private readonly playerMapper: PlayerMapper,
-    private readonly transactionMapper: TransactionMapper,
     private readonly sorobanContractAdapter: SorobanContractAdapter,
-    private readonly stellarAccountAdapter: StellarAccountAdapter,
   ) {}
 
   async getAll(
@@ -60,29 +54,6 @@ export class PlayerService {
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
       [PlayerRelation.OWNER],
-    );
-  }
-
-  async mintPlayerXDR(
-    createPlayerDto: ICreatePlayerDto,
-    user: User,
-  ): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
-    const { name, metadataCid } = createPlayerDto;
-    const issuer = this.stellarAccountAdapter.createIssuerKeypair();
-    const issuerPublicKey = issuer.publicKey();
-    const sourceAccount = await this.stellarAccountAdapter.getAccount(
-      user.publicKey,
-    );
-
-    const transactionXDR = await this.sorobanContractAdapter.mintPlayer(
-      sourceAccount,
-      issuerPublicKey,
-      user.publicKey,
-      name,
-      metadataCid,
-    );
-    return this.playerResponseAdapter.oneEntityResponse(
-      this.transactionMapper.fromXDRToTransactionDTO(transactionXDR),
     );
   }
 

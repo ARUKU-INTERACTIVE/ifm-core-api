@@ -1,5 +1,5 @@
-import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
+import { IPlayerDto } from '@module/player/application/dto/player.dto.interface';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { TransactionBuilder, scValToNative } from '@stellar/stellar-sdk';
 import request from 'supertest';
@@ -232,7 +232,7 @@ describe('Player Module', () => {
     const createPlayerDto = {
       name,
       description: 'description',
-    } as ICreatePlayerDto;
+    } as IPlayerDto;
     it('Should return the XDR of the mintPlayer transaction.', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/mint')

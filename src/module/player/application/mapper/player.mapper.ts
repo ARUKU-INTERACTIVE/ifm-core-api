@@ -2,7 +2,6 @@ import { PlayerResponseDto } from '@module/player/application/dto/player-respons
 import { PlayerDto } from '@module/player/application/dto/player.dto';
 import { IPlayerDto } from '@module/player/application/dto/player.dto.interface';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
-import { IUpdatePlayerDto } from '@module/player/application/dto/update-player.dto.interface';
 import { Player } from '@module/player/domain/player.domain';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -22,9 +21,7 @@ export class PlayerMapper {
     return `https://${this.pinataGatewayUrl}/ipfs/${cid}`;
   }
 
-  private mapPlayerDtoToPlayer(
-    playerDto: IPlayerDto | IUpdatePlayerDto,
-  ): Player {
+  private mapPlayerDtoToPlayer(playerDto: IPlayerDto): Player {
     const player = new Player();
     player.name = playerDto.name;
     player.metadataCid = playerDto.metadataCid;
@@ -40,8 +37,8 @@ export class PlayerMapper {
     return player;
   }
 
-  fromUpdatePlayerDtoToPlayer(PlayerDto: IUpdatePlayerDto): Player {
-    return this.mapPlayerDtoToPlayer(PlayerDto);
+  fromUpdatePlayerDtoToPlayer(playerDto: IPlayerDto): Player {
+    return this.mapPlayerDtoToPlayer(playerDto);
   }
 
   fromPlayerToPlayerResponseDto(player: Player): PlayerResponseDto {

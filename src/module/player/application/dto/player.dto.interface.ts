@@ -1,6 +1,10 @@
-import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
-
-export interface IPlayerDto extends ICreatePlayerDto {
+export interface IPlayerDto {
+  name: string;
+  description: string;
+  metadataCid?: string;
+  imageCid?: string;
+  owner?: string;
   ownerId: number;
   issuer: string;
+  isInAuction?: boolean;
 }
