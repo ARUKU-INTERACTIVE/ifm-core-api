@@ -1,0 +1,16 @@
+entity: Player
+items:
+  player1:
+    name: 'player'
+    description: 'description'
+    metadataCid: 'http://example.com.ar'
+    imageCid: 'http://image.com.ar'
+    issuer: 'ISSUER'
+    owner: '@admin-user'
+  player2:
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: '{{string.alpha}}'
+    imageCid: '{{string.alpha}}'
+    issuer: '{{string.alpha}}'
+    owner: '@admin-user'
