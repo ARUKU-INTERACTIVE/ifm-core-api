@@ -26,7 +26,7 @@ export const environmentConfig = () => ({
         ? process.env.STELLAR_LOCAL_NETWORK_PASSPHRASE
         : process.env.STELLAR_NETWORK_PASSPHRASE,
     homeDomain: process.env.HOME_DOMAIN,
-    admin: process.env.STELLAR_ADMIN,
+    codeMint: process.env.STELLAR_CODE_MINT,
   },
   soroban: {
     serverUrl:

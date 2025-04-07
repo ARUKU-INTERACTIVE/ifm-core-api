@@ -20,7 +20,7 @@ import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-ac
 @Injectable()
 export class StellarNftAdapter {
   private readonly networkPassphrase: string;
-  private readonly code: string = 'NFT';
+  private readonly code: string;
   private readonly stroop = '0.0000001';
   private readonly homeDomain: string;
   private readonly ipfshash: string = 'ipfshash';
@@ -32,10 +32,10 @@ export class StellarNftAdapter {
     private readonly transactionResponseAdapter: TransactionResponseAdapter,
     private readonly transactionMapper: TransactionMapper,
   ) {
-    const serverUrl = this.environmentConfig.get('stellar.serverUrl');
     this.networkPassphrase = this.environmentConfig.get(
       'stellar.networkPassphrase',
     );
+    this.code = this.environmentConfig.get('stellar.codeMint');
     this.homeDomain = this.environmentConfig.get('stellar.homeDomain');
   }
 
@@ -90,7 +90,7 @@ export class StellarNftAdapter {
     nftAsset: Asset,
   ): Promise<string> {
     const issuerPublicKey = issuer.publicKey();
-  
+
     const transaction = new TransactionBuilder(account, {
       fee: BASE_FEE,
       networkPassphrase: this.networkPassphrase,
