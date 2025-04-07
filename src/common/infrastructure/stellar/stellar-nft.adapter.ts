@@ -35,7 +35,7 @@ export class StellarNftAdapter {
     this.networkPassphrase = this.environmentConfig.get(
       'stellar.networkPassphrase',
     );
-    this.code = this.environmentConfig.get('stellar.codeMint');
+    this.code = this.environmentConfig.get('stellar.defaultAssetCode');
     this.homeDomain = this.environmentConfig.get('stellar.homeDomain');
   }
 

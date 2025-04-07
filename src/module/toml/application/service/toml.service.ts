@@ -12,7 +12,9 @@ export class TomlService {
     private readonly environmentConfig: ConfigService,
   ) {
     this.homeDomain = this.environmentConfig.get<string>('stellar.homeDomain');
-    this.codeMint = this.environmentConfig.get<string>('stellar.codeMint');
+    this.codeMint = this.environmentConfig.get<string>(
+      'stellar.defaultAssetCode',
+    );
   }
   private getNftTemplate(player: Partial<PlayerResponseDto>): string {
     return `

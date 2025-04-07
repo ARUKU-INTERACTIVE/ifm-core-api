@@ -31,7 +31,7 @@ jobs:
       SOROBAN_CONTRACT_ADDRESS: CXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       SOROBAN_LOCAL_SERVER_URL: http://localhost:8000/soroban/rpc
       SOROBAN_SERVER_URL: http://localhost:8000/soroban/rpc
-      STELLAR_CODE_MINT: nft
+      STELLAR_DEFAULT_ASSET_CODE: nft
       JWT_SECRET: secret
       PINATA_JWT: secret
       PINATA_GATEWAY_URL: https://example/ipfs/
