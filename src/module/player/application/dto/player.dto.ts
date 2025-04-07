@@ -2,17 +2,21 @@ import { IPlayerDto } from '@module/player/application/dto/player.dto.interface'
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class PlayerDto implements IPlayerDto {
-  @IsNumber()
-  @IsNotEmpty()
-  externalId: number;
-
   @IsString()
   @IsNotEmpty()
   issuer: string;
 
   @IsString()
   @IsNotEmpty()
-  metadataUri: string;
+  description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  metadataCid: string;
+
+  @IsString()
+  @IsNotEmpty()
+  imageCid: string;
 
   @IsString()
   @IsNotEmpty()

@@ -17,13 +17,13 @@ export class PlayerResponseDto {
   uuid: string;
 
   @ApiProperty()
-  metadataUri: string;
+  metadataCid: string;
+
+  @ApiProperty()
+  imageCid: string;
 
   @ApiProperty()
   issuer: string;
-
-  @ApiProperty()
-  externalId: number;
 
   @ApiProperty()
   createdAt: string;

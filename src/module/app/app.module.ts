@@ -1,5 +1,6 @@
 import { AuctionModule } from '@module/auction/auction.module';
 import { PlayerModule } from '@module/player/player.module';
+import { TomlModule } from '@module/toml/toml.module';
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DiscoveryModule } from '@nestjs/core';
@@ -21,7 +22,7 @@ import { ResponseSerializerService } from '@/module/app/application/service/resp
 import { HealthController } from '@/module/health/interface/health.controller';
 import { PaymentModule } from '@/module/payment/payment.module';
 import { StellarModule } from '@/stellar/stellar.module';
-import { TomlModule } from '@module/toml/toml.module';
+import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 
 @Global()
 @Module({
@@ -47,7 +48,8 @@ import { TomlModule } from '@module/toml/toml.module';
     StellarModule,
     PlayerModule,
     AuctionModule,
-    TomlModule
+    TomlModule,
+    PinataModule
   ],
   providers: [AppService, ResponseSerializerService],
   exports: [AppService, ResponseSerializerService],

@@ -3,5 +3,4 @@ import { ICreatePlayerDto } from '@module/player/application/dto/create-player.d
 export interface IPlayerDto extends ICreatePlayerDto {
   ownerId: number;
   issuer: string;
-  externalId: number;
 }

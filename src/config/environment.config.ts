@@ -25,7 +25,8 @@ export const environmentConfig = () => ({
       process.env.NODE_ENV === ENVIRONMENT.AUTOMATED_TESTS
         ? process.env.STELLAR_LOCAL_NETWORK_PASSPHRASE
         : process.env.STELLAR_NETWORK_PASSPHRASE,
-    homeDomain:process.env.HOME_DOMAIN,
+    homeDomain: process.env.HOME_DOMAIN,
+    admin: process.env.STELLAR_ADMIN,
   },
   soroban: {
     serverUrl:
@@ -34,9 +35,8 @@ export const environmentConfig = () => ({
         : process.env.SOROBAN_SERVER_URL,
     contractAddress: process.env.SOROBAN_CONTRACT_ADDRESS,
   },
-  pinata:{
+  pinata: {
     pinataJwt: process.env.PINATA_JWT,
     pinataGatewayUrl: process.env.PINATA_GATEWAY_URL,
-    pinattaurl:process.env.PINATA_URL
-  }
+  },
 });

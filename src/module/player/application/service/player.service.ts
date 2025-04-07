@@ -1,6 +1,7 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
 import { ICreatePlayerDto } from '@module/player/application/dto/create-player.dto.interface';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
+import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import {
@@ -17,7 +18,6 @@ import { OneSerializedResponseDto } from '@common/base/application/dto/one-seria
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
 import { TransactionXDRResponseDto } from '@common/infrastructure/stellar/dto/transaction-xdr-response.dto';
-import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 
@@ -37,10 +37,10 @@ export class PlayerService {
 
   async getAll(
     options: IGetAllOptions<Player, PlayerRelation[]>,
-    user: User,
+    user: User | string,
   ): Promise<ManySerializedResponseDto<PlayerResponseDto>> {
     const sourceAccount = await this.stellarAccountAdapter.getAccount(
-      user.publicKey,
+      typeof user === 'string' ? user : user.publicKey,
     );
 
     const collection = await this.playerRepository.getAll(options);
@@ -51,7 +51,7 @@ export class PlayerService {
           const playerFromContract =
             await this.sorobanContractAdapter.getPlayer(
               sourceAccount,
-              player.externalId,
+              player['externalId'],
             );
 
           return {
@@ -90,7 +90,7 @@ export class PlayerService {
     createPlayerDto: ICreatePlayerDto,
     user: User,
   ): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
-    const { name, metadataUri } = createPlayerDto;
+    const { name, metadataCid } = createPlayerDto;
     const issuer = this.stellarAccountAdapter.createIssuerKeypair();
     const issuerPublicKey = issuer.publicKey();
     const sourceAccount = await this.stellarAccountAdapter.getAccount(
@@ -102,7 +102,7 @@ export class PlayerService {
       issuerPublicKey,
       user.publicKey,
       name,
-      metadataUri,
+      metadataCid,
     );
     return this.playerResponseAdapter.oneEntityResponse(
       this.transactionMapper.fromXDRToTransactionDTO(transactionXDR),
@@ -110,15 +110,17 @@ export class PlayerService {
   }
 
   async submitMintPlayerXdr(
-    transactionXDRDto: TransactionXDRDTO,
+    submitMintPlayerDto: SubmitMintPlayerDto,
     currentUser: User,
-  ): Promise<Player> {
-    const txHash = await this.sorobanContractAdapter.submitMintPlayer(
-      transactionXDRDto.xdr,
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
+    await this.sorobanContractAdapter.submitMintPlayer(submitMintPlayerDto.xdr);
+    const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
+      submitMintPlayerDto,
+      currentUser.id,
     );
-    const playerDto =
-      await this.sorobanContractAdapter.getPlayerFromTransaction(txHash);
-    playerDto.ownerId = currentUser.id;
+    // const playerDto =
+    //   await this.sorobanContractAdapter.getPlayerFromTransaction(txHash);
+    // playerDto.ownerId = currentUser.id;
 
     const player = await this.playerRepository.saveOne(
       this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),

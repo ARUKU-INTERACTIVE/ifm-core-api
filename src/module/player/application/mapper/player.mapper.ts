@@ -1,22 +1,36 @@
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerDto } from '@module/player/application/dto/player.dto';
 import { IPlayerDto } from '@module/player/application/dto/player.dto.interface';
+import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { IUpdatePlayerDto } from '@module/player/application/dto/update-player.dto.interface';
 import { Player } from '@module/player/domain/player.domain';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { ISCPlayerDto } from '@common/infrastructure/stellar/dto/player-sc.dto';
 
 @Injectable()
 export class PlayerMapper {
+  pinataGatewayUrl: string;
+  constructor(private readonly environmentConfig: ConfigService) {
+    this.pinataGatewayUrl = this.environmentConfig.get(
+      'pinata.pinataGatewayUrl',
+    );
+  }
+
+  private getPinataUri(cid: string): string {
+    return `https://${this.pinataGatewayUrl}/ipfs/${cid}`;
+  }
+
   private mapPlayerDtoToPlayer(
     playerDto: IPlayerDto | IUpdatePlayerDto,
   ): Player {
     const player = new Player();
     player.name = playerDto.name;
-    player.metadataUri = playerDto.metadataUri;
+    player.metadataCid = playerDto.metadataCid;
+    player.imageCid = playerDto.imageCid;
+    player.description = playerDto.description;
     player.issuer = playerDto.issuer;
-    player.externalId = playerDto.externalId;
     return player;
   }
 
@@ -36,8 +50,8 @@ export class PlayerMapper {
     playerResponseDto.uuid = player.uuid;
     playerResponseDto.name = player.name;
     playerResponseDto.issuer = player.issuer;
-    playerResponseDto.externalId = player.externalId;
-    playerResponseDto.metadataUri = player.metadataUri;
+    playerResponseDto.metadataCid = this.getPinataUri(player.metadataCid);
+    playerResponseDto.imageCid = this.getPinataUri(player.imageCid);
     playerResponseDto.createdAt = player.createdAt;
     playerResponseDto.updatedAt = player.updatedAt;
     playerResponseDto.deletedAt = player.deletedAt;
@@ -46,13 +60,26 @@ export class PlayerMapper {
     playerResponseDto.auctions = player?.auctions;
     return playerResponseDto;
   }
-
+  //TODO: remove this method
   fromSCPlayerDtoToPlayer(scPlayerDto: ISCPlayerDto): PlayerDto {
     const playerDto = new PlayerDto();
     playerDto.name = scPlayerDto.name;
-    playerDto.externalId = Number(scPlayerDto.id);
     playerDto.issuer = scPlayerDto.issuer;
-    playerDto.metadataUri = scPlayerDto.metadata_uri;
+    playerDto.metadataCid = scPlayerDto.metadata_uri;
+    return playerDto;
+  }
+
+  fromSubmitMintPlayerDtoToPlayerDto(
+    submitMintPlayerDto: SubmitMintPlayerDto,
+    ownerId: number,
+  ): PlayerDto {
+    const playerDto = new PlayerDto();
+    playerDto.name = submitMintPlayerDto.name;
+    playerDto.issuer = submitMintPlayerDto.issuer;
+    playerDto.ownerId = ownerId;
+    playerDto.metadataCid = submitMintPlayerDto.metadataCid;
+    playerDto.imageCid = submitMintPlayerDto.imageCid;
+    playerDto.description = submitMintPlayerDto.description;
     return playerDto;
   }
 }

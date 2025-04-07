@@ -1,15 +1,16 @@
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import { Module } from '@nestjs/common';
 
+import { TransactionResponseAdapter } from '@common/infrastructure/stellar/application/adapter/transaction-response.adapter';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
-import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.adapter';
-import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
+import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
+import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 
 @Module({
-  imports: [],
+  imports: [PinataModule],
   controllers: [],
   providers: [
     StellarAccountAdapter,
@@ -17,8 +18,8 @@ import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
     StellarTransactionAdapter,
     StellarNftAdapter,
     TransactionMapper,
-    PinataAdapter,
     PlayerMapper,
+    TransactionResponseAdapter,
   ],
   exports: [
     TransactionMapper,
@@ -26,6 +27,7 @@ import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
     StellarTransactionAdapter,
     StellarNftAdapter,
     SorobanContractAdapter,
+    TransactionResponseAdapter,
   ],
 })
 export class StellarModule {}
