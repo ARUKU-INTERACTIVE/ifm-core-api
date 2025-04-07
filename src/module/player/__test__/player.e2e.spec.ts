@@ -67,7 +67,8 @@ describe('Player Module', () => {
                 attributes: expect.objectContaining({
                   createdAt: expect.any(String),
                   deletedAt: null,
-                  externalId: expect.any(String),
+                  description: expect.any(String),
+                  imageUri: expect.any(String),
                   isInAuction: expect.any(Boolean),
                   issuer: expect.any(String),
                   metadataUri: expect.any(String),
@@ -159,7 +160,7 @@ describe('Player Module', () => {
     });
 
     it('Should allow to select specific attributes', async () => {
-      const attributes = ['name', 'externalId'] as (keyof PlayerResponseDto)[];
+      const attributes = ['name', 'description'] as (keyof PlayerResponseDto)[];
 
       await request(app.getHttpServer())
         .get(`/api/v1/player?fields[target]=${attributes.join(',')}`)
@@ -169,15 +170,15 @@ describe('Player Module', () => {
           const resourceAttributes = body.data[0].attributes;
           expect(resourceAttributes).toEqual({
             name: expect.any(String),
-            externalId: expect.any(String),
-            isInAuction: expect.any(Boolean),
+            description: expect.any(String),
+            imageUri: expect.any(String),
+            metadataUri: expect.any(String),
           });
         });
     });
 
     it('Should allow to include related resources', async () => {
       const include = ['owner'] as (keyof PlayerResponseDto)[];
-
       await request(app.getHttpServer())
         .get(`/api/v1/player?include[target]=${include.join(',')}`)
         .auth(adminToken, { type: 'bearer' })
@@ -211,9 +212,10 @@ describe('Player Module', () => {
             data: expect.objectContaining({
               attributes: expect.objectContaining({
                 createdAt: expect.any(String),
-                externalId: expect.any(String),
+                description: expect.any(String),
                 issuer: expect.any(String),
                 metadataUri: expect.any(String),
+                imageUri: expect.any(String),
                 name: expect.any(String),
                 updatedAt: expect.any(String),
                 uuid: expect.any(String),
@@ -229,20 +231,24 @@ describe('Player Module', () => {
   describe('POST - /player', () => {
     const createPlayerDto = {
       name,
-      metadataUri,
+      description: 'description',
     } as ICreatePlayerDto;
-
     it('Should return the XDR of the mintPlayer transaction.', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/mint')
         .auth(adminToken, { type: 'bearer' })
-        .send(createPlayerDto)
+        .field('name', createPlayerDto.name)
+        .field('description', createPlayerDto.description)
+        .attach('file', `${__dirname}/fixture/nft.jpeg`)
         .expect(HttpStatus.CREATED)
         .then(({ body }) => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
               attributes: expect.objectContaining({
                 xdr: expect.any(String),
+                imageCid: expect.any(String),
+                metadataCid: expect.any(String),
+                issuer: expect.any(String),
               }),
             }),
           });
@@ -259,16 +265,24 @@ describe('Player Module', () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/submit/mint')
         .auth(adminToken, { type: 'bearer' })
-        .send({ xdr: 'xdr' })
+        .send({
+          xdr: 'xdr',
+          imageCid: 'imageCid',
+          metadataCid: 'metadataCid',
+          issuer,
+          name: 'name',
+          description: 'description',
+        })
         .expect(HttpStatus.CREATED)
         .then(({ body }) => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
               attributes: expect.objectContaining({
-                externalId: expect.any(Number),
                 uuid: expect.any(String),
                 name: expect.any(String),
                 metadataUri: expect.any(String),
+                imageUri: expect.any(String),
+                description: expect.any(String),
                 issuer: expect.any(String),
               }),
             }),
@@ -288,7 +302,9 @@ describe('Player Module', () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/mint')
         .auth(adminToken, { type: 'bearer' })
-        .send(createPlayerDto)
+        .field('name', createPlayerDto.name)
+        .field('description', createPlayerDto.description)
+        .attach('file', `${__dirname}/fixture/nft.jpeg`)
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
           expect(body.error.detail).toEqual(
@@ -306,7 +322,9 @@ describe('Player Module', () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/mint')
         .auth(adminToken, { type: 'bearer' })
-        .send(createPlayerDto)
+        .field('name', createPlayerDto.name)
+        .field('description', createPlayerDto.description)
+        .attach('file', `${__dirname}/fixture/nft.jpeg`)
         .expect(HttpStatus.BAD_REQUEST)
         .then(({ body }) => {
           expect(body.error.detail).toEqual(
@@ -326,7 +344,14 @@ describe('Player Module', () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/submit/mint')
         .auth(adminToken, { type: 'bearer' })
-        .send({ xdr: ERROR })
+        .send({
+          xdr: ERROR,
+          metadataCid: 'metadataCid',
+          imageCid: 'imageCid',
+          issuer,
+          name,
+          description: 'description',
+        })
         .expect(HttpStatus.INTERNAL_SERVER_ERROR)
         .then(({ body }) => {
           expect(body.error.detail).toEqual(

@@ -13,10 +13,10 @@ export class PlayerFieldsQueryParamsDto {
   @IsIn(
     [
       'name',
-      'metadataUri',
+      'metadataCid',
       'ownerId',
       'issuer',
-      'externalId',
+      'description',
       'isInAuction',
     ] as PlayerFields,
     {

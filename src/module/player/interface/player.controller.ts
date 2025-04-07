@@ -47,36 +47,20 @@ export class PlayerController {
     @Query('fields') fields: PlayerFieldsQueryParamsDto,
     @Query('sort') sort: PlayerSortQueryParamsDto,
     @Query('include') include: PlayerIncludeQueryParamsDto,
-    @CurrentUser() user: User,
   ): Promise<ManySerializedResponseDto<PlayerResponseDto>> {
-    return this.playerService.getAll(
-      {
-        page,
-        filter,
-        sort,
-        fields: fields.target,
-        include: include.target ?? [],
-      },
-      user,
-    );
+    return this.playerService.getAll({
+      page,
+      filter,
+      sort,
+      fields: fields.target,
+      include: include.target ?? [],
+    });
   }
 
   @Get('/:id')
   getPlayerById(@Param('id') id: number): Promise<PlayerResponseDto> {
     return this.playerService.getOneById(id);
   }
-
-  //@Post('/mint')
-  //async mintPlayer(
-  //  @CurrentUser() user: User,
-  //  @Body() createPlayerDto: CreatePlayerDto,
-  //): Promise<OneSerializedResponseDto<TransactionXDRResponseDto>> {
-  //  const player = await this.playerService.mintPlayerXDR(
-  //    createPlayerDto,
-  //    user,
-  //  );
-  //  return player;
-  //}
 
   @UseInterceptors(FileInterceptor('file'))
   @Post('/mint')

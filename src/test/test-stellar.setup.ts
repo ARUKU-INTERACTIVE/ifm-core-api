@@ -63,18 +63,25 @@ jest.mock('@stellar/stellar-sdk', () => ({
       }),
     })),
   },
+  Operation: {
+    createAccount: jest.fn(),
+    manageData: jest.fn(),
+    changeTrust: jest.fn(),
+    payment: jest.fn(),
+    setOptions: jest.fn(),
+  },
   TransactionBuilder: jest.fn().mockImplementation(() => ({
+    sign: jest.fn(),
     fromXDR: jest.fn(),
     addMemo: jest.fn(),
-    setTimeout: jest.fn(),
-    build: jest.fn(),
-    addOperation: jest.fn().mockImplementation(() => ({
-      setTimeout: jest.fn().mockImplementation(() => ({
-        build: jest.fn().mockImplementation(() => ({
-          toXDR: jest.fn(),
-        })),
-      })),
-    })),
+    setTimeout: jest.fn().mockReturnThis(),
+    build: jest.fn().mockReturnThis(),
+    addOperation: jest.fn().mockReturnThis(),
+    toXDR: jest.fn().mockReturnValue(xdr),
+  })),
+  Asset: jest.fn().mockImplementation(() => ({
+    code: 'code',
+    issuer: 'issuer',
   })),
   rpc: {
     Api: {
@@ -116,7 +123,7 @@ jest.mock('@stellar/stellar-sdk', () => ({
   },
   Keypair: {
     random: jest.fn().mockImplementation(() => ({
-      publicKey: jest.fn(),
+      publicKey: jest.fn().mockReturnValue('GXX'),
     })),
     fromSecret: jest.fn(),
   },
@@ -129,3 +136,19 @@ jest.mock('@stellar/stellar-sdk', () => ({
     fromString: jest.fn(),
   },
 }));
+jest.mock('pinata', () => {
+  return {
+    PinataSDK: jest.fn().mockImplementation(() => ({
+      upload: {
+        public: {
+          file: jest.fn().mockReturnValue({
+            cid: 'imageCid',
+          }),
+          json: jest.fn().mockReturnValue({
+            cid: 'metadataCid',
+          }),
+        },
+      },
+    })),
+  };
+});

@@ -12,7 +12,6 @@ import { Player } from '@module/player/domain/player.domain';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
-import { ICollection } from '@common/base/application/dto/collection.interface';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
@@ -37,34 +36,12 @@ export class PlayerService {
 
   async getAll(
     options: IGetAllOptions<Player, PlayerRelation[]>,
-    user: User | string,
   ): Promise<ManySerializedResponseDto<PlayerResponseDto>> {
-    const sourceAccount = await this.stellarAccountAdapter.getAccount(
-      typeof user === 'string' ? user : user.publicKey,
-    );
-
     const collection = await this.playerRepository.getAll(options);
-    const players: ICollection<Player> = {
-      ...collection,
-      data: await Promise.all(
-        collection.data.map(async (player) => {
-          const playerFromContract =
-            await this.sorobanContractAdapter.getPlayer(
-              sourceAccount,
-              player['externalId'],
-            );
-
-          return {
-            ...player,
-            isInAuction: playerFromContract?.is_in_auction ?? false,
-          };
-        }),
-      ),
-    };
 
     const collectionDto = new CollectionDto({
       ...collection,
-      data: players.data.map((player) =>
+      data: collection.data.map((player) =>
         this.playerMapper.fromPlayerToPlayerResponseDto(player),
       ),
     });
@@ -118,9 +95,6 @@ export class PlayerService {
       submitMintPlayerDto,
       currentUser.id,
     );
-    // const playerDto =
-    //   await this.sorobanContractAdapter.getPlayerFromTransaction(txHash);
-    // playerDto.ownerId = currentUser.id;
 
     const player = await this.playerRepository.saveOne(
       this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
