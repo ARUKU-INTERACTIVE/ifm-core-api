@@ -8,10 +8,10 @@ import { PlayerController } from '@module/player/interface/player.controller';
 import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 import { StellarModule } from '@common/infrastructure/stellar/stellar.module';
 
 import { UserModule } from '@iam/user/user.module';
-import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 
 export const playerRepositoryProvider: Provider = {
   provide: PLAYER_REPOSITORY_KEY,
@@ -23,7 +23,7 @@ export const playerRepositoryProvider: Provider = {
     TypeOrmModule.forFeature([PlayerSChema]),
     StellarModule,
     UserModule,
-    PinataModule
+    PinataModule,
   ],
   providers: [
     playerRepositoryProvider,

@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 
+import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
+
 import { environmentConfig } from '@config/environment.config';
 import { datasourceOptions } from '@config/orm.config';
 
@@ -22,7 +24,6 @@ import { ResponseSerializerService } from '@/module/app/application/service/resp
 import { HealthController } from '@/module/health/interface/health.controller';
 import { PaymentModule } from '@/module/payment/payment.module';
 import { StellarModule } from '@/stellar/stellar.module';
-import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 
 @Global()
 @Module({
@@ -49,7 +50,7 @@ import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
     PlayerModule,
     AuctionModule,
     TomlModule,
-    PinataModule
+    PinataModule,
   ],
   providers: [AppService, ResponseSerializerService],
   exports: [AppService, ResponseSerializerService],
