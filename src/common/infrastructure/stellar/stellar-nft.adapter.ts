@@ -49,37 +49,35 @@ export class StellarNftAdapter {
   ): Promise<OneSerializedResponseDto<TransactionNFTDto>> {
     const issuer = this.stellarAccountAdapter.createIssuerKeypair();
     const issuerPublicKey = issuer.publicKey();
+
     const nftAsset = this.createAsset(issuerPublicKey);
-    try {
-      const pinataPlayerCid =
-        await this.pinataAdapter.getPinataMetadataAndImageCid({
-          ...createNFTDtoWithFIle,
-          code: nftAsset.code,
-          issuer: issuerPublicKey,
-        });
-      const { metadataCid, imageCid } = pinataPlayerCid;
-      const ownerAccount =
-        await this.stellarAccountAdapter.getAccount(ownerPublicKey);
 
-      const xdr = await this.createTransaction(
-        ownerAccount,
-        issuer,
-        ownerPublicKey,
+    const pinataPlayerCid =
+      await this.pinataAdapter.getPinataMetadataAndImageCid({
+        ...createNFTDtoWithFIle,
+        code: nftAsset.code,
+        issuer: issuerPublicKey,
+      });
+    const { metadataCid, imageCid } = pinataPlayerCid;
+    const ownerAccount =
+      await this.stellarAccountAdapter.getAccount(ownerPublicKey);
+
+    const xdr = await this.createTransaction(
+      ownerAccount,
+      issuer,
+      ownerPublicKey,
+      metadataCid,
+      nftAsset,
+    );
+
+    return this.transactionResponseAdapter.oneEntityResponse<TransactionNFTDto>(
+      this.transactionMapper.fromTransactionToTransactionNFTDto(
+        xdr,
         metadataCid,
-        nftAsset,
-      );
-
-      return this.transactionResponseAdapter.oneEntityResponse<TransactionNFTDto>(
-        this.transactionMapper.fromTransactionToTransactionNFTDto(
-          xdr,
-          metadataCid,
-          imageCid,
-          issuer.publicKey(),
-        ),
-      );
-    } catch (error) {
-      console.log('Error creating NFT:', error);
-    }
+        imageCid,
+        issuer.publicKey(),
+      ),
+    );
   }
 
   async createTransaction(
