@@ -4,7 +4,6 @@ import {
   Account,
   Asset,
   BASE_FEE,
-  Horizon,
   Keypair,
   Operation,
   TransactionBuilder,
@@ -20,7 +19,6 @@ import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-ac
 
 @Injectable()
 export class StellarNftAdapter {
-  private readonly stellarServer: Horizon.Server;
   private readonly networkPassphrase: string;
   private readonly code: string = 'NFT';
   private readonly stroop = '0.0000001';
@@ -39,7 +37,6 @@ export class StellarNftAdapter {
       'stellar.networkPassphrase',
     );
     this.homeDomain = this.environmentConfig.get('stellar.homeDomain');
-    this.stellarServer = new Horizon.Server(serverUrl);
   }
 
   createAsset(publicKey: string): Asset {
@@ -93,12 +90,7 @@ export class StellarNftAdapter {
     nftAsset: Asset,
   ): Promise<string> {
     const issuerPublicKey = issuer.publicKey();
-    console.log(
-      this.homeDomain.length,
-      'this.homeDomain',
-      metadataCID,
-      'metadataCid',
-    );
+  
     const transaction = new TransactionBuilder(account, {
       fee: BASE_FEE,
       networkPassphrase: this.networkPassphrase,
