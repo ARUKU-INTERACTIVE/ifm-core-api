@@ -6,5 +6,4 @@ export interface IPlayerDto {
   owner?: string;
   ownerId: number;
   issuer: string;
-  isInAuction?: boolean;
 }

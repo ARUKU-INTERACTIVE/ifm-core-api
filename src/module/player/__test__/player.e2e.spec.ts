@@ -69,7 +69,6 @@ describe('Player Module', () => {
                   deletedAt: null,
                   description: expect.any(String),
                   imageUri: expect.any(String),
-                  isInAuction: expect.any(Boolean),
                   issuer: expect.any(String),
                   metadataUri: expect.any(String),
                   name: expect.any(String),

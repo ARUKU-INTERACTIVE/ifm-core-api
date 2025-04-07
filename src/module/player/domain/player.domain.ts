@@ -11,7 +11,6 @@ export class Player extends Base {
   issuer: string;
   ownerId: number;
   imageCid: string;
-  isInAuction: boolean;
   metadataCid: string;
   auctions: Auction[];
 }

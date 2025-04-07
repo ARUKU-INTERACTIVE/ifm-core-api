@@ -52,7 +52,6 @@ export class PlayerMapper {
     playerResponseDto.updatedAt = player.updatedAt;
     playerResponseDto.deletedAt = player.deletedAt;
     playerResponseDto.owner = player?.owner;
-    playerResponseDto.isInAuction = player?.isInAuction;
     playerResponseDto.auctions = player?.auctions;
     return playerResponseDto;
   }

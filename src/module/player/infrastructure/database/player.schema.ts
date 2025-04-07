@@ -23,10 +23,6 @@ export const PlayerSChema = new EntitySchema<Player>({
       type: String,
       nullable: false,
     },
-    isInAuction: {
-      type: Boolean,
-      default: false,
-    },
     imageCid: {
       type: String,
       nullable: false,

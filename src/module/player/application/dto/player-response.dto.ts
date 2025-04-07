@@ -41,8 +41,5 @@ export class PlayerResponseDto {
   owner?: User;
 
   @ApiPropertyOptional()
-  isInAuction?: boolean;
-
-  @ApiPropertyOptional()
   auctions?: Auction[];
 }
