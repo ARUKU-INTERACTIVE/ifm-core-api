@@ -80,7 +80,7 @@ jest.mock('@stellar/stellar-sdk', () => ({
     }),
   },
   WebAuth: {
-    verifyTxSignedBy: jest.fn().mockImplementation((transaction, publicKey) => {
+    verifyTxSignedBy: jest.fn().mockImplementation((transaction) => {
       if (transaction == ERROR) {
         throw new Error();
       }

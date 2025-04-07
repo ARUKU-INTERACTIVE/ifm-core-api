@@ -42,9 +42,6 @@ import {
 } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
 
-import { IncorrectMemoException } from '../../../stellar/application/exceptions/incorrect-memo.exception';
-import { IncorrectSignException } from '../../../stellar/application/exceptions/incorrect-sign.exception';
-import { InvalidPublicKeyException } from '../../../stellar/application/exceptions/invalid-public-key.exception';
 import { STELLAR_ERROR } from '../../../stellar/application/exceptions/stellar.error';
 
 describe('Authentication Module', () => {
