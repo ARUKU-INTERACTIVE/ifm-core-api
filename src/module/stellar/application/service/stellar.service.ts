@@ -41,7 +41,6 @@ export class StellarService {
         message: STELLAR_ERROR.INVALID_PUBLIC_KEY,
       });
     }
-
     const account = await this.server.loadAccount(publicKey);
     const memo = Math.random().toString(36).substring(2);
 
@@ -64,7 +63,6 @@ export class StellarService {
       signedXDR,
       this.networkPassphrase,
     ) as Transaction<Memo<MemoType>, Operation[]>;
-
     if (!transaction.memo || transaction.memo.value.toString() !== memo) {
       throw new IncorrectMemoException({
         message: STELLAR_ERROR.INCORRECT_MEMO,
