@@ -1,3 +1,4 @@
+import { PlayerService } from '@module/player/application/service/player.service';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -10,7 +11,6 @@ import {
 } from '@stellar/stellar-sdk';
 
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
-import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
 import { TransactionResponseAdapter } from '@common/infrastructure/stellar/application/adapter/transaction-response.adapter';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
 import { CreateNFTDtoWithFIle } from '@common/infrastructure/stellar/dto/create-nft.dto';
@@ -27,7 +27,7 @@ export class StellarNftAdapter {
   private readonly startingBalance: string = '1.5';
   constructor(
     private readonly environmentConfig: ConfigService,
-    private readonly pinataAdapter: PinataAdapter,
+    private readonly playerService: PlayerService,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
     private readonly transactionResponseAdapter: TransactionResponseAdapter,
     private readonly transactionMapper: TransactionMapper,
@@ -43,7 +43,7 @@ export class StellarNftAdapter {
     return new Asset(this.code, publicKey);
   }
 
-  async createTransactionNFT(
+  async createPlayerNFTTransaction(
     createNFTDtoWithFIle: CreateNFTDtoWithFIle,
     ownerPublicKey: string,
   ): Promise<OneSerializedResponseDto<TransactionNFTDto>> {
@@ -52,17 +52,16 @@ export class StellarNftAdapter {
 
     const nftAsset = this.createAsset(issuerPublicKey);
 
-    const pinataPlayerCid =
-      await this.pinataAdapter.getPinataMetadataAndImageCid({
-        ...createNFTDtoWithFIle,
-        code: nftAsset.code,
-        issuer: issuerPublicKey,
-      });
-    const { metadataCid, imageCid } = pinataPlayerCid;
+    const uploadedPlayer = await this.playerService.uploadPlayerMetadata({
+      ...createNFTDtoWithFIle,
+      code: nftAsset.code,
+      issuer: issuerPublicKey,
+    });
+    const { metadataCid, imageCid } = uploadedPlayer;
     const ownerAccount =
       await this.stellarAccountAdapter.getAccount(ownerPublicKey);
 
-    const xdr = await this.createTransaction(
+    const xdr = await this.mintPlayerTransaction(
       ownerAccount,
       issuer,
       ownerPublicKey,
@@ -80,7 +79,7 @@ export class StellarNftAdapter {
     );
   }
 
-  async createTransaction(
+  async mintPlayerTransaction(
     account: Account,
     issuer: Keypair,
     ownerPublicKey: string,

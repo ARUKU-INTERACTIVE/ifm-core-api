@@ -6,8 +6,6 @@ import { Player } from '@module/player/domain/player.domain';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { ISCPlayerDto } from '@common/infrastructure/stellar/dto/player-sc.dto';
-
 @Injectable()
 export class PlayerMapper {
   pinataGatewayUrl: string;
@@ -57,14 +55,6 @@ export class PlayerMapper {
     playerResponseDto.isInAuction = player?.isInAuction;
     playerResponseDto.auctions = player?.auctions;
     return playerResponseDto;
-  }
-  //TODO: remove this method
-  fromSCPlayerDtoToPlayer(scPlayerDto: ISCPlayerDto): PlayerDto {
-    const playerDto = new PlayerDto();
-    playerDto.name = scPlayerDto.name;
-    playerDto.issuer = scPlayerDto.issuer;
-    playerDto.metadataCid = scPlayerDto.metadata_uri;
-    return playerDto;
   }
 
   fromSubmitMintPlayerDtoToPlayerDto(

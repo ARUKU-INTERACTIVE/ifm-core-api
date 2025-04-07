@@ -3,13 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { Blob } from 'buffer';
 import { PinataSDK, UploadResponse } from 'pinata';
 
-import { IPinataPlayerCid } from '@common/infrastructure/ipfs/application/interfaces/pinata-player-cid.interface';
-import { CreateNFTDtoComplete } from '@common/infrastructure/stellar/dto/create-nft.dto';
-
 @Injectable()
 export class PinataAdapter {
   private readonly pinataJwt: string;
-  private readonly pinataGatewayUrl: string;
+  readonly pinataGatewayUrl: string;
   private readonly pinata: PinataSDK;
 
   constructor(private readonly environmentConfig: ConfigService) {
@@ -23,9 +20,7 @@ export class PinataAdapter {
     });
   }
 
-  async getPinataUriFromFile(
-    file: Express.Multer.File,
-  ): Promise<UploadResponse> {
+  async uploadFIle(file: Express.Multer.File): Promise<UploadResponse> {
     const blob = new Blob([file.buffer], {
       type: file.mimetype,
     });
@@ -35,25 +30,7 @@ export class PinataAdapter {
     return await this.pinata.upload.public.file(currentFile);
   }
 
-  async getPinataMetadataAndImageCid(
-    createNFTDtoComplete: CreateNFTDtoComplete,
-  ): Promise<IPinataPlayerCid> {
-    const imageUploadResult = await this.getPinataUriFromFile(
-      createNFTDtoComplete.file,
-    );
-    const imageCid = imageUploadResult.cid;
-    const metadataPayload = {
-      name: createNFTDtoComplete.name,
-      description: createNFTDtoComplete.description,
-      image: `https://${this.pinataGatewayUrl}/ipfs/${imageCid}`,
-      issuer: createNFTDtoComplete.issuer,
-      code: createNFTDtoComplete.code,
-    };
-    const metadataUploadResult =
-      await this.pinata.upload.public.json(metadataPayload);
-    return {
-      metadataCid: metadataUploadResult.cid,
-      imageCid: imageCid,
-    };
+  async uploadJson(json: Record<string, unknown>): Promise<UploadResponse> {
+    return await this.pinata.upload.public.json(json);
   }
 }

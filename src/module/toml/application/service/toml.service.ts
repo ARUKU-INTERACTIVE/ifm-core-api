@@ -14,7 +14,7 @@ export class TomlService {
     this.homeDomain = this.environmentConfig.get<string>('stellar.homeDomain');
     this.codeMint = this.environmentConfig.get<string>('stellar.codeMint');
   }
-  private templateNft(player: Partial<PlayerResponseDto>): string {
+  private getNftTemplate(player: Partial<PlayerResponseDto>): string {
     return `
    [[CURRENCIES]]
    code=${this.codeMint}
@@ -31,7 +31,7 @@ export class TomlService {
       page: { size: 0, offset: 0, number: 0 },
     });
     const template = players.data.map((player) => {
-      return this.templateNft({
+      return this.getNftTemplate({
         name: player.attributes.name,
         issuer: player.attributes.issuer,
         description: player.attributes.description,

@@ -11,7 +11,6 @@ export class TomlController {
 
   @Get('/stellar.toml')
   @Header('Content-Type', 'text/plain')
-  @Header('Content-Disposition', 'attachment; filename=stellar.toml')
   async getToml(): Promise<string> {
     return await this.tomlService.getToml();
   }

@@ -1,5 +1,6 @@
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
-import { Module } from '@nestjs/common';
+import { PlayerModule } from '@module/player/player.module';
+import { Module, forwardRef } from '@nestjs/common';
 
 import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 import { TransactionResponseAdapter } from '@common/infrastructure/stellar/application/adapter/transaction-response.adapter';
@@ -10,7 +11,7 @@ import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.ad
 import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
 @Module({
-  imports: [PinataModule],
+  imports: [PinataModule, forwardRef(() => PlayerModule)],
   controllers: [],
   providers: [
     StellarAccountAdapter,

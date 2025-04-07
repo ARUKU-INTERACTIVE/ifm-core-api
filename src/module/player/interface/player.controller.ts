@@ -70,13 +70,15 @@ export class PlayerController {
     @Body() createNFTDto: CreateNFTDto,
   ): Promise<OneSerializedResponseDto<TransactionNFTDto>> {
     if (!file || !file.mimetype.startsWith('image/')) {
-      throw new BadRequestException('Debe subir una imagen válida');
+      throw new BadRequestException(
+        'Invalid file type. Only images are allowed.',
+      );
     }
     const createNFTDtoWithFile = {
       ...createNFTDto,
       file,
     };
-    return await this.stellarNFTAdapter.createTransactionNFT(
+    return await this.stellarNFTAdapter.createPlayerNFTTransaction(
       createNFTDtoWithFile,
       user.publicKey,
     );

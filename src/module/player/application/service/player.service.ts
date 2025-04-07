@@ -14,6 +14,9 @@ import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
+import { IPinataPlayerCid } from '@common/infrastructure/ipfs/application/interfaces/pinata-player-cid.interface';
+import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
+import { CreateNFTDtoComplete } from '@common/infrastructure/stellar/dto/create-nft.dto';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 
 import { User } from '@iam/user/domain/user.entity';
@@ -26,6 +29,7 @@ export class PlayerService {
     private readonly playerResponseAdapter: PlayerResponseAdapter,
     private readonly playerMapper: PlayerMapper,
     private readonly sorobanContractAdapter: SorobanContractAdapter,
+    private readonly pinataAdapter: PinataAdapter,
   ) {}
 
   async getAll(
@@ -75,5 +79,27 @@ export class PlayerService {
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
       [PlayerRelation.OWNER],
     );
+  }
+
+  async uploadPlayerMetadata(
+    createNFTDtoComplete: CreateNFTDtoComplete,
+  ): Promise<IPinataPlayerCid> {
+    const imageUploadResult = await this.pinataAdapter.uploadFIle(
+      createNFTDtoComplete.file,
+    );
+    const imageCid = imageUploadResult.cid;
+    const metadataPayload = {
+      name: createNFTDtoComplete.name,
+      description: createNFTDtoComplete.description,
+      image: `https://${this.pinataAdapter.pinataGatewayUrl}/ipfs/${imageCid}`,
+      issuer: createNFTDtoComplete.issuer,
+      code: createNFTDtoComplete.code,
+    };
+    const metadataUploadResult =
+      await this.pinataAdapter.uploadJson(metadataPayload);
+    return {
+      metadataCid: metadataUploadResult.cid,
+      imageCid: imageCid,
+    };
   }
 }

@@ -200,8 +200,6 @@ describe('Authentication Module', () => {
           memo: 'memo',
         };
 
-        //   stellarServiceMock.verifySignature.mockResolvedValueOnce({});
-
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
           .send(signInDto)
@@ -229,12 +227,6 @@ describe('Authentication Module', () => {
           transactionSigned: 'transactionSigned',
           memo: 'invalidMemo',
         };
-
-        //stellarServiceMock.verifySignature.mockImplementationOnce(() => {
-        //  throw new IncorrectMemoException({
-        //    message: STELLAR_ERROR.INCORRECT_MEMO,
-        //  });
-        //});
 
         await request(app.getHttpServer())
           .post('/api/v1/auth/sign-in')
