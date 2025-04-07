@@ -19,7 +19,6 @@ export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderSer
     refreshSession: jest.fn(),
   };
 
-
 export const testModuleBootstrapper = (): Promise<TestingModule> => {
   initializeTransactionalContext();
 

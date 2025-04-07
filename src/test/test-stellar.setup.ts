@@ -70,24 +70,22 @@ jest.mock('@stellar/stellar-sdk', () => ({
     payment: jest.fn(),
     setOptions: jest.fn(),
   },
-  Memo:{text:jest.fn()},
-  StrKey:{
-    isValidEd25519PublicKey:jest.fn().mockImplementation((publicKey) => {
+  Memo: { text: jest.fn() },
+  StrKey: {
+    isValidEd25519PublicKey: jest.fn().mockImplementation((publicKey) => {
       if (publicKey == PK_ERROR) {
         throw new Error();
       }
       return true;
-    }
-  )
+    }),
   },
-  WebAuth:{
-    verifyTxSignedBy:jest.fn().mockImplementation((transaction, publicKey) => {
+  WebAuth: {
+    verifyTxSignedBy: jest.fn().mockImplementation((transaction, publicKey) => {
       if (transaction == ERROR) {
         throw new Error();
       }
       return true;
-    }
-  ),
+    }),
   },
   TransactionBuilder: jest.fn().mockImplementation(() => ({
     sign: jest.fn(),
