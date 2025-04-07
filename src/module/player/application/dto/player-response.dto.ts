@@ -14,13 +14,16 @@ export class PlayerResponseDto {
   name: string;
 
   @ApiProperty()
+  description: string;
+
+  @ApiProperty()
   uuid: string;
 
   @ApiProperty()
-  metadataCid: string;
+  metadataUri: string;
 
   @ApiProperty()
-  imageCid: string;
+  imageUri: string;
 
   @ApiProperty()
   issuer: string;

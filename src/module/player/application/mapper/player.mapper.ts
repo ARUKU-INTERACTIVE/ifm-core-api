@@ -49,9 +49,10 @@ export class PlayerMapper {
     playerResponseDto.id = player.id?.toString();
     playerResponseDto.uuid = player.uuid;
     playerResponseDto.name = player.name;
+    playerResponseDto.description = player.description;
     playerResponseDto.issuer = player.issuer;
-    playerResponseDto.metadataCid = this.getPinataUri(player.metadataCid);
-    playerResponseDto.imageCid = this.getPinataUri(player.imageCid);
+    playerResponseDto.metadataUri = this.getPinataUri(player.metadataCid);
+    playerResponseDto.imageUri = this.getPinataUri(player.imageCid);
     playerResponseDto.createdAt = player.createdAt;
     playerResponseDto.updatedAt = player.updatedAt;
     playerResponseDto.deletedAt = player.deletedAt;
