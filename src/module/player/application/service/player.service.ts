@@ -67,19 +67,8 @@ export class PlayerService {
     submitMintPlayerDto: SubmitMintPlayerDto,
     currentUser: User,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
-    const { mintPlayerTransactionsXDRDto, ...restSubmitMintPlayerDto } =
-      submitMintPlayerDto;
-
-    await this.stellarTransactionAdapter.submitTransaction(
-      mintPlayerTransactionsXDRDto.mintPlayerTransactionXDR,
-    );
-
     const txHash = await this.sorobanContractAdapter.submitMintPlayer(
-      mintPlayerTransactionsXDRDto.createStellarAssetContractXDR,
-    );
-
-    await this.stellarTransactionAdapter.submitTransaction(
-      mintPlayerTransactionsXDRDto.disableMasterKeyTransactionXDR,
+      submitMintPlayerDto.xdr,
     );
 
     const { returnValue } =
@@ -89,7 +78,7 @@ export class PlayerService {
     );
 
     const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
-      restSubmitMintPlayerDto,
+      submitMintPlayerDto,
       currentUser.id,
       playerAddress.toString(),
     );

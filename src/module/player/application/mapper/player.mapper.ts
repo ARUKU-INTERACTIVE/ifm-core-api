@@ -58,10 +58,7 @@ export class PlayerMapper {
   }
 
   fromSubmitMintPlayerDtoToPlayerDto(
-    submitMintPlayerDto: Omit<
-      SubmitMintPlayerDto,
-      'mintPlayerTransactionsXDRDto'
-    >,
+    submitMintPlayerDto: SubmitMintPlayerDto,
     ownerId: number,
     address: string,
   ): PlayerDto {

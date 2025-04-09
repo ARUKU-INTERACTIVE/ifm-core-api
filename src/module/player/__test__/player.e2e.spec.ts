@@ -251,11 +251,7 @@ describe('Player Module', () => {
                 imageCid: expect.any(String),
                 metadataCid: expect.any(String),
                 issuer: expect.any(String),
-                mintPlayerTransactionsXdrDto: expect.objectContaining({
-                  disableMasterKeyTransactionXDR: expect.any(String),
-                  mintPlayerTransactionXDR: expect.any(String),
-                  createStellarAssetContractXDR: expect.any(String),
-                }),
+                xdr: expect.any(String),
               }),
             }),
           });
@@ -273,11 +269,7 @@ describe('Player Module', () => {
         .post('/api/v1/player/submit/mint')
         .auth(adminToken, { type: 'bearer' })
         .send({
-          mintPlayerTransactionsXDRDto: {
-            disableMasterKeyTransactionXDR: 'xdr',
-            mintPlayerTransactionXDR: 'xdr',
-            createStellarAssetContractXDR: 'xdr',
-          },
+          xdr: 'xdr',
           imageCid: 'imageCid',
           metadataCid: 'metadataCid',
           issuer,
@@ -356,11 +348,7 @@ describe('Player Module', () => {
         .post('/api/v1/player/submit/mint')
         .auth(adminToken, { type: 'bearer' })
         .send({
-          mintPlayerTransactionsXDRDto: {
-            disableMasterKeyTransactionXDR: ERROR,
-            mintPlayerTransactionXDR: ERROR,
-            createStellarAssetContractXDR: ERROR,
-          },
+          xdr: ERROR,
           metadataCid: 'metadataCid',
           imageCid: 'imageCid',
           issuer,
