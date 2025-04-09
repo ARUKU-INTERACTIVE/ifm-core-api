@@ -1,7 +1,8 @@
-import { ICollection } from '@common/base/application/dto/collection.interface';
-import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 import { AuctionRelation } from '@module/auction/application/enum/auction-relations.enum';
 import { Auction } from '@module/auction/domain/auction.domain';
+
+import { ICollection } from '@common/base/application/dto/collection.interface';
+import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 
 export const AUCTION_REPOSITORY_KEY = 'auction_repository';
 
