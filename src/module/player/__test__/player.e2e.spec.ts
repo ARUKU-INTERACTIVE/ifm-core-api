@@ -368,7 +368,7 @@ describe('Player Module', () => {
   });
 
   describe('POST - /player/sac', () => {
-    it('Should created SAC asset.', async () => {
+    it('should create the NFT in SAC for blockchain trading', async () => {
       const playerId = 2;
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
         sign: jest.fn(),
@@ -414,7 +414,7 @@ describe('Player Module', () => {
         });
     });
 
-    it('Should show error message if player address already exists', async () => {
+    it('should show an error message if the player already has an assigned address', async () => {
       const playerId = 1;
 
       await request(app.getHttpServer())
@@ -429,7 +429,7 @@ describe('Player Module', () => {
         });
     });
 
-    it('Should show error message if player address already exists', async () => {
+    it('should show an error message if the player already has an address when attempting to submit the transaction to the Soroban network', async () => {
       const playerId = 1;
 
       await request(app.getHttpServer())
