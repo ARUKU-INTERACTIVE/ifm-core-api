@@ -90,7 +90,6 @@ export class PlayerController {
     @Param('id') id: number,
     @CurrentUser() user: User,
   ): Promise<OneSerializedResponseDto<TransactionXDRDTO>> {
-    console.log('mintPlayerSac', id, user);
     return this.playerService.createStellarAssetContract(id, user);
   }
 
@@ -98,8 +97,7 @@ export class PlayerController {
   async submitPlayerSac(
     @Param('id') id: number,
     @Body() transactionXDRDTO: TransactionXDRDTO,
-  ) {
-    console.log('mintPlayerSac', id, transactionXDRDTO);
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     return this.playerService.submitSACXdr(id, transactionXDRDTO);
   }
 

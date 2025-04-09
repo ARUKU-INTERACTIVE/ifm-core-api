@@ -138,7 +138,10 @@ export class PlayerService {
     );
   }
 
-  async submitSACXdr(playerId: number, transactionXDRDTO: TransactionXDRDTO) {
+  async submitSACXdr(
+    playerId: number,
+    transactionXDRDTO: TransactionXDRDTO,
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     const player = await this.playerRepository.getOneById(playerId);
 
     if (player.address) {
