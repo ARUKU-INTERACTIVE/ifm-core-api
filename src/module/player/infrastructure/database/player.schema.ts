@@ -45,6 +45,7 @@ export const PlayerSChema = new EntitySchema<Player>({
     auctions: {
       type: 'one-to-many',
       target: 'Auction',
+      inverseSide:"player",
     },
   },
 });
