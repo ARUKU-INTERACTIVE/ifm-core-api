@@ -14,8 +14,10 @@ import { OneSerializedResponseDto } from '@common/base/application/dto/one-seria
 import { TransactionResponseAdapter } from '@common/infrastructure/stellar/application/adapter/transaction-response.adapter';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
 import { CreateNFTDtoWithFIle } from '@common/infrastructure/stellar/dto/create-nft.dto';
+import { MintPlayerTransactionsXDRDto } from '@common/infrastructure/stellar/dto/mint-player-transactions-xdr.dto';
 import { TransactionNFTDto } from '@common/infrastructure/stellar/dto/transaction-nft.dto';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
+import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
 @Injectable()
 export class StellarNftAdapter {
@@ -30,6 +32,7 @@ export class StellarNftAdapter {
     private readonly playerService: PlayerService,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
     private readonly transactionResponseAdapter: TransactionResponseAdapter,
+    private readonly stellarTransactionAdapter: StellarTransactionAdapter,
     private readonly transactionMapper: TransactionMapper,
   ) {
     this.networkPassphrase = this.environmentConfig.get(
@@ -61,17 +64,16 @@ export class StellarNftAdapter {
     const ownerAccount =
       await this.stellarAccountAdapter.getAccount(ownerPublicKey);
 
-    const xdr = await this.mintPlayerTransaction(
+    const mintPlayerTransactionsXDR = await this.mintPlayerTransaction(
       ownerAccount,
       issuer,
       ownerPublicKey,
       metadataCid,
       nftAsset,
     );
-
     return this.transactionResponseAdapter.oneEntityResponse<TransactionNFTDto>(
       this.transactionMapper.fromTransactionToTransactionNFTDto(
-        xdr,
+        mintPlayerTransactionsXDR,
         metadataCid,
         imageCid,
         issuer.publicKey(),
@@ -85,50 +87,108 @@ export class StellarNftAdapter {
     ownerPublicKey: string,
     metadataCID: string,
     nftAsset: Asset,
-  ): Promise<string> {
+  ): Promise<MintPlayerTransactionsXDRDto> {
     const issuerPublicKey = issuer.publicKey();
+    try {
+      const transaction = new TransactionBuilder(account, {
+        fee: BASE_FEE,
+        networkPassphrase: this.networkPassphrase,
+      })
+        .addOperation(
+          Operation.createAccount({
+            destination: issuerPublicKey,
+            startingBalance: this.startingBalance,
+          }),
+        )
+        .addOperation(
+          Operation.manageData({
+            name: this.ipfshash,
+            value: metadataCID,
+            source: issuerPublicKey,
+          }),
+        )
+        .addOperation(
+          Operation.changeTrust({
+            asset: nftAsset,
+            limit: this.stroop,
+            source: ownerPublicKey,
+          }),
+        )
+        .addOperation(
+          Operation.payment({
+            destination: ownerPublicKey,
+            asset: nftAsset,
+            amount: this.stroop,
+            source: issuerPublicKey,
+          }),
+        )
+        .setTimeout(400)
+        .build();
 
-    const transaction = new TransactionBuilder(account, {
+      const sacTransaction = new TransactionBuilder(account, {
+        fee: BASE_FEE,
+        networkPassphrase: this.networkPassphrase,
+      })
+        .addOperation(
+          Operation.createStellarAssetContract({
+            asset: nftAsset,
+            source: issuerPublicKey,
+          }),
+        )
+        .setTimeout(400)
+        .build();
+      const sacSorobanTransactionXDR =
+        await this.stellarTransactionAdapter.prepareTransaction(
+          sacTransaction.toXDR(),
+        );
+      const sacSorobanTransaction =
+        this.stellarTransactionAdapter.buildTransactionFromXdr(
+          sacSorobanTransactionXDR,
+        );
+      const disableMasterKeyTransaction = new TransactionBuilder(account, {
+        fee: BASE_FEE,
+        networkPassphrase: this.networkPassphrase,
+      })
+        .addOperation(
+          Operation.setOptions({
+            masterWeight: 0,
+            homeDomain: this.homeDomain,
+            source: issuerPublicKey,
+          }),
+        )
+        .setTimeout(400)
+        .build();
+      transaction.sign(issuer);
+      sacSorobanTransaction.sign(issuer);
+      disableMasterKeyTransaction.sign(issuer);
+
+      return this.transactionMapper.fromMintPlayerTransactionsToXDRDto(
+        transaction.toXDR(),
+        sacSorobanTransaction.toXDR(),
+        disableMasterKeyTransaction.toXDR(),
+      );
+    } catch (error) {
+      console.log(error, 'error');
+      throw new Error('Failed to create mint player transaction');
+    }
+  }
+
+  async createStellarAssetContract(
+    issuerAccount: Account,
+    nftAsset: Asset,
+    issuer: Keypair,
+  ) {
+    const transaction = new TransactionBuilder(issuerAccount, {
       fee: BASE_FEE,
       networkPassphrase: this.networkPassphrase,
     })
       .addOperation(
-        Operation.createAccount({
-          destination: issuerPublicKey,
-          startingBalance: this.startingBalance,
-          source: ownerPublicKey,
-        }),
-      )
-      .addOperation(
-        Operation.manageData({
-          name: this.ipfshash,
-          value: metadataCID,
-          source: issuerPublicKey,
-        }),
-      )
-      .addOperation(
-        Operation.changeTrust({
+        Operation.createStellarAssetContract({
           asset: nftAsset,
-          limit: this.stroop,
-          source: ownerPublicKey,
+          source: issuer.publicKey(),
         }),
       )
-      .addOperation(
-        Operation.payment({
-          destination: ownerPublicKey,
-          asset: nftAsset,
-          amount: this.stroop,
-          source: issuerPublicKey,
-        }),
-      )
-      .addOperation(
-        Operation.setOptions({
-          masterWeight: 0,
-          homeDomain: this.homeDomain,
-          source: issuerPublicKey,
-        }),
-      )
-      .setTimeout(180)
+      .setTimeout(60)
       .build();
     transaction.sign(issuer);
     return transaction.toXDR();

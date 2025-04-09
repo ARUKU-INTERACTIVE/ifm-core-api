@@ -1,6 +1,7 @@
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import { PlayerModule } from '@module/player/player.module';
 import { Module, forwardRef } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 import { TransactionResponseAdapter } from '@common/infrastructure/stellar/application/adapter/transaction-response.adapter';
@@ -21,6 +22,7 @@ import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stella
     TransactionMapper,
     PlayerMapper,
     TransactionResponseAdapter,
+    ConfigService,
   ],
   exports: [
     TransactionMapper,

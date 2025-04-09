@@ -18,6 +18,7 @@ import { IPinataPlayerCid } from '@common/infrastructure/ipfs/application/interf
 import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
 import { CreateNFTDtoComplete } from '@common/infrastructure/stellar/dto/create-nft.dto';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
+import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
 import { User } from '@iam/user/domain/user.entity';
 
@@ -28,6 +29,7 @@ export class PlayerService {
     private readonly playerRepository: IPlayerRepository,
     private readonly playerResponseAdapter: PlayerResponseAdapter,
     private readonly playerMapper: PlayerMapper,
+    private readonly stellarTransactionAdapter: StellarTransactionAdapter,
     private readonly sorobanContractAdapter: SorobanContractAdapter,
     private readonly pinataAdapter: PinataAdapter,
   ) {}
@@ -65,20 +67,46 @@ export class PlayerService {
     submitMintPlayerDto: SubmitMintPlayerDto,
     currentUser: User,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
-    await this.sorobanContractAdapter.submitMintPlayer(submitMintPlayerDto.xdr);
-    const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
-      submitMintPlayerDto,
-      currentUser.id,
-    );
+    const { mintPlayerTransactionsXDRDto, ...restSubmitMintPlayerDto } =
+      submitMintPlayerDto;
+    try {
+      console.log(mintPlayerTransactionsXDRDto, 'mintPlayerTransactionsXDRDto');
+      await this.stellarTransactionAdapter.submitTransaction(
+        mintPlayerTransactionsXDRDto.mintPlayerTransactionXDR,
+      );
 
-    const player = await this.playerRepository.saveOne(
-      this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
-    );
+      const txHash = await this.sorobanContractAdapter.submitMintPlayer(
+        mintPlayerTransactionsXDRDto.createStellarAssetContractXDR,
+      );
 
-    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
-      this.playerMapper.fromPlayerToPlayerResponseDto(player),
-      [PlayerRelation.OWNER],
-    );
+      await this.stellarTransactionAdapter.submitTransaction(
+        mintPlayerTransactionsXDRDto.disableMasterKeyTransactionXDR,
+      );
+
+      const { returnValue } =
+        await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
+      const playerAddress = this.sorobanContractAdapter.getAddress(
+        returnValue.address(),
+      );
+      console.log(playerAddress, 'playerAddress');
+      const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
+        restSubmitMintPlayerDto,
+        currentUser.id,
+        playerAddress.toString(),
+      );
+
+      const player = await this.playerRepository.saveOne(
+        this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
+      );
+
+      return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+        this.playerMapper.fromPlayerToPlayerResponseDto(player),
+        [PlayerRelation.OWNER],
+      );
+    } catch (error) {
+      console.error('Error submitting mint player XDR:', error);
+      throw new Error('Failed to submit mint player XDR');
+    }
   }
 
   async uploadPlayerMetadata(

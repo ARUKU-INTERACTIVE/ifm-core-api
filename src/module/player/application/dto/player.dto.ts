@@ -25,4 +25,8 @@ export class PlayerDto implements IPlayerDto {
   @IsNumber()
   @IsNotEmpty()
   ownerId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  address: string;
 }

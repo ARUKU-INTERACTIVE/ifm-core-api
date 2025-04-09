@@ -1,6 +1,5 @@
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerDto } from '@module/player/application/dto/player.dto';
-import { IPlayerDto } from '@module/player/application/dto/player.dto.interface';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { Player } from '@module/player/domain/player.domain';
 import { Injectable } from '@nestjs/common';
@@ -19,23 +18,24 @@ export class PlayerMapper {
     return `https://${this.pinataGatewayUrl}/ipfs/${cid}`;
   }
 
-  private mapPlayerDtoToPlayer(playerDto: IPlayerDto): Player {
+  private mapPlayerDtoToPlayer(playerDto: PlayerDto): Player {
     const player = new Player();
     player.name = playerDto.name;
     player.metadataCid = playerDto.metadataCid;
     player.imageCid = playerDto.imageCid;
     player.description = playerDto.description;
     player.issuer = playerDto.issuer;
+    player.address = playerDto.address;
     return player;
   }
 
-  fromCreatePlayerDtoToPlayer(playerDto: IPlayerDto): Player {
+  fromCreatePlayerDtoToPlayer(playerDto: PlayerDto): Player {
     const player = this.mapPlayerDtoToPlayer(playerDto);
     player.ownerId = playerDto.ownerId;
     return player;
   }
 
-  fromUpdatePlayerDtoToPlayer(playerDto: IPlayerDto): Player {
+  fromUpdatePlayerDtoToPlayer(playerDto: PlayerDto): Player {
     return this.mapPlayerDtoToPlayer(playerDto);
   }
 
@@ -53,12 +53,17 @@ export class PlayerMapper {
     playerResponseDto.deletedAt = player.deletedAt;
     playerResponseDto.owner = player?.owner;
     playerResponseDto.auctions = player?.auctions;
+    playerResponseDto.address = player?.address;
     return playerResponseDto;
   }
 
   fromSubmitMintPlayerDtoToPlayerDto(
-    submitMintPlayerDto: SubmitMintPlayerDto,
+    submitMintPlayerDto: Omit<
+      SubmitMintPlayerDto,
+      'mintPlayerTransactionsXDRDto'
+    >,
     ownerId: number,
+    address: string,
   ): PlayerDto {
     const playerDto = new PlayerDto();
     playerDto.name = submitMintPlayerDto.name;
@@ -67,6 +72,7 @@ export class PlayerMapper {
     playerDto.metadataCid = submitMintPlayerDto.metadataCid;
     playerDto.imageCid = submitMintPlayerDto.imageCid;
     playerDto.description = submitMintPlayerDto.description;
+    playerDto.address = address;
     return playerDto;
   }
 }

@@ -89,6 +89,11 @@ export class StellarTransactionAdapter {
     }
   }
 
+  async submitTransaction(xdr: string) {
+    const transaction = this.buildTransactionFromXdr(xdr);
+    return await this.stellarServer.submitTransaction(transaction);
+  }
+
   async submitSorobanTransaction(
     xdr: string,
   ): Promise<rpc.Api.GetTransactionResponse> {

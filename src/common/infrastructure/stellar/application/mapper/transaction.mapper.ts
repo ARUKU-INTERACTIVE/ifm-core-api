@@ -1,3 +1,5 @@
+import { MintPlayerTransactionsXDRDto } from '@common/infrastructure/stellar/dto/mint-player-transactions-xdr.dto';
+import { IMintPlayerTransactionsXDRDto } from '@common/infrastructure/stellar/dto/mint-player-transactions-xdr.interface';
 import { TransactionNFTDto } from '@common/infrastructure/stellar/dto/transaction-nft.dto';
 import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
 
@@ -8,16 +10,30 @@ export class TransactionMapper {
     return transactionXDRDto;
   }
   fromTransactionToTransactionNFTDto(
-    xdr: string,
+    mintPlayerTransactionsXDR: IMintPlayerTransactionsXDRDto,
     metadataCid: string,
     imageCid: string,
     issuer: string,
   ) {
     const transactionXDRDto = new TransactionNFTDto();
-    transactionXDRDto.xdr = xdr;
+    transactionXDRDto.mintPlayerTransactionsXDRDto = mintPlayerTransactionsXDR;
     transactionXDRDto.issuer = issuer;
     transactionXDRDto.imageCid = imageCid;
     transactionXDRDto.metadataCid = metadataCid;
     return transactionXDRDto;
+  }
+  fromMintPlayerTransactionsToXDRDto(
+    mintPlayerTransactionXDR: string,
+    createStellarAssetContractXDR: string,
+    disableMasterKeyTransactionXDR: string,
+  ): MintPlayerTransactionsXDRDto {
+    const mintPlayerTransactionsXDRDto = new MintPlayerTransactionsXDRDto();
+    mintPlayerTransactionsXDRDto.createStellarAssetContractXDR =
+      createStellarAssetContractXDR;
+    mintPlayerTransactionsXDRDto.disableMasterKeyTransactionXDR =
+      disableMasterKeyTransactionXDR;
+    mintPlayerTransactionsXDRDto.mintPlayerTransactionXDR =
+      mintPlayerTransactionXDR;
+    return mintPlayerTransactionsXDRDto;
   }
 }
