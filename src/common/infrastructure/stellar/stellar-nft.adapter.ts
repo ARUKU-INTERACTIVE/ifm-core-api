@@ -149,7 +149,6 @@ export class StellarNftAdapter {
       )
       .setTimeout(400)
       .build();
-    console.log(sacTransaction, 'sactTRansaction');
     return await this.stellarTransactionAdapter.prepareTransaction(
       sacTransaction.toXDR(),
     );
