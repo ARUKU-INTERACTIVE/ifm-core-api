@@ -42,6 +42,7 @@ export class StellarTransactionAdapter {
   async prepareTransaction(xdr: string): Promise<string> {
     try {
       const transaction = this.buildTransactionFromXdr(xdr);
+
       const uploadTransaction =
         await this.sorobanServer.prepareTransaction(transaction);
 

@@ -233,6 +233,10 @@ describe('Player Module', () => {
       description: 'description',
     } as IPlayerDto;
     it('Should return the XDR of the mintPlayer transaction.', async () => {
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+        sign: jest.fn(),
+        toXDR: jest.fn().mockReturnValue('xdr'),
+      });
       await request(app.getHttpServer())
         .post('/api/v1/player/mint')
         .auth(adminToken, { type: 'bearer' })
@@ -244,10 +248,14 @@ describe('Player Module', () => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
               attributes: expect.objectContaining({
-                xdr: expect.any(String),
                 imageCid: expect.any(String),
                 metadataCid: expect.any(String),
                 issuer: expect.any(String),
+                mintPlayerTransactionsXdrDto: expect.objectContaining({
+                  disableMasterKeyTransactionXDR: expect.any(String),
+                  mintPlayerTransactionXDR: expect.any(String),
+                  createStellarAssetContractXDR: expect.any(String),
+                }),
               }),
             }),
           });
@@ -265,7 +273,11 @@ describe('Player Module', () => {
         .post('/api/v1/player/submit/mint')
         .auth(adminToken, { type: 'bearer' })
         .send({
-          xdr: 'xdr',
+          mintPlayerTransactionsXDRDto: {
+            disableMasterKeyTransactionXDR: 'xdr',
+            mintPlayerTransactionXDR: 'xdr',
+            createStellarAssetContractXDR: 'xdr',
+          },
           imageCid: 'imageCid',
           metadataCid: 'metadataCid',
           issuer,
@@ -344,7 +356,11 @@ describe('Player Module', () => {
         .post('/api/v1/player/submit/mint')
         .auth(adminToken, { type: 'bearer' })
         .send({
-          xdr: ERROR,
+          mintPlayerTransactionsXDRDto: {
+            disableMasterKeyTransactionXDR: ERROR,
+            mintPlayerTransactionXDR: ERROR,
+            createStellarAssetContractXDR: ERROR,
+          },
           metadataCid: 'metadataCid',
           imageCid: 'imageCid',
           issuer,

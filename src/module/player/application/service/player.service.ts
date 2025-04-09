@@ -69,44 +69,39 @@ export class PlayerService {
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     const { mintPlayerTransactionsXDRDto, ...restSubmitMintPlayerDto } =
       submitMintPlayerDto;
-    try {
-      console.log(mintPlayerTransactionsXDRDto, 'mintPlayerTransactionsXDRDto');
-      await this.stellarTransactionAdapter.submitTransaction(
-        mintPlayerTransactionsXDRDto.mintPlayerTransactionXDR,
-      );
 
-      const txHash = await this.sorobanContractAdapter.submitMintPlayer(
-        mintPlayerTransactionsXDRDto.createStellarAssetContractXDR,
-      );
+    await this.stellarTransactionAdapter.submitTransaction(
+      mintPlayerTransactionsXDRDto.mintPlayerTransactionXDR,
+    );
 
-      await this.stellarTransactionAdapter.submitTransaction(
-        mintPlayerTransactionsXDRDto.disableMasterKeyTransactionXDR,
-      );
+    const txHash = await this.sorobanContractAdapter.submitMintPlayer(
+      mintPlayerTransactionsXDRDto.createStellarAssetContractXDR,
+    );
 
-      const { returnValue } =
-        await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
-      const playerAddress = this.sorobanContractAdapter.getAddress(
-        returnValue.address(),
-      );
-      console.log(playerAddress, 'playerAddress');
-      const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
-        restSubmitMintPlayerDto,
-        currentUser.id,
-        playerAddress.toString(),
-      );
+    await this.stellarTransactionAdapter.submitTransaction(
+      mintPlayerTransactionsXDRDto.disableMasterKeyTransactionXDR,
+    );
 
-      const player = await this.playerRepository.saveOne(
-        this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
-      );
+    const { returnValue } =
+      await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
+    const playerAddress = this.sorobanContractAdapter.getAddress(
+      returnValue.address(),
+    );
 
-      return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
-        this.playerMapper.fromPlayerToPlayerResponseDto(player),
-        [PlayerRelation.OWNER],
-      );
-    } catch (error) {
-      console.error('Error submitting mint player XDR:', error);
-      throw new Error('Failed to submit mint player XDR');
-    }
+    const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
+      restSubmitMintPlayerDto,
+      currentUser.id,
+      playerAddress.toString(),
+    );
+
+    const player = await this.playerRepository.saveOne(
+      this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
+    );
+
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+      this.playerMapper.fromPlayerToPlayerResponseDto(player),
+      [PlayerRelation.OWNER],
+    );
   }
 
   async uploadPlayerMetadata(
