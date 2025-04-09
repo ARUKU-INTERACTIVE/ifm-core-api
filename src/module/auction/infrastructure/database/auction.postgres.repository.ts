@@ -1,16 +1,12 @@
-import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
-import { IPlayerRepository } from '@module/player/application/repository/player.repository.interface';
-import { Player } from '@module/player/domain/player.domain';
-import { PlayerSChema } from '@module/player/infrastructure/database/player.schema';
+import { AuctionRelation } from '@module/auction/application/enum/auction-relations.enum';
+import { IAuctionRepository } from '@module/auction/application/repository/auction.repository.interface';
+import { Auction } from '@module/auction/domain/auction.domain';
+import { AuctionSchema } from '@module/auction/infrastructure/database/auction.schema';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
 import { ICollection } from '@common/base/application/dto/collection.interface';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
-import { IAuctionRepository } from '@module/auction/application/repository/auction.repository.interface';
-import { Auction } from '@module/auction/domain/auction.domain';
-import { AuctionRelation } from '@module/auction/application/enum/auction-relations.enum';
-import { AuctionSchema } from '@module/auction/infrastructure/database/auction.schema';
 
 export class AuctionRepository implements IAuctionRepository {
   constructor(
@@ -52,7 +48,10 @@ export class AuctionRepository implements IAuctionRepository {
     };
   }
 
-  async getOneById(id: number, relations?: AuctionRelation[]): Promise<Auction> {
+  async getOneById(
+    id: number,
+    relations?: AuctionRelation[],
+  ): Promise<Auction> {
     return await this.repository.findOne({
       where: {
         id,
@@ -61,7 +60,10 @@ export class AuctionRepository implements IAuctionRepository {
     });
   }
 
-  async saveOne(auction: Auction, relations?: AuctionRelation[]): Promise<Auction> {
+  async saveOne(
+    auction: Auction,
+    relations?: AuctionRelation[],
+  ): Promise<Auction> {
     const savedAuction = await this.repository.save(auction);
 
     return await this.repository.findOne({
