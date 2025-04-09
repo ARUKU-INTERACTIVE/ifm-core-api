@@ -1,5 +1,5 @@
 import { PlayerService } from '@module/player/application/service/player.service';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   Account,
@@ -29,6 +29,7 @@ export class StellarNftAdapter {
   private readonly startingBalance: string = '1.5';
   constructor(
     private readonly environmentConfig: ConfigService,
+    @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
     private readonly transactionResponseAdapter: TransactionResponseAdapter,
@@ -134,5 +135,23 @@ export class StellarNftAdapter {
     transaction.sign(issuer);
 
     return this.transactionMapper.fromXDRToTransactionDTO(transaction.toXDR());
+  }
+
+  async createStellarAssetContract(account: Account, nftAsset: Asset) {
+    const sacTransaction = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: this.networkPassphrase,
+    })
+      .addOperation(
+        Operation.createStellarAssetContract({
+          asset: nftAsset,
+        }),
+      )
+      .setTimeout(400)
+      .build();
+    console.log(sacTransaction, 'sactTRansaction');
+    return await this.stellarTransactionAdapter.prepareTransaction(
+      sacTransaction.toXDR(),
+    );
   }
 }

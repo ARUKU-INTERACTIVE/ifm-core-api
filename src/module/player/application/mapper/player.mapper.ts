@@ -60,7 +60,6 @@ export class PlayerMapper {
   fromSubmitMintPlayerDtoToPlayerDto(
     submitMintPlayerDto: SubmitMintPlayerDto,
     ownerId: number,
-    address: string,
   ): PlayerDto {
     const playerDto = new PlayerDto();
     playerDto.name = submitMintPlayerDto.name;
@@ -69,7 +68,6 @@ export class PlayerMapper {
     playerDto.metadataCid = submitMintPlayerDto.metadataCid;
     playerDto.imageCid = submitMintPlayerDto.imageCid;
     playerDto.description = submitMintPlayerDto.description;
-    playerDto.address = address;
     return playerDto;
   }
 }
