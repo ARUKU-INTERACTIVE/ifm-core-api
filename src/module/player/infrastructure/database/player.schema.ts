@@ -30,7 +30,7 @@ export const PlayerSChema = new EntitySchema<Player>({
     },
     address: {
       type: String,
-      nullable: false,
+      nullable: true,
       unique: true,
     },
   }),

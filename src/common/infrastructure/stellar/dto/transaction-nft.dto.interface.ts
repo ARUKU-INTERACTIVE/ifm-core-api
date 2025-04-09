@@ -1,7 +1,5 @@
-import { IMintPlayerTransactionsXDRDto } from '@common/infrastructure/stellar/dto/mint-player-transactions-xdr.interface';
-
 export interface ITransactionNFTDto {
-  mintPlayerTransactionsXDRDto: IMintPlayerTransactionsXDRDto;
+  xdr: string;
   metadataCid: string;
   imageCid: string;
   issuer: string;
