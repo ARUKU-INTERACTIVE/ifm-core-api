@@ -1,0 +1,27 @@
+entity: User
+items:
+  admin-user:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX1'
+    username: 'admin@test.com'
+    externalId: '00000000-0000-0000-0000-00000000000X'
+    roles: admin
+  user1:
+    publicKey: 'PK-ERROR'
+    username: 'user1@test.com'
+    externalId: '00000000-0000-0000-0000-0000000000XX'
+    roles: regular
+  user2:
+    publicKey: 'ERROR-ACCOUNT'
+    username: 'user2@test.com'
+    externalId: '00000000-0000-0000-0000-000000000XXX'
+    roles: regular
+  user3:
+    publicKey: 'PK-USER'
+    username: 'user3@test.com'
+    externalId: '00000000-0000-0000-0000-000000000PKX'
+    roles: regular
+  user{4..23}:
+    publicKey: '{{string.uuid}}'
+    username: '{{internet.email}}'
+    externalId: '{{string.uuid}}'
+    roles: regular

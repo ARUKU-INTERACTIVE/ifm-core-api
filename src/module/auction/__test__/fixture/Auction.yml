@@ -1,0 +1,14 @@
+entity: Auction
+items:
+  auction1:
+    externalId: '1'
+    status: 0
+    player: '@player4'
+  auction2:
+   externalId: '2'
+   status: 0
+   player: '@player5'
+  auction3:
+   externalId: '3'
+   status: 0
+   player: '@player6'

@@ -3,50 +3,13 @@ import { IAuctionRepository } from '@module/auction/application/repository/aucti
 import { Auction } from '@module/auction/domain/auction.domain';
 import { AuctionSchema } from '@module/auction/infrastructure/database/auction.schema';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
-
-import { ICollection } from '@common/base/application/dto/collection.interface';
-import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
+import { Repository } from 'typeorm';
 
 export class AuctionRepository implements IAuctionRepository {
   constructor(
     @InjectRepository(AuctionSchema)
     private readonly repository: Repository<Auction>,
   ) {}
-
-  async getAll(
-    options: IGetAllOptions<Auction, AuctionRelation[]>,
-  ): Promise<ICollection<Auction>> {
-    const { filter, page, sort, fields, include } = options || {};
-    const whereClause = { ...filter };
-
-    if (filter) {
-      Object.entries(filter).forEach(([key, value]) => {
-        if (typeof value === 'string') {
-          whereClause[key] = ILike(`%${value}%`);
-        } else {
-          whereClause[key] = value;
-        }
-      });
-    }
-
-    const [items, itemCount] = await this.repository.findAndCount({
-      where: whereClause,
-      order: sort,
-      select: fields,
-      take: page?.size,
-      skip: page?.offset,
-      relations: include,
-    });
-
-    return {
-      data: items,
-      pageNumber: page.number,
-      pageSize: page.size,
-      pageCount: Math.ceil(itemCount / page.size),
-      itemCount,
-    };
-  }
 
   async getOneById(
     id: number,

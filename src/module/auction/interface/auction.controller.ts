@@ -24,22 +24,6 @@ export class AuctionController {
     private readonly auctionService: AuctionService,
     private readonly stellarNFTAdapter: StellarNftAdapter,
   ) {}
-  //  @Get()
-  //  getAll(
-  //    @Query('page') page: PageQueryParamsDto,
-  //    @Query('filter') filter: PlayerFilterQueryParamsDto,
-  //    @Query('fields') fields: PlayerFieldsQueryParamsDto,
-  //    @Query('sort') sort: PlayerSortQueryParamsDto,
-  //    @Query('include') include: PlayerIncludeQueryParamsDto,
-  //  ): Promise<ManySerializedResponseDto<PlayerResponseDto>> {
-  //    return this.playerService.getAll({
-  //      page,
-  //      filter,
-  //      sort,
-  //      fields: fields.target,
-  //      include: include.target ?? [],
-  //    });
-  //  }
 
   @Get('/:id')
   getPlayerById(@Param('id') id: number): Promise<PlayerResponseDto> {
@@ -57,9 +41,8 @@ export class AuctionController {
     );
   }
 
-  @Post('/create/submit/transaction')
+  @Post('/submit/transaction')
   async submitCreateAuctionTransaction(
-    @CurrentUser() user: User,
     @Body() createAuctionDto: CreateAuctionDto,
   ): Promise<OneSerializedResponseDto<AuctionResponseDto>> {
     return this.auctionService.saveOne(createAuctionDto);

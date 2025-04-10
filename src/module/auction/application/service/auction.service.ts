@@ -8,21 +8,22 @@ import {
   AUCTION_REPOSITORY_KEY,
   IAuctionRepository,
 } from '@module/auction/application/repository/auction.repository.interface';
-import { Auction } from '@module/auction/domain/auction.domain';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
 import { PlayerService } from '@module/player/application/service/player.service';
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { PlayerNotOwnedByUserException } from '@module/player/infrastructure/database/exception/player.exception';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { scValToNative, xdr } from '@stellar/stellar-sdk';
 
-import { CollectionDto } from '@common/base/application/dto/collection.dto';
-import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
-import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
 import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
-import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.adapter';
 import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
@@ -39,34 +40,18 @@ export class AuctionService {
     private readonly transactionMapper: TransactionMapper,
     private readonly stellarTransactionAdapter: StellarTransactionAdapter,
     private readonly sorobanContractAdapter: SorobanContractAdapter,
-    private readonly stellarAccountAdapter: StellarAccountAdapter,
     @Inject(forwardRef(() => StellarNftAdapter))
     private readonly stellarNFTAdapter: StellarNftAdapter,
   ) {}
-
-  async getAll(
-    options: IGetAllOptions<Auction, AuctionRelation[]>,
-  ): Promise<ManySerializedResponseDto<AuctionResponseDto>> {
-    const collection = await this.auctionRepository.getAll(options);
-
-    const collectionDto = new CollectionDto({
-      ...collection,
-      data: collection.data.map((auction) =>
-        this.auctionMapper.fromAuctionToAuctionResponseDto(auction),
-      ),
-    });
-
-    return this.auctionResponseAdapter.manyEntitiesResponse<AuctionResponseDto>(
-      collectionDto,
-      options.include,
-    );
-  }
 
   async getOneById(
     id: number,
     relations?: AuctionRelation[],
   ): Promise<PlayerResponseDto> {
     const auction = await this.auctionRepository.getOneById(id, relations);
+    if (!auction) {
+      throw new NotFoundException(`Auction with id ${id} not found`);
+    }
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
       this.auctionMapper.fromAuctionToAuctionResponseDto(auction),
       [AuctionRelation.PLAYER],
@@ -83,7 +68,7 @@ export class AuctionService {
     );
     const currrentOwnerId = +player.data.relationships.owner.data.id;
     if (currrentOwnerId !== user.id) {
-      throw new Error('Player not owned by user');
+      throw new PlayerNotOwnedByUserException();
     }
     const xdr = await this.stellarNFTAdapter.createAuctionTransaction(
       user.publicKey,
@@ -104,7 +89,6 @@ export class AuctionService {
     );
     const { returnValue } =
       await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
-
     const txReturnValue = returnValue as unknown as xdr.ScVal;
 
     const auctionSC = scValToNative(txReturnValue);
