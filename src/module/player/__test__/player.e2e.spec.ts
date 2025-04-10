@@ -368,7 +368,7 @@ describe('Player Module', () => {
   });
 
   describe('POST - /player/sac', () => {
-    it('', async () => {
+    it('should deploy the NFT in SAC for Soroban handling', async () => {
       const playerId = 2;
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
         sign: jest.fn(),
