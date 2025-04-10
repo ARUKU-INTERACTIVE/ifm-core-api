@@ -8,7 +8,15 @@ items:
     issuer: 'ISSUER'
     owner: '@admin-user'
     address: 'CXXXXXX'
+    address: 'CXXXXXX'
   player2:
+    name: 'player2'
+    description: 'description'
+    metadataCid: 'metadataCid2'
+    imageCid: 'imageCid2'
+    issuer: '{{string.alpha}}'
+    owner: '@admin-user'
+  player3:
     name: 'player2'
     description: 'description'
     metadataCid: 'metadataCid2'
@@ -18,6 +26,8 @@ items:
   player3:
     name: '{{string.alpha}}'
     description: '{{string.alpha}}'
+    metadataCid: 'metadataCid3'
+    imageCid: 'imageCid3'
     metadataCid: 'metadataCid3'
     imageCid: 'imageCid3'
     issuer: '{{string.alpha}}'

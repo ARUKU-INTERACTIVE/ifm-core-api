@@ -22,6 +22,7 @@ export const getTransactionResponse = {
       externalId: 1,
       metadataUri: 'http://example.com',
       address: jest.fn(),
+      address: jest.fn(),
     },
   },
   GET_PLAYER: {
