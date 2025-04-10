@@ -87,7 +87,6 @@ export class AuctionService {
     relations?: AuctionRelation[],
   ): Promise<PlayerResponseDto> {
     const auction = await this.auctionRepository.getOneById(id, relations);
-    this.stellarNFTAdapter;
     const sourceAccount = await this.stellarAccountAdapter.getAccount(
       user.publicKey,
     );
