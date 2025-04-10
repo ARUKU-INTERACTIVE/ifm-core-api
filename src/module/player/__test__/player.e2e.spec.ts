@@ -368,7 +368,7 @@ describe('Player Module', () => {
   });
 
   describe('POST - /player/sac', () => {
-    it('should create the NFT in SAC for blockchain trading', async () => {
+    it('', async () => {
       const playerId = 2;
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
         sign: jest.fn(),

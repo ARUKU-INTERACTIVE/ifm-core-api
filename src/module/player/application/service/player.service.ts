@@ -129,7 +129,7 @@ export class PlayerService {
     );
     const issuerPublicKey = player.issuer;
     const nftAsset = this.stellarNFTAdapter.createAsset(issuerPublicKey);
-    const xdr = await this.stellarNFTAdapter.createStellarAssetContract(
+    const xdr = await this.stellarNFTAdapter.deployNFTStellarAssetContract(
       account,
       nftAsset,
     );
