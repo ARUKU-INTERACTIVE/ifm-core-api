@@ -66,7 +66,6 @@ export class SorobanContractAdapter {
 
     const simulateResponse =
       await this.sorobanServer._simulateTransaction(buildTransaction);
-
     if (!simulateResponse.results?.[0]) {
       return null;
     }

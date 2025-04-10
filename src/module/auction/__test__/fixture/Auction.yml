@@ -10,5 +10,5 @@ items:
    player: '@player5'
   auction3:
    externalId: '3'
-   status: 0
+   status: 1
    player: '@player6'

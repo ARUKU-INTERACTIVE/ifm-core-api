@@ -150,4 +150,9 @@ jest.mock('@stellar/stellar-sdk', () => ({
     fromString: jest.fn(),
     fromScAddress: jest.fn().mockReturnValue('CXX'),
   },
+  xdr: {
+    ScVal: {
+      fromXDR: jest.fn().mockReturnValue('xdr'),
+    },
+  },
 }));

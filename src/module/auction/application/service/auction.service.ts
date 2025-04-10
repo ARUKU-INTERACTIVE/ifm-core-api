@@ -135,15 +135,18 @@ export class AuctionService {
     const txHash = await this.sorobanContractAdapter.submitMintPlayer(
       createAuctionDto.xdr,
     );
+    console.info(txHash, 'txHash');
     const { returnValue } =
       await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
+    console.info(returnValue, 'returnValue');
+
     const txReturnValue = returnValue as unknown as xdr.ScVal;
 
     const auctionSC = scValToNative(txReturnValue);
+    console.info(auctionSC, 'auctionSC');
     createAuctionDto.externalId = Number(auctionSC.id);
     const auction =
       this.auctionMapper.fromCreateAuctionDtoToAuction(createAuctionDto);
-
     const savedAuction = await this.auctionRepository.saveOne(auction);
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
       this.auctionMapper.fromAuctionToAuctionResponseDto(

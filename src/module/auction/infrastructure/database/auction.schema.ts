@@ -19,11 +19,21 @@ export const AuctionSchema = new EntitySchema<Auction>({
       nullable: false,
     },
     status: isEnvironmentAutomatedTest
-      ? { type: String, default: AuctionStatus.Open }
+      ? { type: String, default: 'Open' }
       : {
           type: 'enum',
           enum: AuctionStatus,
           default: AuctionStatus.Open,
         },
   }),
+  relations: {
+    player: {
+      type: 'many-to-one',
+      target: 'Player',
+      joinColumn: {
+        name: 'player_id',
+      },
+      inverseSide: 'auctions',
+    },
+  },
 });

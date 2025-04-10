@@ -14,7 +14,7 @@ export class AuctionMapper {
     auctionResponseDto.uuid = auction.uuid;
     auctionResponseDto.externalId = auction.externalId;
     auctionResponseDto.player = auction.player;
-    auctionResponseDto.status = auctionSC.status[0];
+    auctionResponseDto.status = auctionSC.status?.[0];
     auctionResponseDto.highestBidAmount = Number(auctionSC.highest_bid_amount);
     auctionResponseDto.highestBidderAddress = auctionSC.highest_bidder_address;
     auctionResponseDto.playerAddress = auctionSC.player_address;
@@ -30,7 +30,6 @@ export class AuctionMapper {
     auctionDto: CreateAuctionDto | UpdateAuctionDto,
   ): Auction {
     const auction = new Auction();
-    auction.playerId = auctionDto.playerId;
     auction.externalId = auctionDto.externalId;
     return auction;
   }

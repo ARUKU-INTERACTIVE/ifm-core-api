@@ -13,7 +13,7 @@ items:
     description: 'description'
     metadataCid: 'metadataCid2'
     imageCid: 'imageCid2'
-    issuer: '{{string.alpha}}'
+    issuer: 'CXXXXXXX2'
     owner: '@user1'
   player3:
     name: '{{string.alpha}}'
@@ -21,7 +21,7 @@ items:
     metadataCid: 'metadataCid3'
     imageCid: 'imageCid3'
     issuer: '{{string.alpha}}'
-    address: '{{string.alpha}}'
+    address: 'CXXXXXXX3'
     owner: '@admin-user'
   player4:
     name: '{{string.alpha}}'
@@ -29,7 +29,7 @@ items:
     metadataCid: 'metadataCid4'
     imageCid: 'imageCid4'
     issuer: '{{string.alpha}}'
-    address: '{{string.alpha}}'
+    address: 'CXXXXXXX4'
     owner: '@admin-user'
   player5:
     name: '{{string.alpha}}'
@@ -37,7 +37,7 @@ items:
     metadataCid: 'metadataCid5'
     imageCid: 'imageCid5'
     issuer: '{{string.alpha}}'
-    address: '{{string.alpha}}'
+    address: 'CXXXXXXX5'
     owner: '@admin-user'
   player6:
     name: '{{string.alpha}}'
@@ -45,5 +45,5 @@ items:
     metadataCid: 'metadataCid6'
     imageCid: 'imageCid6'
     issuer: '{{string.alpha}}'
-    address: '{{string.alpha}}'
+    address: 'CXXXXXXX6'
     owner: '@admin-user'

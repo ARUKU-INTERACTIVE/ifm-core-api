@@ -29,7 +29,6 @@ export class AuctionRepository implements IAuctionRepository {
         }
       });
     }
-
     const [items, itemCount] = await this.repository.findAndCount({
       where: whereClause,
       order: sort,
@@ -38,7 +37,6 @@ export class AuctionRepository implements IAuctionRepository {
       skip: page?.offset,
       relations: include,
     });
-
     return {
       data: items,
       pageNumber: page.number,
@@ -65,7 +63,6 @@ export class AuctionRepository implements IAuctionRepository {
     relations?: AuctionRelation[],
   ): Promise<Auction> {
     const savedAuction = await this.repository.save(auction);
-
     return await this.repository.findOne({
       where: {
         id: savedAuction.id,
