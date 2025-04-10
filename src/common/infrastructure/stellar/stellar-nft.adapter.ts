@@ -175,7 +175,7 @@ export class StellarNftAdapter {
     return this.transactionMapper.fromXDRToTransactionDTO(transaction.toXDR());
   }
 
-  async createStellarAssetContract(account: Account, nftAsset: Asset) {
+  async deployNFTStellarAssetContract(account: Account, nftAsset: Asset) {
     const sacTransaction = new TransactionBuilder(account, {
       fee: BASE_FEE,
       networkPassphrase: this.networkPassphrase,
