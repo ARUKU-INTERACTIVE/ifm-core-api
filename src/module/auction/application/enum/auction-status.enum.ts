@@ -4,3 +4,10 @@ export enum AuctionStatus {
   Completed,
   NFTTransferred,
 }
+
+export enum AuctionSCStatus {
+  Open = 'Open',
+  Cancelled = 'Cancelled',
+  Completed = 'Completed',
+  NFTTransferred = 'NFTTransferred',
+}

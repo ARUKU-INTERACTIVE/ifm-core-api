@@ -1,4 +1,4 @@
-import { AuctionStatus } from '@module/auction/application/enum/auction-status.enum';
+import { AuctionSCStatus } from '@module/auction/application/enum/auction-status.enum';
 import { AUCTION_ENTITY_NAME } from '@module/auction/domain/auction.name';
 import { Player } from '@module/player/domain/player.domain';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -31,14 +31,39 @@ export class AuctionResponseDto {
   externalId: number;
 
   @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  highestBidAmount: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  endTime: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  startTime: number;
+
+  @ApiProperty()
   @ValidateNested()
   @Type(() => Player)
   player: Player;
 
   @ApiProperty()
-  @IsEnum(AuctionStatus)
+  @IsEnum(AuctionSCStatus)
   @IsNotEmpty()
-  status: AuctionStatus;
+  status: AuctionSCStatus;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  highestBidderAddress: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  playerAddress: string;
 
   @ApiProperty()
   @IsString()
