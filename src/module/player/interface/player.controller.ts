@@ -59,7 +59,9 @@ export class PlayerController {
   }
 
   @Get('/:id')
-  getPlayerById(@Param('id') id: number): Promise<PlayerResponseDto> {
+  getPlayerById(
+    @Param('id') id: number,
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     return this.playerService.getOneById(id);
   }
 

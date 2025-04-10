@@ -64,7 +64,7 @@ export class PlayerService {
   async getOneById(
     id: number,
     relations?: PlayerRelation[],
-  ): Promise<PlayerResponseDto> {
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     const player = await this.playerRepository.getOneById(id, relations);
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(player),

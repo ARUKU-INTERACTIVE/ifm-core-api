@@ -1,3 +1,5 @@
+import { Player } from '@module/player/domain/player.domain';
+
 import { Base } from '@common/base/domain/base.entity';
 
 import { AppRole } from '@iam/authorization/domain/app-role.enum';
@@ -8,6 +10,7 @@ export class User extends Base {
   externalId?: string;
   roles: AppRole[];
   isVerified: boolean;
+  players?: Player[];
 
   constructor(
     publicKey?: string,
@@ -19,6 +22,7 @@ export class User extends Base {
     updatedAt?: string,
     deletedAt?: string,
     isVerified?: boolean,
+    players?: Player[],
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this.publicKey = publicKey;
@@ -26,5 +30,6 @@ export class User extends Base {
     this.externalId = externalId;
     this.roles = roles;
     this.isVerified = isVerified;
+    this.players = players;
   }
 }

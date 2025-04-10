@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Address, Contract, xdr } from '@stellar/stellar-sdk';
 
 import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
@@ -9,7 +10,12 @@ export class SorobanContractAdapter {
 
   constructor(
     private readonly stellarTransactionAdapter: StellarTransactionAdapter,
-  ) {}
+    private readonly environmentConfig: ConfigService,
+  ) {
+    this.contractAddress = this.environmentConfig.get(
+      'soroban.contractAddress',
+    );
+  }
 
   async getContract(): Promise<Contract> {
     return new Contract(this.contractAddress);

@@ -41,6 +41,7 @@ export const PlayerSChema = new EntitySchema<Player>({
       joinColumn: {
         name: 'owner_id',
       },
+      inverseSide: 'players',
     },
     auctions: {
       type: 'one-to-many',
