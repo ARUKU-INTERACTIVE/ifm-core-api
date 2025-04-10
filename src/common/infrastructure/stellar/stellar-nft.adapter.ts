@@ -1,5 +1,5 @@
 import { PlayerService } from '@module/player/application/service/player.service';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   Account,
@@ -15,7 +15,9 @@ import { TransactionResponseAdapter } from '@common/infrastructure/stellar/appli
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
 import { CreateNFTDtoWithFIle } from '@common/infrastructure/stellar/dto/create-nft.dto';
 import { TransactionNFTDto } from '@common/infrastructure/stellar/dto/transaction-nft.dto';
+import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
+import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
 @Injectable()
 export class StellarNftAdapter {
@@ -27,9 +29,11 @@ export class StellarNftAdapter {
   private readonly startingBalance: string = '1.5';
   constructor(
     private readonly environmentConfig: ConfigService,
+    @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
     private readonly transactionResponseAdapter: TransactionResponseAdapter,
+    private readonly stellarTransactionAdapter: StellarTransactionAdapter,
     private readonly transactionMapper: TransactionMapper,
   ) {
     this.networkPassphrase = this.environmentConfig.get(
@@ -61,7 +65,7 @@ export class StellarNftAdapter {
     const ownerAccount =
       await this.stellarAccountAdapter.getAccount(ownerPublicKey);
 
-    const xdr = await this.mintPlayerTransaction(
+    const { xdr } = await this.mintPlayerTransaction(
       ownerAccount,
       issuer,
       ownerPublicKey,
@@ -85,9 +89,8 @@ export class StellarNftAdapter {
     ownerPublicKey: string,
     metadataCID: string,
     nftAsset: Asset,
-  ): Promise<string> {
+  ): Promise<TransactionXDRDTO> {
     const issuerPublicKey = issuer.publicKey();
-
     const transaction = new TransactionBuilder(account, {
       fee: BASE_FEE,
       networkPassphrase: this.networkPassphrase,
@@ -96,7 +99,6 @@ export class StellarNftAdapter {
         Operation.createAccount({
           destination: issuerPublicKey,
           startingBalance: this.startingBalance,
-          source: ownerPublicKey,
         }),
       )
       .addOperation(
@@ -128,9 +130,27 @@ export class StellarNftAdapter {
           source: issuerPublicKey,
         }),
       )
-      .setTimeout(180)
+      .setTimeout(400)
       .build();
     transaction.sign(issuer);
-    return transaction.toXDR();
+
+    return this.transactionMapper.fromXDRToTransactionDTO(transaction.toXDR());
+  }
+
+  async deployNFTStellarAssetContract(account: Account, nftAsset: Asset) {
+    const sacTransaction = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: this.networkPassphrase,
+    })
+      .addOperation(
+        Operation.createStellarAssetContract({
+          asset: nftAsset,
+        }),
+      )
+      .setTimeout(400)
+      .build();
+    return await this.stellarTransactionAdapter.prepareTransaction(
+      sacTransaction.toXDR(),
+    );
   }
 }

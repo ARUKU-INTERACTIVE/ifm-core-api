@@ -29,6 +29,9 @@ export class PlayerResponseDto {
   issuer: string;
 
   @ApiProperty()
+  address: string;
+
+  @ApiProperty()
   createdAt: string;
 
   @ApiProperty()

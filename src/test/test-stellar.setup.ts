@@ -21,6 +21,7 @@ export const getTransactionResponse = {
       issuer: 'Issuer',
       externalId: 1,
       metadataUri: 'http://example.com',
+      address: jest.fn(),
     },
   },
   GET_PLAYER: {
@@ -61,6 +62,7 @@ jest.mock('@stellar/stellar-sdk', () => ({
         }
         return DEFAULT;
       }),
+      submitTransaction: jest.fn(),
     })),
   },
   Operation: {
@@ -69,6 +71,7 @@ jest.mock('@stellar/stellar-sdk', () => ({
     changeTrust: jest.fn(),
     payment: jest.fn(),
     setOptions: jest.fn(),
+    createStellarAssetContract: jest.fn(),
   },
   Memo: { text: jest.fn() },
   StrKey: {
@@ -145,5 +148,6 @@ jest.mock('@stellar/stellar-sdk', () => ({
   })),
   Address: {
     fromString: jest.fn(),
+    fromScAddress: jest.fn().mockReturnValue('CXX'),
   },
 }));

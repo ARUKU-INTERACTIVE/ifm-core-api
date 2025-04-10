@@ -12,5 +12,6 @@ export class Player extends Base {
   ownerId: number;
   imageCid: string;
   metadataCid: string;
+  address: string;
   auctions: Auction[];
 }

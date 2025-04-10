@@ -28,6 +28,11 @@ export const PlayerSChema = new EntitySchema<Player>({
       nullable: false,
       unique: true,
     },
+    address: {
+      type: String,
+      nullable: true,
+      unique: true,
+    },
   }),
   relations: {
     owner: {

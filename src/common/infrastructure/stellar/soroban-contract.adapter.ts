@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Contract } from '@stellar/stellar-sdk';
+import { Address, Contract, xdr } from '@stellar/stellar-sdk';
 
 import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
@@ -19,5 +19,9 @@ export class SorobanContractAdapter {
     const { txHash } =
       await this.stellarTransactionAdapter.submitSorobanTransaction(xdr);
     return txHash;
+  }
+
+  getAddress(addressValue: xdr.ScAddress): Address {
+    return Address.fromScAddress(addressValue);
   }
 }

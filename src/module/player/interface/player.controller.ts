@@ -25,6 +25,7 @@ import { PageQueryParamsDto } from '@common/base/application/dto/page-query-para
 import { ControllerEntity } from '@common/base/application/interface/decorators/endpoint-entity.decorator';
 import { CreateNFTDto } from '@common/infrastructure/stellar/dto/create-nft.dto';
 import { TransactionNFTDto } from '@common/infrastructure/stellar/dto/transaction-nft.dto';
+import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
 import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.adapter';
 
 import { AuthType } from '@iam/authentication/domain/auth-type.enum';
@@ -82,6 +83,22 @@ export class PlayerController {
       createNFTDtoWithFile,
       user.publicKey,
     );
+  }
+
+  @Post('/sac/:id')
+  async mintPlayerSac(
+    @Param('id') id: number,
+    @CurrentUser() user: User,
+  ): Promise<OneSerializedResponseDto<TransactionXDRDTO>> {
+    return this.playerService.createStellarAssetContract(id, user);
+  }
+
+  @Post('/submit/sac/:id')
+  async submitPlayerSac(
+    @Param('id') id: number,
+    @Body() transactionXDRDTO: TransactionXDRDTO,
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
+    return this.playerService.submitSACXdr(id, transactionXDRDTO);
   }
 
   @Post('/submit/mint')

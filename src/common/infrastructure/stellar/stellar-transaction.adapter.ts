@@ -42,6 +42,7 @@ export class StellarTransactionAdapter {
   async prepareTransaction(xdr: string): Promise<string> {
     try {
       const transaction = this.buildTransactionFromXdr(xdr);
+
       const uploadTransaction =
         await this.sorobanServer.prepareTransaction(transaction);
 
@@ -87,6 +88,11 @@ export class StellarTransactionAdapter {
         message: 'Failed to get transaction details',
       });
     }
+  }
+
+  async submitTransaction(xdr: string) {
+    const transaction = this.buildTransactionFromXdr(xdr);
+    return await this.stellarServer.submitTransaction(transaction);
   }
 
   async submitSorobanTransaction(

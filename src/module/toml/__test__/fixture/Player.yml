@@ -7,6 +7,7 @@ items:
     imageCid: 'http://image.com.ar'
     issuer: 'ISSUER'
     owner: '@admin-user'
+    address: 'CXXXXXX'
   player2:
     name: '{{string.alpha}}'
     description: '{{string.alpha}}'
@@ -14,3 +15,4 @@ items:
     imageCid: '{{string.alpha}}'
     issuer: '{{string.alpha}}'
     owner: '@admin-user'
+    address: '{{string.alpha}}'

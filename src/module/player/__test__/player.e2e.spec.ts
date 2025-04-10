@@ -1,5 +1,6 @@
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { IPlayerDto } from '@module/player/application/dto/player.dto.interface';
+import { PlayerAddressAlreadyExistsException } from '@module/player/infrastructure/database/exception/player.exception';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { TransactionBuilder, scValToNative } from '@stellar/stellar-sdk';
 import request from 'supertest';
@@ -227,12 +228,16 @@ describe('Player Module', () => {
     });
   });
 
-  describe('POST - /player', () => {
+  describe('POST - /player/mint', () => {
     const createPlayerDto = {
       name,
       description: 'description',
     } as IPlayerDto;
     it('Should return the XDR of the mintPlayer transaction.', async () => {
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+        sign: jest.fn(),
+        toXDR: jest.fn().mockReturnValue('xdr'),
+      });
       await request(app.getHttpServer())
         .post('/api/v1/player/mint')
         .auth(adminToken, { type: 'bearer' })
@@ -244,10 +249,10 @@ describe('Player Module', () => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
               attributes: expect.objectContaining({
-                xdr: expect.any(String),
                 imageCid: expect.any(String),
                 metadataCid: expect.any(String),
                 issuer: expect.any(String),
+                xdr: expect.any(String),
               }),
             }),
           });
@@ -357,6 +362,86 @@ describe('Player Module', () => {
             new UnknownErrorException({
               message: 'Failed to submit transaction to Soroban',
             }).message,
+          );
+        });
+    });
+  });
+
+  describe('POST - /player/sac', () => {
+    it('should deploy the NFT in SAC for Soroban handling', async () => {
+      const playerId = 2;
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+        sign: jest.fn(),
+        toXDR: jest.fn().mockReturnValue('xdr'),
+      });
+      await request(app.getHttpServer())
+        .post(`/api/v1/player/sac/${playerId}`)
+        .auth(adminToken, { type: 'bearer' })
+        .send({ xdr: 'xdr' })
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                xdr: expect.any(String),
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+
+      await request(app.getHttpServer())
+        .post(`/api/v1/player/submit/sac/${playerId}`)
+        .auth(adminToken, { type: 'bearer' })
+        .send({
+          xdr: 'xdr',
+        })
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                uuid: expect.any(String),
+                name: expect.any(String),
+                metadataUri: expect.any(String),
+                imageUri: expect.any(String),
+                description: expect.any(String),
+                issuer: expect.any(String),
+              }),
+            }),
+          });
+          expect(expectedResponse).toEqual(body);
+        });
+    });
+
+    it('should show an error message if the player already has an assigned address', async () => {
+      const playerId = 1;
+
+      await request(app.getHttpServer())
+        .post(`/api/v1/player/sac/${playerId}`)
+        .auth(adminToken, { type: 'bearer' })
+        .send({ xdr: 'xdr' })
+        .expect(HttpStatus.BAD_REQUEST)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(
+            new PlayerAddressAlreadyExistsException().message,
+          );
+        });
+    });
+
+    it('should show an error message if the player already has an address when attempting to submit the transaction to the Soroban network', async () => {
+      const playerId = 1;
+
+      await request(app.getHttpServer())
+        .post(`/api/v1/player/submit/sac/${playerId}`)
+        .auth(adminToken, { type: 'bearer' })
+        .send({
+          xdr: 'xdr',
+        })
+        .expect(HttpStatus.BAD_REQUEST)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(
+            new PlayerAddressAlreadyExistsException().message,
           );
         });
     });
