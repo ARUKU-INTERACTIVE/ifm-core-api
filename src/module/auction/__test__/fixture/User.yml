@@ -20,7 +20,22 @@ items:
     username: 'user3@test.com'
     externalId: '00000000-0000-0000-0000-000000000PKX'
     roles: regular
-  user{4..23}:
+  user4:
+    publicKey: 'BIDDER-1'
+    username: 'user1@bid.com'
+    externalId: '00000000-0000-0000-0000-00000000BID1'
+    roles: regular
+  user5:
+    publicKey: 'BIDDER-2'
+    username: 'user2@bid.com'
+    externalId: '00000000-0000-0000-0000-00000000BID2'
+    roles: regular
+  user6:
+    publicKey: 'ERROR_PREPARE_TRANSACTION'
+    username: 'user3@bid.com'
+    externalId: '00000000-0000-0000-0000-00000000BID3'
+    roles: regular
+  user{7..23}:
     publicKey: '{{string.uuid}}'
     username: '{{internet.email}}'
     externalId: '{{string.uuid}}'
