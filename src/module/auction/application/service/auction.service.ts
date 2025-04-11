@@ -3,7 +3,7 @@ import { ISCAuctionDto } from '@module/auction/application/dto/auction-sc.dto.in
 import { AuctionResponseDto } from '@module/auction/application/dto/auction.response.dto';
 import { CreateAuctionDto } from '@module/auction/application/dto/create-auction.dto';
 import { CreatePlaceBIdDto } from '@module/auction/application/dto/create-place-bid.dto';
-import { CreateTransactionAuctionDto } from '@module/auction/application/dto/create-transaction-auction.dto';
+import { CreateAuctionTransactionDto } from '@module/auction/application/dto/create-transaction-auction.dto';
 import { SubmitPlaceBidDto } from '@module/auction/application/dto/submit-place-bid.dto';
 import { AuctionRelation } from '@module/auction/application/enum/auction-relations.enum';
 import { AuctionMapper } from '@module/auction/application/mapper/auction.mapper';
@@ -13,7 +13,6 @@ import {
 } from '@module/auction/application/repository/auction.repository.interface';
 import { Auction } from '@module/auction/domain/auction.domain';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
-import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
 import { PlayerService } from '@module/player/application/service/player.service';
 import { PlayerNotOwnedByUserException } from '@module/player/infrastructure/database/exception/player.exception';
 import {
@@ -110,14 +109,16 @@ export class AuctionService {
 
   async createAuctionTransaction(
     user: User,
-    createTransactionAuctionDto: CreateTransactionAuctionDto,
+    createTransactionAuctionDto: CreateAuctionTransactionDto,
   ): Promise<OneSerializedResponseDto<TransactionXDRDTO>> {
     const player = await this.playerService.getOneById(
       createTransactionAuctionDto.playerId,
-      [PlayerRelation.OWNER],
     );
-    const currrentOwnerId = +player.data.relationships.owner.data.id;
-    if (currrentOwnerId !== user.id) {
+    const isCurrentOwner = await this.stellarNFTAdapter.getBalanceNFT(
+      user.publicKey,
+      player.data.attributes.issuer,
+    );
+    if (!isCurrentOwner) {
       throw new PlayerNotOwnedByUserException();
     }
     const xdr = await this.stellarNFTAdapter.createAuctionTransaction(

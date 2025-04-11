@@ -26,21 +26,12 @@ export class AuctionMapper {
     return auctionResponseDto;
   }
 
-  private mapPlayerDtoToPlayer(
+  fromCreateAuctionDtoToAuction(
     auctionDto: CreateAuctionDto | UpdateAuctionDto,
   ): Auction {
     const auction = new Auction();
     auction.externalId = auctionDto.externalId;
+    auction.playerId = auctionDto.playerId;
     return auction;
-  }
-
-  fromCreateAuctionDtoToAuction(createAuctionDto: CreateAuctionDto): Auction {
-    const auction = this.mapPlayerDtoToPlayer(createAuctionDto);
-    auction.playerId = createAuctionDto.playerId;
-    return auction;
-  }
-
-  fromUpdatePlayerDtoToPlayer(updateAuctionDto: UpdateAuctionDto): Auction {
-    return this.mapPlayerDtoToPlayer(updateAuctionDto);
   }
 }

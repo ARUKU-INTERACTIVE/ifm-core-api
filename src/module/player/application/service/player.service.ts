@@ -68,7 +68,6 @@ export class PlayerService {
     const player = await this.playerRepository.getOneById(id, relations);
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
-      [PlayerRelation.OWNER],
     );
   }
 
@@ -89,7 +88,6 @@ export class PlayerService {
 
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
-      [PlayerRelation.OWNER],
     );
   }
 

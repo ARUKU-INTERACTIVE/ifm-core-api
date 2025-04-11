@@ -49,7 +49,7 @@ export const transactionUseCases = {
 const { ERROR, ERROR_PREPARE_TRANSACTION } = transactionUseCases;
 const { SUCCESS, PENDING } = SubmitStatus;
 const { xdr } = transactionXDR;
-const { DEFAULT, ERROR_ACCOUNT, PK_ERROR } = loadAccountUseCases;
+const { ERROR_ACCOUNT, PK_ERROR } = loadAccountUseCases;
 
 jest.mock('@stellar/stellar-sdk', () => ({
   ...jest.requireActual('@stellar/stellar-sdk'),
@@ -63,7 +63,22 @@ jest.mock('@stellar/stellar-sdk', () => ({
         } else if (publicKey === ERROR_PREPARE_TRANSACTION) {
           return ERROR_PREPARE_TRANSACTION;
         }
-        return DEFAULT;
+        return {
+          balances: [
+            {
+              balance: '0.0000001',
+              limit: '0.0000001',
+              buying_liabilities: '0.0000000',
+              selling_liabilities: '0.0000000',
+              last_modified_ledger: 393875,
+              is_authorized: true,
+              is_authorized_to_maintain_liabilities: true,
+              asset_type: 'credit_alphanum4',
+              asset_code: 'NFT',
+              asset_issuer: 'ISSUER',
+            },
+          ],
+        };
       }),
       submitTransaction: jest.fn(),
     })),

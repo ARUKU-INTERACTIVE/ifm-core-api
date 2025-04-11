@@ -176,29 +176,6 @@ describe('Player Module', () => {
           });
         });
     });
-
-    it('Should allow to include related resources', async () => {
-      const include = ['owner'] as (keyof PlayerResponseDto)[];
-      await request(app.getHttpServer())
-        .get(`/api/v1/player?include[target]=${include.join(',')}`)
-        .auth(adminToken, { type: 'bearer' })
-        .expect(HttpStatus.OK)
-        .then(({ body }) => {
-          const player = body.data[0];
-          expect(player.relationships).toEqual({
-            owner: expect.objectContaining({
-              data: expect.objectContaining({
-                id: expect.any(String),
-                type: 'owner',
-              }),
-              links: expect.objectContaining({
-                self: expect.any(String),
-                related: expect.any(String),
-              }),
-            }),
-          });
-        });
-    });
   });
 
   describe('GET - /player/:id', () => {
@@ -368,7 +345,7 @@ describe('Player Module', () => {
   });
 
   describe('POST - /player/sac', () => {
-    it('should deploy the NFT in SAC for Soroban handling', async () => {
+    it('Should deploy the NFT in SAC for Soroban handling', async () => {
       const playerId = 2;
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
         sign: jest.fn(),
@@ -414,7 +391,7 @@ describe('Player Module', () => {
         });
     });
 
-    it('should show an error message if the player already has an assigned address', async () => {
+    it('Should show an error message if the player already has an assigned address', async () => {
       const playerId = 1;
 
       await request(app.getHttpServer())
@@ -429,7 +406,7 @@ describe('Player Module', () => {
         });
     });
 
-    it('should show an error message if the player already has an address when attempting to submit the transaction to the Soroban network', async () => {
+    it('Should show an error message if the player already has an address when attempting to submit the transaction to the Soroban network', async () => {
       const playerId = 1;
 
       await request(app.getHttpServer())
