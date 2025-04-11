@@ -2,13 +2,13 @@ entity: Auction
 items:
   auction1:
     externalId: '1'
-    status: 0
+    status: 'Open'
     player: '@player4'
   auction2:
    externalId: '2'
-   status: 0
+   status: 'Open'
    player: '@player5'
   auction3:
    externalId: '3'
-   status: 1
+   status: 'Completed'
    player: '@player6'

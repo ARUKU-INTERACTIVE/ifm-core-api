@@ -68,7 +68,6 @@ export class AuctionController {
   async submitCreateAuctionTransaction(
     @Body() createAuctionDto: CreateAuctionDto,
   ): Promise<OneSerializedResponseDto<AuctionResponseDto>> {
-    console.info(createAuctionDto, 'createAuctionDto');
     return this.auctionService.saveOne(createAuctionDto);
   }
 }

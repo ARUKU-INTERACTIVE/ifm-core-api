@@ -1,3 +1,4 @@
+import { AuctionStatus } from '@module/auction/application/enum/auction-status.enum';
 import { Auction } from '@module/auction/domain/auction.domain';
 import { PlayerNotOwnedByUserException } from '@module/player/infrastructure/database/exception/player.exception';
 import {
@@ -107,7 +108,7 @@ describe('Auction Module', () => {
     });
 
     it('Should allow to filter by attributes', async () => {
-      const status = 0;
+      const status = AuctionStatus.Open;
 
       await request(app.getHttpServer())
         .get(`/api/v1/auction?filter[status]=${status}`)
@@ -141,8 +142,8 @@ describe('Auction Module', () => {
     });
 
     it('Should allow to sort by attributes', async () => {
-      const firstPlayer = { status: 0 };
-      const lastPlayer = { status: 0 };
+      const firstPlayer = { status: AuctionStatus.Open };
+      const lastPlayer = { status: AuctionStatus.Open };
       let pageCount: number;
 
       await request(app.getHttpServer())
