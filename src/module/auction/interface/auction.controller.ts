@@ -1,10 +1,12 @@
 import { AuctionResponseDto } from '@module/auction/application/dto/auction.response.dto';
 import { CreateAuctionDto } from '@module/auction/application/dto/create-auction.dto';
+import { CreatePlaceBIdDto } from '@module/auction/application/dto/create-place-bid.dto';
 import { CreateTransactionAuctionDto } from '@module/auction/application/dto/create-transaction-auction.dto';
 import { AuctionFieldsQueryParamsDto } from '@module/auction/application/dto/params/auction-fields-query-params.dto';
 import { AuctionFilterQueryParamsDto } from '@module/auction/application/dto/params/auction-filter-query-params.dto';
 import { AuctionIncludeQueryParamsDto } from '@module/auction/application/dto/params/auction-include-query-params.dto';
 import { AuctionSortQueryParamsDto } from '@module/auction/application/dto/params/query-sort-query-params.dto';
+import { SubmitPlaceBidDto } from '@module/auction/application/dto/submit-place-bid.dto';
 import { AuctionService } from '@module/auction/application/service/auction.service';
 import { AUCTION_ENTITY_NAME } from '@module/auction/domain/auction.name';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
@@ -69,5 +71,25 @@ export class AuctionController {
     @Body() createAuctionDto: CreateAuctionDto,
   ): Promise<OneSerializedResponseDto<AuctionResponseDto>> {
     return this.auctionService.saveOne(createAuctionDto);
+  }
+
+  @Post('/create/transaction/place-bid')
+  async createPlaceBidTransaction(
+    @CurrentUser() user: User,
+    @Body() createPlaceBIdDto: CreatePlaceBIdDto,
+  ) {
+    return await this.auctionService.createPlaceBidTransaction(
+      user,
+      createPlaceBIdDto,
+    );
+  }
+
+  @Post('/submit/transaction/place-bid')
+  async submitPlaceBidTransaction(
+    @Body() submitPlaceBidDto: SubmitPlaceBidDto,
+  ) {
+    return await this.auctionService.submitPlaceBidTransaction(
+      submitPlaceBidDto,
+    );
   }
 }

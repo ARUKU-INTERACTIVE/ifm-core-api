@@ -87,6 +87,17 @@ export class PlayerController {
     );
   }
 
+  @Post('/submit/mint')
+  async submitMintPlayer(
+    @CurrentUser() user: User,
+    @Body() submitMintPlayerDto: SubmitMintPlayerDto,
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
+    return await this.playerService.submitMintPlayerXdr(
+      submitMintPlayerDto,
+      user,
+    );
+  }
+
   @Post('/sac/:id')
   async mintPlayerSac(
     @Param('id') id: number,
@@ -101,16 +112,5 @@ export class PlayerController {
     @Body() transactionXDRDTO: TransactionXDRDTO,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     return this.playerService.submitSACXdr(id, transactionXDRDTO);
-  }
-
-  @Post('/submit/mint')
-  async submitMintPlayer(
-    @CurrentUser() user: User,
-    @Body() submitMintPlayerDto: SubmitMintPlayerDto,
-  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
-    return await this.playerService.submitMintPlayerXdr(
-      submitMintPlayerDto,
-      user,
-    );
   }
 }

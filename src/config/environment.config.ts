@@ -27,6 +27,7 @@ export const environmentConfig = () => ({
         : process.env.STELLAR_NETWORK_PASSPHRASE,
     homeDomain: process.env.HOME_DOMAIN,
     defaultAssetCode: process.env.STELLAR_DEFAULT_ASSET_CODE,
+    nativeAssetAddress: process.env.NATIVE_ASSET_ADDRESS,
   },
   soroban: {
     serverUrl:
