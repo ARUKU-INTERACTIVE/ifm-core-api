@@ -76,7 +76,9 @@ export class PlayerService {
     submitMintPlayerDto: SubmitMintPlayerDto,
     currentUser: User,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
-    await this.sorobanContractAdapter.submitMintPlayer(submitMintPlayerDto.xdr);
+    await this.sorobanContractAdapter.submitSorobanTransaction(
+      submitMintPlayerDto.xdr,
+    );
 
     const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
       submitMintPlayerDto,
@@ -148,7 +150,7 @@ export class PlayerService {
       throw new PlayerAddressAlreadyExistsException();
     }
 
-    const txHash = await this.sorobanContractAdapter.submitMintPlayer(
+    const txHash = await this.sorobanContractAdapter.submitSorobanTransaction(
       transactionXDRDTO.xdr,
     );
     const { returnValue } =

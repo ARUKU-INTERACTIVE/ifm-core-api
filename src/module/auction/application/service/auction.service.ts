@@ -131,7 +131,7 @@ export class AuctionService {
   async saveOne(
     createAuctionDto: CreateAuctionDto,
   ): Promise<OneSerializedResponseDto<AuctionResponseDto>> {
-    const txHash = await this.sorobanContractAdapter.submitMintPlayer(
+    const txHash = await this.sorobanContractAdapter.submitSorobanTransaction(
       createAuctionDto.xdr,
     );
     const { returnValue } =

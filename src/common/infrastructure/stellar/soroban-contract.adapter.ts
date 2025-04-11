@@ -40,7 +40,7 @@ export class SorobanContractAdapter {
     return new Contract(this.contractAddress);
   }
 
-  async submitMintPlayer(xdr: string) {
+  async submitSorobanTransaction(xdr: string) {
     const { txHash } =
       await this.stellarTransactionAdapter.submitSorobanTransaction(xdr);
     return txHash;
