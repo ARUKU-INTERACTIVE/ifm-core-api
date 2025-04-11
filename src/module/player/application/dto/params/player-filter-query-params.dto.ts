@@ -13,11 +13,6 @@ export class PlayerFilterQueryParamsDto {
   metadataUri?: string;
 
   @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  ownerId?: number;
-
-  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   issuer?: string;

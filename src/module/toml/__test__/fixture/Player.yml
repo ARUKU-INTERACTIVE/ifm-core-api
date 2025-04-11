@@ -6,7 +6,6 @@ items:
     metadataCid: 'http://example.com.ar'
     imageCid: 'http://image.com.ar'
     issuer: 'ISSUER'
-    owner: '@admin-user'
     address: 'CXXXXXX'
   player2:
     name: '{{string.alpha}}'
@@ -14,5 +13,4 @@ items:
     metadataCid: '{{string.alpha}}'
     imageCid: '{{string.alpha}}'
     issuer: '{{string.alpha}}'
-    owner: '@admin-user'
     address: '{{string.alpha}}'

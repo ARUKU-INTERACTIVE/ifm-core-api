@@ -73,16 +73,13 @@ export class PlayerService {
 
   async submitMintPlayerXdr(
     submitMintPlayerDto: SubmitMintPlayerDto,
-    currentUser: User,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     await this.sorobanContractAdapter.submitSorobanTransaction(
       submitMintPlayerDto.xdr,
     );
 
-    const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
-      submitMintPlayerDto,
-      currentUser.id,
-    );
+    const playerDto =
+      this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(submitMintPlayerDto);
 
     const player = await this.playerRepository.saveOne(
       this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
