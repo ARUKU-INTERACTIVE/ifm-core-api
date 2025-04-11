@@ -8,6 +8,10 @@ export const PlayerSChema = new EntitySchema<Player>({
   target: Player,
   tableName: 'player',
   columns: withBaseSchemaColumns({
+    ownerId: {
+      type: Number,
+      nullable: false,
+    },
     name: {
       type: String,
     },

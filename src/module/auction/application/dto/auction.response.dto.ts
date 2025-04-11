@@ -1,4 +1,4 @@
-import { AuctionSCStatus } from '@module/auction/application/enum/auction-status.enum';
+import { AuctionStatus } from '@module/auction/application/enum/auction-status.enum';
 import { AUCTION_ENTITY_NAME } from '@module/auction/domain/auction.name';
 import { Player } from '@module/player/domain/player.domain';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -51,9 +51,9 @@ export class AuctionResponseDto {
   player: Player;
 
   @ApiProperty()
-  @IsEnum(AuctionSCStatus)
+  @IsEnum(AuctionStatus)
   @IsNotEmpty()
-  status: AuctionSCStatus;
+  status: AuctionStatus;
 
   @ApiProperty()
   @IsString()

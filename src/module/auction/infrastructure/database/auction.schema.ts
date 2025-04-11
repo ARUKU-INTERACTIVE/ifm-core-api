@@ -18,6 +18,10 @@ export const AuctionSchema = new EntitySchema<Auction>({
       type: Number,
       nullable: false,
     },
+    playerId: {
+      type: Number,
+      nullable: false,
+    },
     status: isEnvironmentAutomatedTest
       ? { type: String, default: 'Open' }
       : {

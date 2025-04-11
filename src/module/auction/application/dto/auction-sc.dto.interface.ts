@@ -1,4 +1,4 @@
-import { AuctionSCStatus } from '@module/auction/application/enum/auction-status.enum';
+import { AuctionStatus } from '@module/auction/application/enum/auction-status.enum';
 
 export interface ISCAuctionDto {
   id: bigint;
@@ -8,5 +8,5 @@ export interface ISCAuctionDto {
   end_time: bigint;
   start_time: bigint;
   player_address: string;
-  status: AuctionSCStatus[];
+  status: AuctionStatus[];
 }
