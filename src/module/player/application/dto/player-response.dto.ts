@@ -1,7 +1,6 @@
 import { Auction } from '@module/auction/domain/auction.domain';
 import { PLAYER_ENTITY_NAME } from '@module/player/domain/player.name';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { User } from '@sentry/nestjs';
 
 import { EntityName } from '@common/decorators/entity-name.decorator';
 
@@ -39,9 +38,6 @@ export class PlayerResponseDto {
 
   @ApiPropertyOptional()
   deletedAt?: string;
-
-  @ApiPropertyOptional()
-  owner?: User;
 
   @ApiPropertyOptional()
   auctions?: Auction[];

@@ -77,8 +77,10 @@ export class PlayerService {
     await this.sorobanContractAdapter.submitSorobanTransaction(
       submitMintPlayerDto.xdr,
     );
+
     const playerDto =
       this.playerMapper.fromSubmitMintPlayerDtoToPlayer(submitMintPlayerDto);
+
     const player = await this.playerRepository.saveOne(
       this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
     );
