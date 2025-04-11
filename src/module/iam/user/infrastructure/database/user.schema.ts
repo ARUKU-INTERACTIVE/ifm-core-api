@@ -32,11 +32,4 @@ export const UserSchema = new EntitySchema<User>({
       unique: true,
     },
   }),
-  relations: {
-    players: {
-      type: 'one-to-many',
-      target: 'Player',
-      inverseSide: 'owner',
-    },
-  },
 });

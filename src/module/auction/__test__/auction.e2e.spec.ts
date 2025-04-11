@@ -209,7 +209,7 @@ describe('Auction Module', () => {
   });
 
   describe('GET - /auction/:id', () => {
-    it('should return the auction being searched for', async () => {
+    it('Should return the auction being searched for', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/auction/1')
         .auth(adminToken, { type: 'bearer' })
@@ -237,7 +237,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the auction does not exist', async () => {
+    it('Should return an error message if the auction does not exist', async () => {
       const auctionId = 10000000;
       await request(app.getHttpServer())
         .get(`/api/v1/auction/${auctionId}`)
@@ -279,7 +279,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message and status code 403 if the user is not the owner of the player', async () => {
+    it('Should return an error message and status code 403 if the user is not the owner of the player', async () => {
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
         sign: jest.fn(),
         toXDR: jest.fn().mockReturnValue('xdr'),
@@ -293,7 +293,7 @@ describe('Auction Module', () => {
         .post('/api/v1/auction/create/transaction')
         .auth(user, { type: 'bearer' })
         .send({
-          playerId: 1,
+          playerId: 2,
           startingPrice: 100,
           auctionTimeMs: 100,
         })
@@ -307,7 +307,7 @@ describe('Auction Module', () => {
   });
 
   describe('POST - /auction/submit/transaction', () => {
-    it('should return the auction created in Soroban', async () => {
+    it('Should return the auction created in Soroban', async () => {
       const playerId = 1;
 
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
@@ -342,7 +342,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the transaction could not be submitted to the Soroban network', async () => {
+    it('Should return an error message if the transaction could not be submitted to the Soroban network', async () => {
       const playerId = 1;
 
       TransactionBuilder.fromXDR = jest.fn().mockReturnValue(ERROR);

@@ -1,6 +1,6 @@
 import { AuctionResponseDto } from '@module/auction/application/dto/auction.response.dto';
 import { CreateAuctionDto } from '@module/auction/application/dto/create-auction.dto';
-import { CreateTransactionAuctionDto } from '@module/auction/application/dto/create-transaction-auction.dto';
+import { CreateAuctionTransactionDto } from '@module/auction/application/dto/create-transaction-auction.dto';
 import { AuctionFieldsQueryParamsDto } from '@module/auction/application/dto/params/auction-fields-query-params.dto';
 import { AuctionFilterQueryParamsDto } from '@module/auction/application/dto/params/auction-filter-query-params.dto';
 import { AuctionIncludeQueryParamsDto } from '@module/auction/application/dto/params/auction-include-query-params.dto';
@@ -56,7 +56,7 @@ export class AuctionController {
   @Post('/create/transaction')
   async createAuctionTransaction(
     @CurrentUser() user: User,
-    @Body() createTransactionAuctionDto: CreateTransactionAuctionDto,
+    @Body() createTransactionAuctionDto: CreateAuctionTransactionDto,
   ): Promise<OneSerializedResponseDto<TransactionXDRDTO>> {
     return this.auctionService.createAuctionTransaction(
       user,

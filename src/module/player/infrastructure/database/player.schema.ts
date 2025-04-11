@@ -8,10 +8,6 @@ export const PlayerSChema = new EntitySchema<Player>({
   target: Player,
   tableName: 'player',
   columns: withBaseSchemaColumns({
-    ownerId: {
-      type: Number,
-      nullable: false,
-    },
     name: {
       type: String,
     },
@@ -39,14 +35,6 @@ export const PlayerSChema = new EntitySchema<Player>({
     },
   }),
   relations: {
-    owner: {
-      type: 'many-to-one',
-      target: 'User',
-      joinColumn: {
-        name: 'owner_id',
-      },
-      inverseSide: 'players',
-    },
     auctions: {
       type: 'one-to-many',
       target: 'Auction',

@@ -175,6 +175,20 @@ export class StellarNftAdapter {
     return this.transactionMapper.fromXDRToTransactionDTO(transaction.toXDR());
   }
 
+  async getBalanceNFT(publicKey: string, issuer: string) {
+    const account = await this.stellarAccountAdapter.getAccount(publicKey);
+    return account.balances.some((balance) => {
+      if (
+        balance.asset_type === 'credit_alphanum4' &&
+        `${balance.asset_code}:${balance.asset_issuer}` ===
+          `${this.code}:${issuer}`
+      ) {
+        return +balance.balance > 0;
+      }
+      return false;
+    });
+  }
+
   async deployNFTStellarAssetContract(account: Account, nftAsset: Asset) {
     const sacTransaction = new TransactionBuilder(account, {
       fee: BASE_FEE,

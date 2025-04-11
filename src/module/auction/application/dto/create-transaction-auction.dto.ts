@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class CreateTransactionAuctionDto {
+export class CreateAuctionTransactionDto {
   @IsNumber()
   @IsNotEmpty()
   playerId: number;
