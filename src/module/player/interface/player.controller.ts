@@ -89,13 +89,9 @@ export class PlayerController {
 
   @Post('/submit/mint')
   async submitMintPlayer(
-    @CurrentUser() user: User,
     @Body() submitMintPlayerDto: SubmitMintPlayerDto,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
-    return await this.playerService.submitMintPlayerXdr(
-      submitMintPlayerDto,
-      user,
-    );
+    return await this.playerService.submitMintPlayerXdr(submitMintPlayerDto);
   }
 
   @Post('/sac/:id')

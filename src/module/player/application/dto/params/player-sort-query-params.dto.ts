@@ -17,11 +17,6 @@ export class PlayerSortQueryParamsDto {
   @ApiPropertyOptional()
   @IsEnum(SortType)
   @IsOptional()
-  ownerId?: SortType;
-
-  @ApiPropertyOptional()
-  @IsEnum(SortType)
-  @IsOptional()
   issuer?: SortType;
 
   @ApiPropertyOptional()

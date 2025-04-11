@@ -57,12 +57,10 @@ export class PlayerMapper {
 
   fromSubmitMintPlayerDtoToPlayer(
     submitMintPlayerDto: SubmitMintPlayerDto,
-    ownerId: number,
   ): PlayerDto {
     const playerDto = new Player();
     playerDto.name = submitMintPlayerDto.name;
     playerDto.issuer = submitMintPlayerDto.issuer;
-    playerDto.ownerId = ownerId;
     playerDto.metadataCid = submitMintPlayerDto.metadataCid;
     playerDto.imageCid = submitMintPlayerDto.imageCid;
     playerDto.description = submitMintPlayerDto.description;
