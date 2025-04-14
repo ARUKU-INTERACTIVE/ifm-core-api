@@ -168,7 +168,7 @@ export class AuctionService {
       throw new NotFoundException(`Auction with ${auctionId} not found`);
     }
 
-    const xdr = await this.stellarNFTAdapter.placeBid(
+    const xdr = await this.stellarNFTAdapter.createPlaceBidTransaction(
       user.publicKey,
       createPlaceBIdDto,
       auction.externalId,

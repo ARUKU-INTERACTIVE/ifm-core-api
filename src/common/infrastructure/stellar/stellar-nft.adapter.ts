@@ -196,7 +196,7 @@ export class StellarNftAdapter {
     );
   }
 
-  async placeBid(
+  async createPlaceBidTransaction(
     userPublickey: string,
     createPlaceBIdDto: CreatePlaceBIdDto,
     auctionExternalId: number,

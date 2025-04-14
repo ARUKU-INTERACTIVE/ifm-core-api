@@ -77,7 +77,7 @@ export class AuctionController {
   async createPlaceBidTransaction(
     @CurrentUser() user: User,
     @Body() createPlaceBIdDto: CreatePlaceBIdDto,
-  ) {
+  ): Promise<OneSerializedResponseDto<TransactionXDRDTO>> {
     return await this.auctionService.createPlaceBidTransaction(
       user,
       createPlaceBIdDto,
