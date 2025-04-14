@@ -53,8 +53,6 @@ export class AuctionService {
     private readonly stellarNFTAdapter: StellarNftAdapter,
   ) {}
 
-  private;
-
   async getAll(
     user: User,
     options: IGetAllOptions<Auction, AuctionRelation[]>,
@@ -117,7 +115,7 @@ export class AuctionService {
     const player = await this.playerService.getOneById(
       createTransactionAuctionDto.playerId,
     );
-    const isCurrentOwner = await this.stellarNFTAdapter.checkBalanceNFT(
+    const isCurrentOwner = await this.stellarNFTAdapter.checkNFTBalance(
       user.publicKey,
       player.data.attributes.issuer,
     );
@@ -171,7 +169,7 @@ export class AuctionService {
       throw new NotFoundException(`Auction with ${auctionId} not found`);
     }
 
-    const xdr = await this.stellarNFTAdapter.placeBid(
+    const xdr = await this.stellarNFTAdapter.createPlaceBidTransaction(
       user.publicKey,
       createPlaceBIdDto,
       auction.externalId,
