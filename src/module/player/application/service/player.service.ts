@@ -78,15 +78,15 @@ export class PlayerService {
       submitMintPlayerDto.xdr,
     );
 
-    const playerDto =
+    const player =
       this.playerMapper.fromSubmitMintPlayerDtoToPlayer(submitMintPlayerDto);
 
-    const player = await this.playerRepository.saveOne(
-      this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
+    const savedPlayer = await this.playerRepository.saveOne(
+      this.playerMapper.fromCreatePlayerDtoToPlayer(player),
     );
 
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
-      this.playerMapper.fromPlayerToPlayerResponseDto(player),
+      this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
     );
   }
 
