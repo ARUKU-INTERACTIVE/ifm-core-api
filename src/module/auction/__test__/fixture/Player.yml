@@ -1,0 +1,43 @@
+entity: Player
+items:
+  player1:
+    name: 'player'
+    description: 'description'
+    metadataCid: 'http://example.com.ar'
+    imageCid: 'http://image.com.ar'
+    issuer: 'ISSUER'
+    address: 'CXXXXXX'
+  player2:
+    name: 'player2'
+    description: 'description'
+    metadataCid: 'metadataCid2'
+    imageCid: 'imageCid2'
+    issuer: 'CXXXXXXX2'
+  player3:
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid3'
+    imageCid: 'imageCid3'
+    issuer: '{{string.alpha}}'
+    address: 'CXXXXXXX3'
+  player4:
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid4'
+    imageCid: 'imageCid4'
+    issuer: '{{string.alpha}}'
+    address: 'CXXXXXXX4'
+  player5:
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid5'
+    imageCid: 'imageCid5'
+    issuer: '{{string.alpha}}'
+    address: 'CXXXXXXX5'
+  player6:
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid6'
+    imageCid: 'imageCid6'
+    issuer: '{{string.alpha}}'
+    address: 'CXXXXXXX6'

@@ -3,7 +3,5 @@ export interface IPlayerDto {
   description: string;
   metadataCid?: string;
   imageCid?: string;
-  owner?: string;
-  ownerId: number;
   issuer: string;
 }

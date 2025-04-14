@@ -1,5 +1,5 @@
 import { IPlayerDto } from '@module/player/application/dto/player.dto.interface';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class PlayerDto implements IPlayerDto {
   @IsString()
@@ -21,10 +21,6 @@ export class PlayerDto implements IPlayerDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  ownerId: number;
 
   @IsString()
   @IsNotEmpty()

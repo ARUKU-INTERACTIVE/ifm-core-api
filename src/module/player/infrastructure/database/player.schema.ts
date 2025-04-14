@@ -35,16 +35,10 @@ export const PlayerSChema = new EntitySchema<Player>({
     },
   }),
   relations: {
-    owner: {
-      type: 'many-to-one',
-      target: 'User',
-      joinColumn: {
-        name: 'owner_id',
-      },
-    },
     auctions: {
       type: 'one-to-many',
       target: 'Auction',
+      inverseSide: 'player',
     },
   },
 });

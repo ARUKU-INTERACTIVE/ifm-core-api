@@ -31,7 +31,6 @@ export class PlayerMapper {
 
   fromCreatePlayerDtoToPlayer(playerDto: PlayerDto): Player {
     const player = this.mapPlayerDtoToPlayer(playerDto);
-    player.ownerId = playerDto.ownerId;
     return player;
   }
 
@@ -51,7 +50,6 @@ export class PlayerMapper {
     playerResponseDto.createdAt = player.createdAt;
     playerResponseDto.updatedAt = player.updatedAt;
     playerResponseDto.deletedAt = player.deletedAt;
-    playerResponseDto.owner = player?.owner;
     playerResponseDto.auctions = player?.auctions;
     playerResponseDto.address = player?.address;
     return playerResponseDto;
@@ -59,12 +57,10 @@ export class PlayerMapper {
 
   fromSubmitMintPlayerDtoToPlayerDto(
     submitMintPlayerDto: SubmitMintPlayerDto,
-    ownerId: number,
   ): PlayerDto {
     const playerDto = new PlayerDto();
     playerDto.name = submitMintPlayerDto.name;
     playerDto.issuer = submitMintPlayerDto.issuer;
-    playerDto.ownerId = ownerId;
     playerDto.metadataCid = submitMintPlayerDto.metadataCid;
     playerDto.imageCid = submitMintPlayerDto.imageCid;
     playerDto.description = submitMintPlayerDto.description;

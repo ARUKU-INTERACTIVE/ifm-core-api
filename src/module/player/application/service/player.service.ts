@@ -64,24 +64,22 @@ export class PlayerService {
   async getOneById(
     id: number,
     relations?: PlayerRelation[],
-  ): Promise<PlayerResponseDto> {
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     const player = await this.playerRepository.getOneById(id, relations);
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
-      [PlayerRelation.OWNER],
     );
   }
 
   async submitMintPlayerXdr(
     submitMintPlayerDto: SubmitMintPlayerDto,
-    currentUser: User,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
-    await this.sorobanContractAdapter.submitMintPlayer(submitMintPlayerDto.xdr);
-
-    const playerDto = this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(
-      submitMintPlayerDto,
-      currentUser.id,
+    await this.sorobanContractAdapter.submitSorobanTransaction(
+      submitMintPlayerDto.xdr,
     );
+
+    const playerDto =
+      this.playerMapper.fromSubmitMintPlayerDtoToPlayerDto(submitMintPlayerDto);
 
     const player = await this.playerRepository.saveOne(
       this.playerMapper.fromCreatePlayerDtoToPlayer(playerDto),
@@ -89,7 +87,6 @@ export class PlayerService {
 
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(player),
-      [PlayerRelation.OWNER],
     );
   }
 
@@ -148,7 +145,7 @@ export class PlayerService {
       throw new PlayerAddressAlreadyExistsException();
     }
 
-    const txHash = await this.sorobanContractAdapter.submitMintPlayer(
+    const txHash = await this.sorobanContractAdapter.submitSorobanTransaction(
       transactionXDRDTO.xdr,
     );
     const { returnValue } =

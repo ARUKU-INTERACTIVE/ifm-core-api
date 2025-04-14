@@ -3,11 +3,13 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   Account,
+  Address,
   Asset,
   BASE_FEE,
   Keypair,
   Operation,
   TransactionBuilder,
+  nativeToScVal,
 } from '@stellar/stellar-sdk';
 
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
@@ -16,6 +18,7 @@ import { TransactionMapper } from '@common/infrastructure/stellar/application/ma
 import { CreateNFTDtoWithFIle } from '@common/infrastructure/stellar/dto/create-nft.dto';
 import { TransactionNFTDto } from '@common/infrastructure/stellar/dto/transaction-nft.dto';
 import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
+import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
@@ -35,6 +38,7 @@ export class StellarNftAdapter {
     private readonly transactionResponseAdapter: TransactionResponseAdapter,
     private readonly stellarTransactionAdapter: StellarTransactionAdapter,
     private readonly transactionMapper: TransactionMapper,
+    private readonly sorobanContractAdapter: SorobanContractAdapter,
   ) {
     this.networkPassphrase = this.environmentConfig.get(
       'stellar.networkPassphrase',
@@ -80,6 +84,40 @@ export class StellarNftAdapter {
         imageCid,
         issuer.publicKey(),
       ),
+    );
+  }
+
+  async createAuctionTransaction(
+    userPublickey: string,
+    playerAddress: string,
+    startingPrice: number,
+    auctionTimeMs: number,
+  ) {
+    const contract = await this.sorobanContractAdapter.getContract();
+    const account = await this.stellarAccountAdapter.getAccount(userPublickey);
+
+    const userPublickeySC = nativeToScVal(Address.fromString(userPublickey));
+    const playerAddressSC = nativeToScVal(Address.fromString(playerAddress));
+    const startingPriceSC = nativeToScVal(startingPrice, { type: 'i128' });
+    const auctionTimeMsSC = nativeToScVal(auctionTimeMs, { type: 'u64' });
+
+    const transaction = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: this.networkPassphrase,
+    })
+      .addOperation(
+        contract.call(
+          'create_auction',
+          userPublickeySC,
+          playerAddressSC,
+          startingPriceSC,
+          auctionTimeMsSC,
+        ),
+      )
+      .setTimeout(400)
+      .build();
+    return await this.stellarTransactionAdapter.prepareTransaction(
+      transaction.toXDR(),
     );
   }
 
@@ -135,6 +173,21 @@ export class StellarNftAdapter {
     transaction.sign(issuer);
 
     return this.transactionMapper.fromXDRToTransactionDTO(transaction.toXDR());
+  }
+
+  async checkNFTBalance(publicKey: string, issuer: string): Promise<boolean> {
+    const account = await this.stellarAccountAdapter.getAccount(publicKey);
+    return (
+      Number(
+        account.balances.find(
+          (balance) =>
+            (balance.asset_type === 'credit_alphanum4' ||
+              balance.asset_type === 'credit_alphanum12') &&
+            balance.asset_code === this.code &&
+            balance.asset_issuer === issuer,
+        )?.balance || '0',
+      ) > 0
+    );
   }
 
   async deployNFTStellarAssetContract(account: Account, nftAsset: Asset) {
