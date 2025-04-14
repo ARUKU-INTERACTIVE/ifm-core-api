@@ -43,9 +43,10 @@ const transactionXDR = {
 
 export const transactionUseCases = {
   ERROR: 'ERROR',
+  ERROR_PREPARE_TRANSACTION: 'ERROR_PREPARE_TRANSACTION',
 };
 
-const { ERROR } = transactionUseCases;
+const { ERROR, ERROR_PREPARE_TRANSACTION } = transactionUseCases;
 const { SUCCESS, PENDING } = SubmitStatus;
 const { xdr } = transactionXDR;
 const { ERROR_ACCOUNT, PK_ERROR } = loadAccountUseCases;
@@ -59,6 +60,8 @@ jest.mock('@stellar/stellar-sdk', () => ({
           throw new StellarAccountNotFound(publicKey);
         } else if (publicKey == ERROR_ACCOUNT) {
           throw new InvalidStellarTransactionError();
+        } else if (publicKey === ERROR_PREPARE_TRANSACTION) {
+          return ERROR_PREPARE_TRANSACTION;
         }
         return {
           balances: [
@@ -105,14 +108,19 @@ jest.mock('@stellar/stellar-sdk', () => ({
       return true;
     }),
   },
-  TransactionBuilder: jest.fn().mockImplementation(() => ({
+  TransactionBuilder: jest.fn().mockImplementation((account) => ({
     sign: jest.fn(),
     fromXDR: jest.fn(),
     addMemo: jest.fn().mockReturnThis(),
     setTimeout: jest.fn().mockReturnThis(),
     build: jest.fn().mockReturnThis(),
     addOperation: jest.fn().mockReturnThis(),
-    toXDR: jest.fn().mockReturnValue(xdr),
+    toXDR: jest.fn().mockImplementation(() => {
+      if (account === ERROR_PREPARE_TRANSACTION) {
+        return ERROR_PREPARE_TRANSACTION;
+      }
+      return xdr;
+    }),
   })),
   Asset: jest.fn().mockImplementation(() => ({
     code: 'code',
@@ -125,9 +133,14 @@ jest.mock('@stellar/stellar-sdk', () => ({
       },
     },
     Server: jest.fn().mockImplementation(() => ({
-      prepareTransaction: jest.fn().mockImplementation(() => ({
-        toXDR: jest.fn().mockReturnValue(xdr),
-      })),
+      prepareTransaction: jest.fn().mockImplementation((transaction) => {
+        if (transaction === ERROR_PREPARE_TRANSACTION) {
+          throw new Error();
+        }
+        return {
+          toXDR: jest.fn().mockReturnValue(xdr),
+        };
+      }),
       _simulateTransaction: jest.fn().mockReturnValue({
         results: [
           {

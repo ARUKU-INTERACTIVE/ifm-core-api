@@ -55,15 +55,15 @@ export class PlayerMapper {
     return playerResponseDto;
   }
 
-  fromSubmitMintPlayerDtoToPlayerDto(
+  fromSubmitMintPlayerDtoToPlayer(
     submitMintPlayerDto: SubmitMintPlayerDto,
   ): PlayerDto {
-    const playerDto = new PlayerDto();
-    playerDto.name = submitMintPlayerDto.name;
-    playerDto.issuer = submitMintPlayerDto.issuer;
-    playerDto.metadataCid = submitMintPlayerDto.metadataCid;
-    playerDto.imageCid = submitMintPlayerDto.imageCid;
-    playerDto.description = submitMintPlayerDto.description;
-    return playerDto;
+    const player = new Player();
+    player.name = submitMintPlayerDto.name;
+    player.issuer = submitMintPlayerDto.issuer;
+    player.metadataCid = submitMintPlayerDto.metadataCid;
+    player.imageCid = submitMintPlayerDto.imageCid;
+    player.description = submitMintPlayerDto.description;
+    return player;
   }
 }

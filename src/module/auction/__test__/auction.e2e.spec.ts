@@ -23,7 +23,7 @@ import { createAccessToken } from '@test/test.util';
 
 const { MINT_PLAYER } = getTransactionResponse;
 const { externalId } = MINT_PLAYER.returnValue;
-const { ERROR } = transactionUseCases;
+const { ERROR, ERROR_PREPARE_TRANSACTION } = transactionUseCases;
 
 describe('Auction Module', () => {
   let app: INestApplication;
@@ -354,6 +354,196 @@ describe('Auction Module', () => {
         .post('/api/v1/auction/submit/transaction')
         .auth(adminToken, { type: 'bearer' })
         .send({ playerId, xdr: 'xdr' })
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(
+            'Failed to submit transaction to Soroban',
+          );
+        });
+    });
+  });
+
+  describe('POST - /auction/create/transaction/place-bid', () => {
+    it('should return the XDR to submit bids to the auction', async () => {
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+        sign: jest.fn(),
+        toXDR: jest.fn().mockReturnValue('xdr'),
+      });
+      const bidder1Token = createAccessToken({
+        publicKey: 'BIDDER-1',
+        sub: '00000000-0000-0000-0000-00000000BID1',
+      });
+      await request(app.getHttpServer())
+        .post('/api/v1/auction/create/transaction/place-bid')
+        .auth(bidder1Token, { type: 'bearer' })
+        .send({
+          bidAmount: 550,
+          auctionId: 1,
+        })
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                xdr: expect.any(String),
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+    });
+
+    it('should return an error message if the auction does not exist', async () => {
+      const bidder4Token = createAccessToken({
+        publicKey: 'BIDDER-2',
+        sub: '00000000-0000-0000-0000-00000000BID2',
+      });
+      const auctionId = 1000000;
+
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue(ERROR);
+      (scValToNative as jest.Mock).mockReturnValue({
+        id: externalId,
+      });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/auction/create/transaction/place-bid')
+        .auth(bidder4Token, { type: 'bearer' })
+        .send({
+          bidAmount: 550,
+          auctionId,
+        })
+        .expect(HttpStatus.NOT_FOUND)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(`Auction with ${auctionId} not found`);
+        });
+    });
+
+    it('should return an error message if the transaction could not be submitted to the Soroban network', async () => {
+      const bidder3Token = createAccessToken({
+        publicKey: 'ERROR_PREPARE_TRANSACTION',
+        sub: '00000000-0000-0000-0000-00000000BID3',
+      });
+      const auctionId = 1;
+
+      TransactionBuilder.fromXDR = jest
+        .fn()
+        .mockReturnValue(ERROR_PREPARE_TRANSACTION);
+      (scValToNative as jest.Mock).mockReturnValue({
+        id: externalId,
+      });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/auction/create/transaction/place-bid')
+        .auth(bidder3Token, { type: 'bearer' })
+        .send({
+          bidAmount: 550,
+          auctionId,
+        })
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe('Failed to prepare transaction');
+        });
+    });
+  });
+
+  describe('POST - /auction/submit/transaction/place-bid', () => {
+    beforeEach(() => {
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+        sign: jest.fn(),
+        toXDR: jest.fn().mockReturnValue('xdr'),
+      });
+    });
+    it('should return the XDR to submit bids to the auction', async () => {
+      (scValToNative as jest.Mock).mockReturnValue({
+        end_time: 1744266314n,
+        highest_bid_amount: 300n,
+        highest_bidder_address:
+          'GBVGKQFIRR2XB2SI5IALEP6PU4QOUHYZF6S5TYVPITIA3NS7SVQ44TL4',
+        id: 1n,
+        owner_address:
+          'GDBTYMYAM7MUQZKKLHVWZWJLNUXKNZBAITUJY6ES7RYZ5VSD72LP3YPL',
+        player_address:
+          'CCX7BU3F5E2G3CZE2HTXT46PSWNSRNUR5HA4AKKGPG5V6ZORWFXU7IGH',
+        start_time: 1744266014n,
+        status: ['Open'],
+      });
+
+      const bidder1Token = createAccessToken({
+        publicKey: 'BIDDER-1',
+        sub: '00000000-0000-0000-0000-00000000BID1',
+      });
+      await request(app.getHttpServer())
+        .post('/api/v1/auction/submit/transaction/place-bid')
+        .auth(bidder1Token, { type: 'bearer' })
+        .send({
+          xdr: 'xdr',
+          auctionId: 1,
+        })
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                uuid: expect.any(String),
+                externalId: expect.any(Number),
+                status: expect.any(String),
+                highestBidAmount: expect.any(Number),
+                highestBidderAddress: expect.any(String),
+                playerAddress: expect.any(String),
+                startTime: expect.any(Number),
+                endTime: expect.any(Number),
+                createdAt: expect.any(String),
+                updatedAt: expect.any(String),
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+    });
+
+    it('should return an error message if the auction does not exist', async () => {
+      const bidder4Token = createAccessToken({
+        publicKey: 'BIDDER-2',
+        sub: '00000000-0000-0000-0000-00000000BID2',
+      });
+      const auctionId = 1000000;
+
+      (scValToNative as jest.Mock).mockReturnValue({
+        id: externalId,
+      });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/auction/submit/transaction/place-bid')
+        .auth(bidder4Token, { type: 'bearer' })
+        .send({
+          xdr: 'xdr',
+          auctionId,
+        })
+        .expect(HttpStatus.NOT_FOUND)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(`Auction with ${auctionId} not found`);
+        });
+    });
+
+    it('should return an error message if the transaction could not be submitted to the Soroban network', async () => {
+      const bidder3Token = createAccessToken({
+        publicKey: 'BIDDER-1',
+        sub: '00000000-0000-0000-0000-00000000BID1',
+      });
+      const auctionId = 1;
+
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue(ERROR);
+      (scValToNative as jest.Mock).mockReturnValue({
+        id: externalId,
+      });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/auction/submit/transaction/place-bid')
+        .auth(bidder3Token, { type: 'bearer' })
+        .send({
+          xdr: 'xdr',
+          auctionId,
+        })
         .expect(HttpStatus.INTERNAL_SERVER_ERROR)
         .then(({ body }) => {
           expect(body.error.detail).toBe(

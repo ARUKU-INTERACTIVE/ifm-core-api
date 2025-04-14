@@ -1,3 +1,4 @@
+import { CreatePlaceBIdDto } from '@module/auction/application/dto/create-place-bid.dto';
 import { PlayerService } from '@module/player/application/service/player.service';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -30,6 +31,8 @@ export class StellarNftAdapter {
   private readonly homeDomain: string;
   private readonly ipfshash: string = 'ipfshash';
   private readonly startingBalance: string = '1.5';
+  private readonly BASE_TIMEOUT: number = 300;
+  private readonly tokenAddress: string;
   constructor(
     private readonly environmentConfig: ConfigService,
     @Inject(forwardRef(() => PlayerService))
@@ -44,6 +47,9 @@ export class StellarNftAdapter {
       'stellar.networkPassphrase',
     );
     this.code = this.environmentConfig.get('stellar.defaultAssetCode');
+    this.tokenAddress = this.environmentConfig.get(
+      'stellar.nativeAssetAddress',
+    );
     this.homeDomain = this.environmentConfig.get('stellar.homeDomain');
   }
 
@@ -187,6 +193,43 @@ export class StellarNftAdapter {
             balance.asset_issuer === issuer,
         )?.balance || '0',
       ) > 0
+    );
+  }
+
+  async createPlaceBidTransaction(
+    userPublickey: string,
+    createPlaceBIdDto: CreatePlaceBIdDto,
+    auctionExternalId: number,
+  ): Promise<string> {
+    const contract = await this.sorobanContractAdapter.getContract();
+    const account = await this.stellarAccountAdapter.getAccount(userPublickey);
+    const auctionIdScVal = nativeToScVal(auctionExternalId, {
+      type: 'u128',
+    });
+    const bidderAddressSCVal = nativeToScVal(Address.fromString(userPublickey));
+    const bidAmountSCVal = nativeToScVal(createPlaceBIdDto.bidAmount, {
+      type: 'i128',
+    });
+    const tokenAddressSCVal = nativeToScVal(
+      Address.fromString(this.tokenAddress),
+    );
+    const transaction = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: this.networkPassphrase,
+    })
+      .addOperation(
+        contract.call(
+          'place_bid',
+          auctionIdScVal,
+          bidderAddressSCVal,
+          bidAmountSCVal,
+          tokenAddressSCVal,
+        ),
+      )
+      .setTimeout(this.BASE_TIMEOUT)
+      .build();
+    return await this.stellarTransactionAdapter.prepareTransaction(
+      transaction.toXDR(),
     );
   }
 
