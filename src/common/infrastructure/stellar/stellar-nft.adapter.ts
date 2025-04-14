@@ -181,20 +181,19 @@ export class StellarNftAdapter {
     return this.transactionMapper.fromXDRToTransactionDTO(transaction.toXDR());
   }
 
-  async getBalanceNFT(publicKey: string, issuer: string) {
+  async checkBalanceNFT(publicKey: string, issuer: string): Promise<boolean> {
     const account = await this.stellarAccountAdapter.getAccount(publicKey);
-    return account.balances.some((balance) => {
-      console.log(balance, this.code);
-      if (
-        (balance.asset_type === 'credit_alphanum4' ||
-          balance.asset_type === 'credit_alphanum12') &&
-        `${balance.asset_code}:${balance.asset_issuer}` ===
-          `${this.code}:${issuer}`
-      ) {
-        return +balance.balance > 0;
-      }
-      return false;
-    });
+    return (
+      Number(
+        account.balances.find(
+          (balance) =>
+            (balance.asset_type === 'credit_alphanum4' ||
+              balance.asset_type === 'credit_alphanum12') &&
+            balance.asset_code === this.code &&
+            balance.asset_issuer === issuer,
+        )?.balance || '0',
+      ) > 0
+    );
   }
 
   async placeBid(
