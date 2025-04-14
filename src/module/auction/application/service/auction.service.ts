@@ -111,7 +111,7 @@ export class AuctionService {
     const player = await this.playerService.getOneById(
       createTransactionAuctionDto.playerId,
     );
-    const isCurrentOwner = await this.stellarNFTAdapter.checkBalanceNFT(
+    const isCurrentOwner = await this.stellarNFTAdapter.checkNFTBalance(
       user.publicKey,
       player.data.attributes.issuer,
     );

@@ -175,7 +175,7 @@ export class StellarNftAdapter {
     return this.transactionMapper.fromXDRToTransactionDTO(transaction.toXDR());
   }
 
-  async checkBalanceNFT(publicKey: string, issuer: string): Promise<boolean> {
+  async checkNFTBalance(publicKey: string, issuer: string): Promise<boolean> {
     const account = await this.stellarAccountAdapter.getAccount(publicKey);
     return (
       Number(
