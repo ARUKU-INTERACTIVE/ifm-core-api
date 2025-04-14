@@ -184,8 +184,10 @@ export class StellarNftAdapter {
   async getBalanceNFT(publicKey: string, issuer: string) {
     const account = await this.stellarAccountAdapter.getAccount(publicKey);
     return account.balances.some((balance) => {
+      console.log(balance, this.code);
       if (
-        balance.asset_type === 'credit_alphanum4' &&
+        (balance.asset_type === 'credit_alphanum4' ||
+          balance.asset_type === 'credit_alphanum12') &&
         `${balance.asset_code}:${balance.asset_issuer}` ===
           `${this.code}:${issuer}`
       ) {
@@ -206,9 +208,12 @@ export class StellarNftAdapter {
       type: 'u128',
     });
     const bidderAddressSCVal = nativeToScVal(Address.fromString(userPublickey));
-    const bidAmountSCVal = nativeToScVal(createPlaceBIdDto.bidAmount, {
-      type: 'i128',
-    });
+    const bidAmountSCVal = nativeToScVal(
+      createPlaceBIdDto.bidAmount * 10 ** 7,
+      {
+        type: 'i128',
+      },
+    );
     const tokenAddressSCVal = nativeToScVal(
       Address.fromString(this.tokenAddress),
     );
@@ -230,6 +235,46 @@ export class StellarNftAdapter {
     return await this.stellarTransactionAdapter.prepareTransaction(
       transaction.toXDR(),
     );
+  }
+
+  async claim(
+    userPublickey: string,
+    auctionExternalId: number,
+  ): Promise<string> {
+    try {
+      const contract = await this.sorobanContractAdapter.getContract();
+      const account =
+        await this.stellarAccountAdapter.getAccount(userPublickey);
+      const auctionIdScVal = nativeToScVal(auctionExternalId, {
+        type: 'u128',
+      });
+      const bidderAddressSCVal = nativeToScVal(
+        Address.fromString(userPublickey),
+      );
+      const tokenAddressSCVal = nativeToScVal(
+        Address.fromString(this.tokenAddress),
+      );
+      const transaction = new TransactionBuilder(account, {
+        fee: BASE_FEE,
+        networkPassphrase: this.networkPassphrase,
+      })
+        .addOperation(
+          contract.call(
+            'claim',
+            bidderAddressSCVal,
+            auctionIdScVal,
+            tokenAddressSCVal,
+          ),
+        )
+        .setTimeout(this.BASE_TIMEOUT)
+        .build();
+      console.log('transaction');
+      return await this.stellarTransactionAdapter.prepareTransaction(
+        transaction.toXDR(),
+      );
+    } catch (error) {
+      console.error(error, 'error');
+    }
   }
 
   async deployNFTStellarAssetContract(account: Account, nftAsset: Asset) {

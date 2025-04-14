@@ -4,6 +4,7 @@ import { AuctionResponseDto } from '@module/auction/application/dto/auction.resp
 import { CreateAuctionDto } from '@module/auction/application/dto/create-auction.dto';
 import { CreatePlaceBIdDto } from '@module/auction/application/dto/create-place-bid.dto';
 import { CreateAuctionTransactionDto } from '@module/auction/application/dto/create-transaction-auction.dto';
+import { SubmitClaimDto } from '@module/auction/application/dto/submit-claim.dto';
 import { SubmitPlaceBidDto } from '@module/auction/application/dto/submit-place-bid.dto';
 import { AuctionRelation } from '@module/auction/application/enum/auction-relations.enum';
 import { AuctionMapper } from '@module/auction/application/mapper/auction.mapper';
@@ -51,6 +52,8 @@ export class AuctionService {
     @Inject(forwardRef(() => StellarNftAdapter))
     private readonly stellarNFTAdapter: StellarNftAdapter,
   ) {}
+
+  private;
 
   async getAll(
     user: User,
@@ -192,6 +195,47 @@ export class AuctionService {
     if (!auction) {
       throw new NotFoundException(`Auction with ${auctionId} not found`);
     }
+    const { returnValue } =
+      await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
+
+    const txReturnValue = returnValue as unknown as xdr.ScVal;
+
+    const auctionSC: ISCAuctionDto = scValToNative(txReturnValue);
+
+    return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
+      this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSC),
+    );
+  }
+
+  async createClaimTransaction(publicKey: string, auctionId: number) {
+    const auction = await this.auctionRepository.getOneById(auctionId, [
+      AuctionRelation.PLAYER,
+    ]);
+
+    if (!auction) {
+      throw new NotFoundException(`Auction with ${auctionId} not found`);
+    }
+    console.log({ auction });
+    const xdr = await this.stellarNFTAdapter.claim(
+      publicKey,
+      auction.externalId,
+    );
+
+    return this.auctionResponseAdapter.oneEntityResponse<TransactionXDRDTO>(
+      this.transactionMapper.fromXDRToTransactionDTO(xdr),
+    );
+  }
+
+  async submitClaimTransaction(submitClaimDto: SubmitClaimDto) {
+    const auctionId = submitClaimDto.auctionId;
+    const auction = await this.auctionRepository.getOneById(auctionId);
+
+    if (!auction) {
+      throw new NotFoundException(`Auction with ${auctionId} not found`);
+    }
+    const txHash = await this.sorobanContractAdapter.submitSorobanTransaction(
+      submitClaimDto.xdr,
+    );
     const { returnValue } =
       await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
 
