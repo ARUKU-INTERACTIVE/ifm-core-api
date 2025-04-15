@@ -213,7 +213,6 @@ export class AuctionService {
     if (!auction) {
       throw new NotFoundException(`Auction with ${auctionId} not found`);
     }
-    console.log({ auction });
     const xdr = await this.stellarNFTAdapter.createClaimTransaction(
       publicKey,
       auction.externalId,
