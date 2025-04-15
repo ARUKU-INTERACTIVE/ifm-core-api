@@ -41,3 +41,10 @@ items:
     imageCid: 'imageCid6'
     issuer: '{{string.alpha}}'
     address: 'CXXXXXXX6'
+  player7:
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid7'
+    imageCid: 'imageCid7'
+    issuer: '{{string.alpha}}'
+    address: 'CXXXXXXX7'
