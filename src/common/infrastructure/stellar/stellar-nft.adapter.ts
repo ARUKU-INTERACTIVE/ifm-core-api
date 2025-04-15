@@ -236,7 +236,7 @@ export class StellarNftAdapter {
     );
   }
 
-  async claim(
+  async createClaimTransaction(
     userPublickey: string,
     auctionExternalId: number,
   ): Promise<string> {

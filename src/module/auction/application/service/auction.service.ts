@@ -214,7 +214,7 @@ export class AuctionService {
       throw new NotFoundException(`Auction with ${auctionId} not found`);
     }
     console.log({ auction });
-    const xdr = await this.stellarNFTAdapter.claim(
+    const xdr = await this.stellarNFTAdapter.createClaimTransaction(
       publicKey,
       auction.externalId,
     );
@@ -224,25 +224,30 @@ export class AuctionService {
     );
   }
 
-  async submitClaimTransaction(submitClaimDto: SubmitClaimDto) {
+  async submitClaimTransaction(
+    currentUser: User,
+    submitClaimDto: SubmitClaimDto,
+  ) {
     const auctionId = submitClaimDto.auctionId;
     const auction = await this.auctionRepository.getOneById(auctionId);
 
     if (!auction) {
       throw new NotFoundException(`Auction with ${auctionId} not found`);
     }
-    const txHash = await this.sorobanContractAdapter.submitSorobanTransaction(
+    await this.sorobanContractAdapter.submitSorobanTransaction(
       submitClaimDto.xdr,
     );
-    const { returnValue } =
-      await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
+    const account = await this.stellarAccountAdapter.getAccount(
+      currentUser.publicKey,
+    );
 
-    const txReturnValue = returnValue as unknown as xdr.ScVal;
-
-    const auctionSC: ISCAuctionDto = scValToNative(txReturnValue);
+    const auctionSc = await this.sorobanContractAdapter.getAuction(
+      account,
+      auction.externalId,
+    );
 
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
-      this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSC),
+      this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSc),
     );
   }
 }

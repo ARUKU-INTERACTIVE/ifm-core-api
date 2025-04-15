@@ -107,7 +107,10 @@ export class AuctionController {
   }
 
   @Post('/submit/transaction/claim')
-  async submitClaimTransaction(@Body() submitClaimDto: SubmitClaimDto) {
-    return this.auctionService.submitClaimTransaction(submitClaimDto);
+  async submitClaimTransaction(
+    @CurrentUser() user: User,
+    @Body() submitClaimDto: SubmitClaimDto,
+  ) {
+    return this.auctionService.submitClaimTransaction(user, submitClaimDto);
   }
 }
