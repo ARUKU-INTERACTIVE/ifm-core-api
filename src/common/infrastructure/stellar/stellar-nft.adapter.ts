@@ -263,7 +263,6 @@ export class StellarNftAdapter {
       )
       .setTimeout(this.BASE_TIMEOUT)
       .build();
-    console.log('transaction');
     return await this.stellarTransactionAdapter.prepareTransaction(
       transaction.toXDR(),
     );
