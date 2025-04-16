@@ -15,6 +15,7 @@ export class UserMapper {
     userResponseDto.createdAt = user.createdAt;
     userResponseDto.updatedAt = user.updatedAt;
     userResponseDto.deletedAt = user.deletedAt;
+    userResponseDto.publicKey = user.publicKey;
     return userResponseDto;
   }
 }
