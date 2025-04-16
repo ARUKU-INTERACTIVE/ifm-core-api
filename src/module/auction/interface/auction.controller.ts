@@ -1,11 +1,13 @@
 import { AuctionResponseDto } from '@module/auction/application/dto/auction.response.dto';
 import { CreateAuctionDto } from '@module/auction/application/dto/create-auction.dto';
+import { CreateClaimDto } from '@module/auction/application/dto/create-claim.dto';
 import { CreatePlaceBIdDto } from '@module/auction/application/dto/create-place-bid.dto';
 import { CreateAuctionTransactionDto } from '@module/auction/application/dto/create-transaction-auction.dto';
 import { AuctionFieldsQueryParamsDto } from '@module/auction/application/dto/params/auction-fields-query-params.dto';
 import { AuctionFilterQueryParamsDto } from '@module/auction/application/dto/params/auction-filter-query-params.dto';
 import { AuctionIncludeQueryParamsDto } from '@module/auction/application/dto/params/auction-include-query-params.dto';
 import { AuctionSortQueryParamsDto } from '@module/auction/application/dto/params/query-sort-query-params.dto';
+import { SubmitClaimDto } from '@module/auction/application/dto/submit-claim.dto';
 import { SubmitPlaceBidDto } from '@module/auction/application/dto/submit-place-bid.dto';
 import { AuctionService } from '@module/auction/application/service/auction.service';
 import { AUCTION_ENTITY_NAME } from '@module/auction/domain/auction.name';
@@ -91,5 +93,24 @@ export class AuctionController {
     return await this.auctionService.submitPlaceBidTransaction(
       submitPlaceBidDto,
     );
+  }
+
+  @Post('/create/transaction/claim')
+  async createClaimTransaction(
+    @CurrentUser() user: User,
+    @Body() createClaimDto: CreateClaimDto,
+  ) {
+    return this.auctionService.createClaimTransaction(
+      user.publicKey,
+      createClaimDto.auctionId,
+    );
+  }
+
+  @Post('/submit/transaction/claim')
+  async submitClaimTransaction(
+    @CurrentUser() user: User,
+    @Body() submitClaimDto: SubmitClaimDto,
+  ) {
+    return this.auctionService.submitClaimTransaction(user, submitClaimDto);
   }
 }

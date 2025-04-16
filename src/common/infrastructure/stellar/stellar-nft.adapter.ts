@@ -207,9 +207,12 @@ export class StellarNftAdapter {
       type: 'u128',
     });
     const bidderAddressSCVal = nativeToScVal(Address.fromString(userPublickey));
-    const bidAmountSCVal = nativeToScVal(createPlaceBIdDto.bidAmount, {
-      type: 'i128',
-    });
+    const bidAmountSCVal = nativeToScVal(
+      createPlaceBIdDto.bidAmount * 10 ** 7,
+      {
+        type: 'i128',
+      },
+    );
     const tokenAddressSCVal = nativeToScVal(
       Address.fromString(this.tokenAddress),
     );
@@ -223,6 +226,38 @@ export class StellarNftAdapter {
           auctionIdScVal,
           bidderAddressSCVal,
           bidAmountSCVal,
+          tokenAddressSCVal,
+        ),
+      )
+      .setTimeout(this.BASE_TIMEOUT)
+      .build();
+    return await this.stellarTransactionAdapter.prepareTransaction(
+      transaction.toXDR(),
+    );
+  }
+
+  async createClaimTransaction(
+    userPublickey: string,
+    auctionExternalId: number,
+  ): Promise<string> {
+    const contract = await this.sorobanContractAdapter.getContract();
+    const account = await this.stellarAccountAdapter.getAccount(userPublickey);
+    const auctionIdScVal = nativeToScVal(auctionExternalId, {
+      type: 'u128',
+    });
+    const bidderAddressSCVal = nativeToScVal(Address.fromString(userPublickey));
+    const tokenAddressSCVal = nativeToScVal(
+      Address.fromString(this.tokenAddress),
+    );
+    const transaction = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: this.networkPassphrase,
+    })
+      .addOperation(
+        contract.call(
+          'claim',
+          bidderAddressSCVal,
+          auctionIdScVal,
           tokenAddressSCVal,
         ),
       )

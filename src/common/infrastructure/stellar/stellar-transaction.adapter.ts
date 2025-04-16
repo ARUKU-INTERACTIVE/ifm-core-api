@@ -13,9 +13,11 @@ import {
 
 import { UnknownErrorException } from '@common/infrastructure/exception/unknow-error.exception';
 import { TRANSACTION_STATUS } from '@common/infrastructure/stellar/enum/transaction-status.enum';
+import { SorobanErrorMap } from '@common/infrastructure/stellar/exception/soroban-error-map.exception';
 import { TransactionTimeoutException } from '@common/infrastructure/stellar/exception/transaction-timeout-error.exception';
 import { UnknownErrorSubmittingTransaction } from '@common/infrastructure/stellar/exception/unknown-error-submitting-transaction';
 import { UnknownStatusException } from '@common/infrastructure/stellar/exception/unknown-status-error.exception';
+import { XDRReadErrorException } from '@common/infrastructure/stellar/exception/xdr-read-error.exception';
 import { IGetSorobanTransactionResponse } from '@common/infrastructure/stellar/interface/get-soroban-transaction-response.interface';
 
 @Injectable()
@@ -24,7 +26,10 @@ export class StellarTransactionAdapter {
   private readonly stellarServer: Horizon.Server;
   private readonly networkPassphrase: string;
 
-  constructor(private readonly environmentConfig: ConfigService) {
+  constructor(
+    private readonly environmentConfig: ConfigService,
+    private readonly sorobanErrorMap: SorobanErrorMap,
+  ) {
     const serverUrl = this.environmentConfig.get('stellar.serverUrl');
     const sorobanServerUrl = this.environmentConfig.get('soroban.serverUrl');
     this.networkPassphrase = this.environmentConfig.get(
@@ -37,8 +42,13 @@ export class StellarTransactionAdapter {
   buildTransactionFromXdr(
     xdr: string,
   ): Transaction<Memo<MemoType>, Operation[]> | FeeBumpTransaction {
-    return TransactionBuilder.fromXDR(xdr, this.networkPassphrase);
+    try {
+      return TransactionBuilder.fromXDR(xdr, this.networkPassphrase);
+    } catch (error) {
+      throw new XDRReadErrorException();
+    }
   }
+
   async prepareTransaction(xdr: string): Promise<string> {
     try {
       const transaction = this.buildTransactionFromXdr(xdr);
@@ -48,8 +58,18 @@ export class StellarTransactionAdapter {
 
       return uploadTransaction.toXDR();
     } catch (err) {
+      if (err instanceof XDRReadErrorException) {
+        throw err;
+      }
+      const errString = this.sorobanErrorMap.errorStringSorobanToObject(
+        err?.toString(),
+      );
+
+      const errorNameSc = this.sorobanErrorMap.getName(errString?.errorCode);
+
       throw new UnknownErrorException({
         message: 'Failed to prepare transaction',
+        title: errorNameSc,
       });
     }
   }
@@ -98,15 +118,15 @@ export class StellarTransactionAdapter {
   async submitSorobanTransaction(
     xdr: string,
   ): Promise<rpc.Api.GetTransactionResponse> {
-    const transaction = this.buildTransactionFromXdr(xdr);
-    const POLLING_SLEEP_TIME_MS = 500;
-    const POLLING_ATTEMPTS = 15;
-
-    const pollingOptions: rpc.Server.PollingOptions = {
-      sleepStrategy: () => POLLING_SLEEP_TIME_MS,
-      attempts: POLLING_ATTEMPTS,
-    };
     try {
+      const transaction = this.buildTransactionFromXdr(xdr);
+      const POLLING_SLEEP_TIME_MS = 500;
+      const POLLING_ATTEMPTS = 15;
+
+      const pollingOptions: rpc.Server.PollingOptions = {
+        sleepStrategy: () => POLLING_SLEEP_TIME_MS,
+        attempts: POLLING_ATTEMPTS,
+      };
       const initialResponse =
         await this.sorobanServer.sendTransaction(transaction);
       if (initialResponse.status !== TRANSACTION_STATUS.PENDING) {
@@ -118,15 +138,23 @@ export class StellarTransactionAdapter {
         pollingOptions,
       );
       return this.handleTransactionStatus(finalResponse);
-    } catch (error) {
+    } catch (err) {
       if (
-        error instanceof UnknownErrorSubmittingTransaction ||
-        error instanceof UnknownStatusException
+        err instanceof UnknownErrorSubmittingTransaction ||
+        err instanceof UnknownStatusException ||
+        err instanceof XDRReadErrorException
       ) {
-        throw error;
+        throw err;
       }
+      const errString = this.sorobanErrorMap.errorStringSorobanToObject(
+        err?.toString(),
+      );
+
+      const errorNameSc = this.sorobanErrorMap.getName(errString?.errorCode);
+
       throw new UnknownErrorException({
         message: 'Failed to submit transaction to Soroban',
+        title: errorNameSc,
       });
     }
   }

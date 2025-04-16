@@ -4,6 +4,7 @@ import { AuctionResponseDto } from '@module/auction/application/dto/auction.resp
 import { CreateAuctionDto } from '@module/auction/application/dto/create-auction.dto';
 import { CreatePlaceBIdDto } from '@module/auction/application/dto/create-place-bid.dto';
 import { CreateAuctionTransactionDto } from '@module/auction/application/dto/create-transaction-auction.dto';
+import { SubmitClaimDto } from '@module/auction/application/dto/submit-claim.dto';
 import { SubmitPlaceBidDto } from '@module/auction/application/dto/submit-place-bid.dto';
 import { AuctionRelation } from '@module/auction/application/enum/auction-relations.enum';
 import { AuctionMapper } from '@module/auction/application/mapper/auction.mapper';
@@ -201,6 +202,51 @@ export class AuctionService {
 
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
       this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSC),
+    );
+  }
+
+  async createClaimTransaction(publicKey: string, auctionId: number) {
+    const auction = await this.auctionRepository.getOneById(auctionId, [
+      AuctionRelation.PLAYER,
+    ]);
+
+    if (!auction) {
+      throw new NotFoundException(`Auction with ${auctionId} not found`);
+    }
+    const xdr = await this.stellarNFTAdapter.createClaimTransaction(
+      publicKey,
+      auction.externalId,
+    );
+
+    return this.auctionResponseAdapter.oneEntityResponse<TransactionXDRDTO>(
+      this.transactionMapper.fromXDRToTransactionDTO(xdr),
+    );
+  }
+
+  async submitClaimTransaction(
+    currentUser: User,
+    submitClaimDto: SubmitClaimDto,
+  ) {
+    const auctionId = submitClaimDto.auctionId;
+    const auction = await this.auctionRepository.getOneById(auctionId);
+
+    if (!auction) {
+      throw new NotFoundException(`Auction with ${auctionId} not found`);
+    }
+    await this.sorobanContractAdapter.submitSorobanTransaction(
+      submitClaimDto.xdr,
+    );
+    const account = await this.stellarAccountAdapter.getAccount(
+      currentUser.publicKey,
+    );
+
+    const auctionSc = await this.sorobanContractAdapter.getAuction(
+      account,
+      auction.externalId,
+    );
+
+    return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
+      this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSc),
     );
   }
 }

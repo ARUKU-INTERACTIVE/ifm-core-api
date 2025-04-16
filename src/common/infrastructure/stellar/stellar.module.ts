@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 import { TransactionResponseAdapter } from '@common/infrastructure/stellar/application/adapter/transaction-response.adapter';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
+import { SorobanErrorMap } from '@common/infrastructure/stellar/exception/soroban-error-map.exception';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
 import { StellarAccountAdapter } from '@common/infrastructure/stellar/stellar-account.adapter';
 import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.adapter';
@@ -23,6 +24,7 @@ import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stella
     PlayerMapper,
     TransactionResponseAdapter,
     ConfigService,
+    SorobanErrorMap,
   ],
   exports: [
     TransactionMapper,
