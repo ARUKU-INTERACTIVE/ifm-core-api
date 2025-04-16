@@ -1,3 +1,5 @@
+import { Team } from '@module/team/domain/team.entity';
+
 import { Base } from '@common/base/domain/base.entity';
 
 import { AppRole } from '@iam/authorization/domain/app-role.enum';
@@ -8,7 +10,8 @@ export class User extends Base {
   externalId?: string;
   roles: AppRole[];
   isVerified: boolean;
-
+  team?: Team;
+  teamId?: number;
   constructor(
     publicKey?: string,
     username?: string,

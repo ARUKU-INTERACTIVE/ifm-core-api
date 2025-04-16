@@ -33,12 +33,24 @@ export const PlayerSChema = new EntitySchema<Player>({
       nullable: true,
       unique: true,
     },
+    teamId: {
+      type: Number,
+      nullable: false,
+    },
   }),
   relations: {
     auctions: {
       type: 'one-to-many',
       target: 'Auction',
       inverseSide: 'player',
+    },
+    team: {
+      type: 'many-to-one',
+      target: 'Team',
+      inverseSide: 'players',
+      joinColumn: {
+        name: 'team_id',
+      },
     },
   },
 });
