@@ -69,7 +69,7 @@ export class Service {
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const ownedPlayerIds = [];
     const unownedPlayerIds = [];
-    for (const playerId of createDto.players) {
+    for (const playerId of createDto?.players || []) {
       const currentPlayer = await this.playerService.getOneById(playerId);
       const isOwner = await this.stellarNFTAdapter.checkNFTBalance(
         currentUser.publicKey,
