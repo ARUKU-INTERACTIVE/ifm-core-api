@@ -4,7 +4,7 @@ import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TeamResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
-import { Mapper } from '@/module/team/application/mapper/team.mapper';
+import { TeamMapper } from '@/module/team/application/mapper/team.mapper';
 import { TEAM_REPOSITORY_KEY } from '@/module/team/application/repository/team.repository.interface';
 import { Service } from '@/module/team/application/service/team.service';
 import { TeamSchema } from '@/module/team/infrastructure/database/team.schema';
@@ -17,8 +17,8 @@ const RepositoryProvider: Provider = {
 
 @Module({
   imports: [PlayerModule, TypeOrmModule.forFeature([TeamSchema])],
-  providers: [Service, Mapper, TeamResponseAdapter, RepositoryProvider],
+  providers: [Service, TeamMapper, TeamResponseAdapter, RepositoryProvider],
   controllers: [Controller],
-  exports: [Service, Mapper, RepositoryProvider],
+  exports: [Service, TeamMapper, RepositoryProvider],
 })
 export class TeamModule {}

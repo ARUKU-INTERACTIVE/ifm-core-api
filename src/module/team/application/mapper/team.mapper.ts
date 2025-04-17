@@ -7,7 +7,7 @@ import { IUpdateDto } from '@/module/team/application/dto/update-team.dto.interf
 import { Team } from '@/module/team/domain/team.entity';
 
 @Injectable()
-export class Mapper {
+export class TeamMapper {
   fromCreateTeamDtoToTeam(teamDto: ICreateDto, userId: number): Team {
     const team = new Team();
     team.name = teamDto.name;

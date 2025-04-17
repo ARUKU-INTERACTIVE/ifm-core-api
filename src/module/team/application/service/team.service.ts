@@ -12,7 +12,7 @@ import { ICreateDto } from '@/module/team/application/dto/create-team.dto.interf
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
 import { IUpdateDto } from '@/module/team/application/dto/update-team.dto.interface';
 import { TeamRelation } from '@/module/team/application/enum/team-relation.enum';
-import { Mapper } from '@/module/team/application/mapper/team.mapper';
+import { TeamMapper } from '@/module/team/application/mapper/team.mapper';
 import {
   IRepository,
   TEAM_REPOSITORY_KEY,
@@ -24,7 +24,7 @@ export class Service {
   constructor(
     @Inject(TEAM_REPOSITORY_KEY)
     private readonly repository: IRepository,
-    private readonly mapper: Mapper,
+    private readonly teamMapper: TeamMapper,
     private readonly teamResponseAdapter: TeamResponseAdapter,
   ) {}
 
@@ -39,7 +39,7 @@ export class Service {
     const collectionDto = new CollectionDto({
       ...collection,
       data: collection.data.map((team: Team) =>
-        this.mapper.fromTeamToTeamResponseDto(team),
+        this.teamMapper.fromTeamToTeamResponseDto(team),
       ),
     });
 
@@ -55,7 +55,7 @@ export class Service {
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const team = await this.repository.getOneByIdOrFail(id, relations);
     return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
-      this.mapper.fromTeamToTeamResponseDto(team),
+      this.teamMapper.fromTeamToTeamResponseDto(team),
     );
   }
 
@@ -64,10 +64,10 @@ export class Service {
     currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const team = await this.repository.saveOne(
-      this.mapper.fromCreateTeamDtoToTeam(createDto, currentUser.id),
+      this.teamMapper.fromCreateTeamDtoToTeam(createDto, currentUser.id),
     );
     return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
-      this.mapper.fromTeamToTeamResponseDto(team),
+      this.teamMapper.fromTeamToTeamResponseDto(team),
     );
   }
 
@@ -77,10 +77,10 @@ export class Service {
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const team = await this.repository.updateOneOrFail(
       id,
-      this.mapper.fromUpdateTeamDtoToTeam(updateDto),
+      this.teamMapper.fromUpdateTeamDtoToTeam(updateDto),
     );
     return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
-      this.mapper.fromTeamToTeamResponseDto(team),
+      this.teamMapper.fromTeamToTeamResponseDto(team),
     );
   }
 
