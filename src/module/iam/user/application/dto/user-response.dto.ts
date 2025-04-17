@@ -29,4 +29,7 @@ export class UserResponseDto {
 
   @ApiPropertyOptional()
   deletedAt?: string;
+
+  @ApiPropertyOptional()
+  publicKey?: string;
 }

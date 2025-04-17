@@ -39,15 +39,21 @@ export class SorobanErrorMap {
     };
 
     const errorMatch = errorString.match(/Error\(Contract, #(\d+)\)/);
-    if (errorMatch) error.errorCode = parseInt(errorMatch[1]);
+    if (errorMatch) {
+      error.errorCode = parseInt(errorMatch[1]);
+    }
 
     const contractMatch = errorString.match(/CC[A-Z0-9]{54}/);
-    if (contractMatch) error.contractId = contractMatch[0];
+    if (contractMatch) {
+      error.contractId = contractMatch[0];
+    }
 
     const fnMatch = errorString.match(
       /topics:\[fn_call, [A-Z0-9]+, ([a-z_]+)\]/,
     );
-    if (fnMatch) error.method = fnMatch[1];
+    if (fnMatch) {
+      error.method = fnMatch[1];
+    }
 
     const eventLines = errorString.match(/\[Diagnostic Event\].+/g) || [];
     error.events = eventLines.map((line) => line.trim());
