@@ -1,9 +1,11 @@
+import { PlayerService } from '@module/player/application/service/player.service';
 import { Inject, Injectable } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
+import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.adapter';
 
 import { User } from '@iam/user/domain/user.entity';
 
@@ -26,6 +28,8 @@ export class Service {
     private readonly repository: IRepository,
     private readonly teamMapper: TeamMapper,
     private readonly teamResponseAdapter: TeamResponseAdapter,
+    private readonly stellarNFTAdapter: StellarNftAdapter,
+    private readonly playerService: PlayerService,
   ) {}
 
   async getAll(
@@ -63,6 +67,21 @@ export class Service {
     createDto: ICreateDto,
     currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
+    const ownedPlayerIds = [];
+    const unownedPlayerIds = [];
+    for (const playerId of createDto.players) {
+      const currentPlayer = await this.playerService.getOneById(playerId);
+      const isOwner = await this.stellarNFTAdapter.checkNFTBalance(
+        currentUser.publicKey,
+        currentPlayer.data.attributes.issuer,
+      );
+      if (isOwner) {
+        ownedPlayerIds.push(playerId);
+      } else {
+        unownedPlayerIds.push(playerId);
+      }
+    }
+    createDto.players = ownedPlayerIds;
     const team = await this.repository.saveOne(
       this.teamMapper.fromCreateTeamDtoToTeam(createDto, currentUser.id),
     );

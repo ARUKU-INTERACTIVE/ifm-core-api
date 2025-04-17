@@ -3,6 +3,8 @@ import { MySqlRepository } from '@module/team/infrastructure/database/team.postg
 import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { StellarModule } from '@common/infrastructure/stellar/stellar.module';
+
 import { TeamResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
 import { TeamMapper } from '@/module/team/application/mapper/team.mapper';
 import { TEAM_REPOSITORY_KEY } from '@/module/team/application/repository/team.repository.interface';
@@ -16,7 +18,11 @@ const RepositoryProvider: Provider = {
 };
 
 @Module({
-  imports: [PlayerModule, TypeOrmModule.forFeature([TeamSchema])],
+  imports: [
+    PlayerModule,
+    TypeOrmModule.forFeature([TeamSchema]),
+    StellarModule,
+  ],
   providers: [Service, TeamMapper, TeamResponseAdapter, RepositoryProvider],
   controllers: [Controller],
   exports: [Service, TeamMapper, RepositoryProvider],
