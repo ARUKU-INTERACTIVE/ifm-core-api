@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -18,7 +17,6 @@ import {
 } from '@nestjs/swagger';
 
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
-import { OneRelationResponse } from '@common/base/application/dto/one-relation-response.interface.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { PageQueryParamsDto } from '@common/base/application/dto/page-query-params.dto';
 import { ControllerEntity } from '@common/base/application/interface/decorators/endpoint-entity.decorator';
@@ -26,9 +24,8 @@ import { SortOptions } from '@common/base/application/interface/get-all-options.
 import { GetAllSwaggerDecorator } from '@common/base/application/interface/getAllSwaggerDecorator';
 import { GetOneSwaggerDecorator } from '@common/base/application/interface/getOneSwaggerDecorator';
 
-import { AppAction } from '@iam/authorization/domain/app-action.enum';
-import { Policy } from '@iam/authorization/infrastructure/policy/decorator/policy.decorator';
-import { PolicyGuard } from '@iam/authorization/infrastructure/policy/guard/policy.guard';
+import { CurrentUser } from '@iam/authentication/infrastructure/decorator/current-user.decorator';
+import { User } from '@iam/user/domain/user.entity';
 
 import { CreateDto } from '@/module/team/application/dto/create-team.dto';
 import { TeamFieldsQueryParamsDto } from '@/module/team/application/dto/query-param/team-fields-query-params.dto';
@@ -36,20 +33,16 @@ import { TeamFilterQueryParamsDto } from '@/module/team/application/dto/query-pa
 import { IncludeQueryParamsDto } from '@/module/team/application/dto/team-include-query-params.dto';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
 import { UpdateDto } from '@/module/team/application/dto/update-team.dto';
-import { TeamRelation } from '@/module/team/application/enum/team-relation.enum';
 import { Service } from '@/module/team/application/service/team.service';
-import { Team } from '@/module/team/domain/team.entity';
 import { TEAM_ENTITY_NAME } from '@/module/team/domain/team.name';
 
 @Controller('team')
 @ControllerEntity(TEAM_ENTITY_NAME)
-@UseGuards(PolicyGuard)
 @ApiTags('team')
 export class TeamController {
   constructor(private readonly service: Service) {}
 
   @Get()
-  @Policy(AppAction.Read, Team)
   @GetAllSwaggerDecorator(
     TeamResponseDto,
     TeamFilterQueryParamsDto,
@@ -72,7 +65,6 @@ export class TeamController {
   }
 
   @Get(':id')
-  @Policy(AppAction.Read, Team)
   @ApiParam({ name: 'id', type: Number })
   @ApiOperation({ summary: 'Get one Team by id or throw not found' })
   @GetOneSwaggerDecorator(TeamResponseDto)
@@ -83,18 +75,17 @@ export class TeamController {
   }
 
   @Post()
-  @Policy(AppAction.Create, Team)
   @ApiOperation({ summary: 'Create new Team' })
   @ApiBody({ type: CreateDto })
   @GetOneSwaggerDecorator(TeamResponseDto)
   saveOne(
     @Body() createDto: CreateDto,
+    @CurrentUser() currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    return this.service.saveOne(createDto);
+    return this.service.saveOne(createDto, currentUser);
   }
 
   @Patch(':id')
-  @Policy(AppAction.Update, Team)
   @ApiParam({ name: 'id', type: Number })
   @ApiOperation({
     summary: 'Update one Team by id or throw not found',
@@ -109,7 +100,6 @@ export class TeamController {
   }
 
   @Delete(':id')
-  @Policy(AppAction.Delete, Team)
   @ApiParam({ name: 'id', type: Number })
   @ApiOperation({
     summary: 'Delete one Team by id or throw not found',
@@ -117,14 +107,5 @@ export class TeamController {
   @ApiOkResponse({ status: 200 })
   deleteOneOrFail(@Param('id') id: number) {
     return this.service.deleteOneOrFail(id);
-  }
-
-  @Get('/:id/relationships/:name')
-  @Policy(AppAction.Read, Team)
-  async getOneRelation(
-    @Param('id') id: number,
-    @Param('name') relationName: TeamRelation | undefined,
-  ): Promise<OneRelationResponse> {
-    return this.service.getOneRelation(id, relationName);
   }
 }

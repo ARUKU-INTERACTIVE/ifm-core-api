@@ -67,4 +67,8 @@ export class PlayerRepository implements IPlayerRepository {
       relations,
     });
   }
+
+  async unsetPlayersFromTeam(player: Player[]) {
+    return await this.repository.save(player);
+  }
 }

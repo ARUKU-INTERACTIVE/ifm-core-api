@@ -10,7 +10,7 @@ export interface IRepository {
   getAll(
     options?: IGetAllOptions<Team, TeamRelation[]>,
   ): Promise<ICollection<Team>>;
-  getOneByIdOrFail(id: number): Promise<Team>;
+  getOneByIdOrFail(id: number, relations?: TeamRelation[]): Promise<Team>;
   getOneById(id: number, relations?: TeamRelation[]): Promise<Team>;
   saveOne(team: Team): Promise<Team>;
   updateOneOrFail(

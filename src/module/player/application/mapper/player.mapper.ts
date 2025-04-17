@@ -45,6 +45,7 @@ export class PlayerMapper {
     playerResponseDto.name = player.name;
     playerResponseDto.description = player.description;
     playerResponseDto.issuer = player.issuer;
+    playerResponseDto.teamId = player.teamId;
     playerResponseDto.metadataUri = this.getPinataUri(player.metadataCid);
     playerResponseDto.imageUri = this.getPinataUri(player.imageCid);
     playerResponseDto.createdAt = player.createdAt;

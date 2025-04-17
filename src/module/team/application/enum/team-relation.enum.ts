@@ -1,12 +1,6 @@
-/**
- * Enum for defining relations between entities in the external module.
- *
- * Add relations here by specifying the name of the related entity on the domain,
- * as defined in the corresponding entity file (e.g. `module/domain/entity.name.ts`).
- *
- * Example:
- * RELATED_ENTITY = 'related-entity-name',
- */
+import { USER_ENTITY_NAME } from '@iam/user/domain/user.name';
+
 export enum TeamRelation {
-  RELATED_ENTITY = 'related-entity-name',
+  PLAYER_ENTITY = 'players',
+  USER_ENTITY = USER_ENTITY_NAME,
 }

@@ -161,4 +161,7 @@ export class PlayerService {
       this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
     );
   }
+  async unsetPlayersFromTeam(players: Player[]) {
+    this.playerRepository.unsetPlayersFromTeam(players);
+  }
 }

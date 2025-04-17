@@ -1,3 +1,4 @@
+import { Player } from '@module/player/domain/player.domain';
 import { Injectable } from '@nestjs/common';
 
 import { ICreateDto } from '@/module/team/application/dto/create-team.dto.interface';
@@ -7,18 +8,20 @@ import { Team } from '@/module/team/domain/team.entity';
 
 @Injectable()
 export class Mapper {
-  private mapDtoToTeam(teamDto: IUpdateDto): Team {
+  fromCreateTeamDtoToTeam(teamDto: ICreateDto, userId: number): Team {
     const team = new Team();
     team.name = teamDto.name;
+    team.logoUri = teamDto.logoUri;
+    team.players = (teamDto?.players?.map((id) => ({ id })) || []) as Player[];
+    team.userId = userId;
     return team;
   }
 
-  fromCreateTeamDtoToTeam(teamDto: ICreateDto): Team {
-    return this.mapDtoToTeam(teamDto);
-  }
-
   fromUpdateTeamDtoToTeam(teamDto: IUpdateDto): Team {
-    return this.mapDtoToTeam(teamDto);
+    const team = new Team();
+    team.name = teamDto.name;
+    team.logoUri = teamDto.logoUri;
+    return team;
   }
 
   fromTeamToTeamResponseDto(team: Team): TeamResponseDto {
@@ -26,6 +29,7 @@ export class Mapper {
     teamResponseDto.id = team.id;
     teamResponseDto.uuid = team.uuid;
     teamResponseDto.name = team.name;
+    teamResponseDto.logoUri = team.logoUri;
     teamResponseDto.createdAt = team.createdAt;
     teamResponseDto.updatedAt = team.updatedAt;
     teamResponseDto.deletedAt = team.deletedAt;

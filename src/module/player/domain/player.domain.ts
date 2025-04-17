@@ -11,6 +11,6 @@ export class Player extends Base {
   metadataCid: string;
   address: string;
   auctions: Auction[];
-  team: Team;
-  teamId: number;
+  team?: Team;
+  teamId?: number;
 }

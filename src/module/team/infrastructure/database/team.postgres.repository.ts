@@ -1,3 +1,4 @@
+import { PlayerService } from '@module/player/application/service/player.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -14,6 +15,7 @@ export class MySqlRepository implements IRepository {
   constructor(
     @InjectRepository(TeamSchema)
     private readonly repository: Repository<Team>,
+    private readonly playerService: PlayerService,
   ) {}
 
   async getAll(
@@ -43,18 +45,18 @@ export class MySqlRepository implements IRepository {
     id: number,
     relations: TeamRelation[] = [],
   ): Promise<Team> {
-    const Team = await this.repository.findOne({
+    const team = await this.repository.findOne({
       where: { id },
       relations,
     });
 
-    if (!Team) {
+    if (!team) {
       throw new TeamNotFoundException({
         message: `Team with ID ${id} not found`,
       });
     }
 
-    return Team;
+    return team;
   }
 
   async getOneById(id: number, relations: TeamRelation[] = []): Promise<Team> {
@@ -93,6 +95,7 @@ export class MySqlRepository implements IRepository {
   async deleteOneOrFail(id: number): Promise<void> {
     const teamToDelete = await this.repository.findOne({
       where: { id },
+      relations: [TeamRelation.PLAYER_ENTITY],
     });
 
     if (!teamToDelete) {
@@ -100,7 +103,12 @@ export class MySqlRepository implements IRepository {
         message: `TeamModule with ID ${id} not found`,
       });
     }
-
-    await this.repository.softDelete({ id });
+    for (const player of teamToDelete.players) {
+      player.team = null;
+    }
+    teamToDelete.userId = null;
+    await this.repository.save(teamToDelete);
+    await this.playerService.unsetPlayersFromTeam(teamToDelete.players);
+    await this.repository.softRemove({ id });
   }
 }

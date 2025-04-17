@@ -34,6 +34,9 @@ export class PlayerResponseDto {
   createdAt: string;
 
   @ApiProperty()
+  teamId: number;
+
+  @ApiProperty()
   updatedAt: string;
 
   @ApiPropertyOptional()

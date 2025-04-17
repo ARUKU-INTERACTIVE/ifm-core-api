@@ -12,4 +12,5 @@ export interface IPlayerRepository {
   ): Promise<ICollection<Player>>;
   getOneById(id: number, relations?: PlayerRelation[]): Promise<Player>;
   saveOne(player: Player, relations?: PlayerRelation[]): Promise<Player>;
+  unsetPlayersFromTeam(player: Player[]): Promise<Player[]>;
 }

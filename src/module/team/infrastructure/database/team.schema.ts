@@ -18,7 +18,7 @@ export const TeamSchema = new EntitySchema<Team>({
     },
     userId: {
       type: Number,
-      nullable: false,
+      nullable: true,
     },
   }),
   relations: {

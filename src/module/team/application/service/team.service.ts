@@ -1,12 +1,13 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
-import { OneRelationResponse } from '@common/base/application/dto/one-relation-response.interface.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 
-import { ResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
+import { User } from '@iam/user/domain/user.entity';
+
+import { TeamResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
 import { ICreateDto } from '@/module/team/application/dto/create-team.dto.interface';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
 import { IUpdateDto } from '@/module/team/application/dto/update-team.dto.interface';
@@ -17,7 +18,6 @@ import {
   TEAM_REPOSITORY_KEY,
 } from '@/module/team/application/repository/team.repository.interface';
 import { Team } from '@/module/team/domain/team.entity';
-import { TeamNotFoundException } from '@/module/team/infrastructure/database/exception/team-not-found.exception';
 
 @Injectable()
 export class Service {
@@ -25,7 +25,7 @@ export class Service {
     @Inject(TEAM_REPOSITORY_KEY)
     private readonly repository: IRepository,
     private readonly mapper: Mapper,
-    private readonly responseAdapter: ResponseAdapter,
+    private readonly teamResponseAdapter: TeamResponseAdapter,
   ) {}
 
   async getAll(
@@ -43,7 +43,7 @@ export class Service {
       ),
     });
 
-    return this.responseAdapter.manyEntitiesResponse<TeamResponseDto>(
+    return this.teamResponseAdapter.manyEntitiesResponse<TeamResponseDto>(
       collectionDto,
       include,
     );
@@ -51,20 +51,22 @@ export class Service {
 
   async getOneByIdOrFail(
     id: number,
+    relations?: TeamRelation[],
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    const team = await this.repository.getOneByIdOrFail(id);
-    return this.responseAdapter.oneEntityResponse<TeamResponseDto>(
+    const team = await this.repository.getOneByIdOrFail(id, relations);
+    return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
       this.mapper.fromTeamToTeamResponseDto(team),
     );
   }
 
   async saveOne(
     createDto: ICreateDto,
+    currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const team = await this.repository.saveOne(
-      this.mapper.fromCreateTeamDtoToTeam(createDto),
+      this.mapper.fromCreateTeamDtoToTeam(createDto, currentUser.id),
     );
-    return this.responseAdapter.oneEntityResponse<TeamResponseDto>(
+    return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
       this.mapper.fromTeamToTeamResponseDto(team),
     );
   }
@@ -77,39 +79,11 @@ export class Service {
       id,
       this.mapper.fromUpdateTeamDtoToTeam(updateDto),
     );
-    return this.responseAdapter.oneEntityResponse<TeamResponseDto>(
+    return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
       this.mapper.fromTeamToTeamResponseDto(team),
     );
   }
 
-  async getOneRelation(
-    id: number,
-    relationName: TeamRelation,
-  ): Promise<OneRelationResponse> {
-    const teamRelationsList = Object.values(TeamRelation);
-
-    if (!teamRelationsList.includes(relationName)) {
-      throw new BadRequestException(
-        `Invalid relation name: ${relationName}, expected one of ${teamRelationsList}`,
-      );
-    }
-
-    const team = await this.repository.getOneById(id, [relationName]);
-
-    if (!team) {
-      throw new TeamNotFoundException({
-        message: `Team with ID ${id} not found`,
-      });
-    }
-
-    const relationData = team[relationName] ?? null;
-
-    return this.responseAdapter.oneRelationshipsResponse(
-      relationData,
-      relationName,
-      relationData?.id.toString(),
-    );
-  }
   async deleteOneOrFail(id: number): Promise<void> {
     return this.repository.deleteOneOrFail(id);
   }

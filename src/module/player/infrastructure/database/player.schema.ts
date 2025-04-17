@@ -35,7 +35,7 @@ export const PlayerSChema = new EntitySchema<Player>({
     },
     teamId: {
       type: Number,
-      nullable: false,
+      nullable: true,
     },
   }),
   relations: {
@@ -51,6 +51,8 @@ export const PlayerSChema = new EntitySchema<Player>({
       joinColumn: {
         name: 'team_id',
       },
+      nullable: true,
+      onDelete: 'SET NULL',
     },
   },
 });
