@@ -14,7 +14,7 @@ import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto
 import { UpdateDto } from '@/module/team/application/dto/update-team.dto';
 import { TEAM_ENTITY_NAME } from '@/module/team/domain/team.name';
 
-describe.skip('Team Module', () => {
+describe('Team Module', () => {
   let app: INestApplication;
 
   const adminToken = createAccessToken({
@@ -48,11 +48,9 @@ describe.skip('Team Module', () => {
             data: expect.arrayContaining([
               expect.objectContaining({
                 attributes: expect.objectContaining({
+                  uuid: expect.any(String),
                   name: expect.any(String),
-                  uuid:
-                    expect.stringMatching(
-                      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
-                    ) || expect(undefined),
+                  logoUri: expect.any(String),
                   createdAt: expect.any(String),
                   updatedAt: expect.any(String),
                   deletedAt: null,
@@ -142,7 +140,10 @@ describe.skip('Team Module', () => {
 
   describe('POST - /team', () => {
     it('should create a new team', async () => {
-      const createTeamDto = { name: 'Mary' } as CreateDto;
+      const createTeamDto = {
+        name: 'Mary',
+        logoUri: 'http://example.com',
+      } as CreateDto;
 
       await request(app.getHttpServer())
         .post('/api/v1/team/')
@@ -160,17 +161,62 @@ describe.skip('Team Module', () => {
           expect(body).toEqual(expectedResponse);
         });
     });
+
+    it('should create a new team with players', async () => {
+      const playerId = 1;
+      const createTeamDto = {
+        name: 'Mary2',
+        logoUri: 'http://example2.com',
+        players: [playerId],
+      } as CreateDto;
+      let teamId: number = 0;
+      const userToken = createAccessToken({
+        publicKey: 'GXXX-XXXX-XXXX-XXXX2',
+        sub: '00000000-0000-0000-0000-0000000000XX',
+      });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/team/')
+        .auth(userToken, { type: 'bearer' })
+        .send(createTeamDto)
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                name: createTeamDto.name,
+              }),
+            }),
+          });
+          teamId = +body.data.id;
+          expect(body).toEqual(expectedResponse);
+        });
+
+      await request(app.getHttpServer())
+        .get(`/api/v1/player/${playerId}`)
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          expect(body.data.attributes.teamId).toEqual(teamId);
+        });
+    });
   });
 
   describe('PATCH - /team/:id', () => {
     it('should update an existing team', async () => {
-      const createTeamDto = { name: 'Mary' } as CreateDto;
       const updateTeamDto = { name: 'Jane' } as UpdateDto;
+      const createTeamDto = {
+        name: 'Mary',
+        logoUri: 'http://example3.com',
+      } as CreateDto;
       let teamId: number;
-
+      const user4Token = createAccessToken({
+        publicKey: 'GXXX-XXXX-XXXX-XXXX4',
+        sub: '00000000-0000-0000-0000-00000000XXXX',
+      });
       await request(app.getHttpServer())
         .post('/api/v1/team')
-        .auth(adminToken, { type: 'bearer' })
+        .auth(user4Token, { type: 'bearer' })
         .send(createTeamDto)
         .expect(HttpStatus.CREATED)
         .then(({ body }) => {
@@ -218,12 +264,19 @@ describe.skip('Team Module', () => {
 
   describe('DELETE - /team/:id', () => {
     it('should delete a team', async () => {
-      const createTeamDto = { name: 'Mary' } as CreateDto;
+      const createTeamDto = {
+        name: 'Mary',
+        logoUri: 'http://example3.com',
+      } as CreateDto;
       let teamId: number;
+      const user2Token = createAccessToken({
+        publicKey: 'GXXX-XXXX-XXXX-XXXX3',
+        sub: '00000000-0000-0000-0000-000000000XXX',
+      });
 
       await request(app.getHttpServer())
         .post('/api/v1/team')
-        .auth(adminToken, { type: 'bearer' })
+        .auth(user2Token, { type: 'bearer' })
         .send(createTeamDto)
         .expect(HttpStatus.CREATED)
         .then(({ body }) => {

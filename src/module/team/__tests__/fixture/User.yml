@@ -1,10 +1,27 @@
 entity: User
 items:
   admin-user:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX1'
     username: 'admin@test.com'
     externalId: '00000000-0000-0000-0000-00000000000X'
     roles: admin
-  user{2..23}:
+  user1:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX2'
+    username: 'user@test.com'
+    externalId: '00000000-0000-0000-0000-0000000000XX'
+    roles: admin
+  user2:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX3'
+    username: 'user3@test.com'
+    externalId: '00000000-0000-0000-0000-000000000XXX'
+    roles: admin
+  user3:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX4'
+    username: 'user4@test.com'
+    externalId: '00000000-0000-0000-0000-00000000XXXX'
+    roles: admin
+  user{4..23}:
+    publicKey: '{{string.uuid}}'
     username: '{{internet.email}}'
     externalId: '{{string.uuid}}'
     roles: regular

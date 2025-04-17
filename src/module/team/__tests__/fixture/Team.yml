@@ -1,6 +1,8 @@
 entity: Team
 items:
-  romance:
+  team1:
     name: 'John'
-  genre{2..23}:
+    logoUri: "{{string.alpha}}"
+  team{2..23}:
     name: '{{string.alpha}}'
+    logoUri: '{{string.alpha}}'
