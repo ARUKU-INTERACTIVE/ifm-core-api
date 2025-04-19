@@ -33,14 +33,14 @@ import { TeamFilterQueryParamsDto } from '@/module/team/application/dto/query-pa
 import { IncludeQueryParamsDto } from '@/module/team/application/dto/team-include-query-params.dto';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
 import { UpdateDto } from '@/module/team/application/dto/update-team.dto';
-import { Service } from '@/module/team/application/service/team.service';
+import { TeamService } from '@/module/team/application/service/team.service';
 import { TEAM_ENTITY_NAME } from '@/module/team/domain/team.name';
 
 @Controller('team')
 @ControllerEntity(TEAM_ENTITY_NAME)
 @ApiTags('team')
 export class TeamController {
-  constructor(private readonly service: Service) {}
+  constructor(private readonly teamService: TeamService) {}
 
   @Get()
   @GetAllSwaggerDecorator(
@@ -55,7 +55,7 @@ export class TeamController {
     @Query('sort') sort: SortOptions<TeamResponseDto>,
     @Query('include') include: IncludeQueryParamsDto,
   ): Promise<ManySerializedResponseDto<TeamResponseDto>> {
-    return this.service.getAll({
+    return this.teamService.getAll({
       page,
       filter,
       sort,
@@ -71,7 +71,7 @@ export class TeamController {
   getOneByIdOrFail(
     @Param('id') id: number,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    return this.service.getOneByIdOrFail(id);
+    return this.teamService.getOneByIdOrFail(id);
   }
 
   @Post()
@@ -82,7 +82,7 @@ export class TeamController {
     @Body() createDto: CreateDto,
     @CurrentUser() currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    return this.service.saveOne(createDto, currentUser);
+    return this.teamService.saveOne(createDto, currentUser);
   }
 
   @Patch(':id')
@@ -96,7 +96,7 @@ export class TeamController {
     @Param('id') id: number,
     @Body() updateDto: UpdateDto,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    return this.service.updateOneOrFail(id, updateDto);
+    return this.teamService.updateOneOrFail(id, updateDto);
   }
 
   @Delete(':id')
@@ -106,6 +106,6 @@ export class TeamController {
   })
   @ApiOkResponse({ status: 200 })
   deleteOneOrFail(@Param('id') id: number) {
-    return this.service.deleteOneOrFail(id);
+    return this.teamService.deleteOneOrFail(id);
   }
 }

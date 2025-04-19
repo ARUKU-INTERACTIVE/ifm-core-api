@@ -22,7 +22,7 @@ import {
 import { Team } from '@/module/team/domain/team.entity';
 
 @Injectable()
-export class Service {
+export class TeamService {
   constructor(
     @Inject(TEAM_REPOSITORY_KEY)
     private readonly repository: IRepository,

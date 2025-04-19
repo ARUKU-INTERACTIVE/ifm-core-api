@@ -8,7 +8,7 @@ import { StellarModule } from '@common/infrastructure/stellar/stellar.module';
 import { TeamResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
 import { TeamMapper } from '@/module/team/application/mapper/team.mapper';
 import { TEAM_REPOSITORY_KEY } from '@/module/team/application/repository/team.repository.interface';
-import { Service } from '@/module/team/application/service/team.service';
+import { TeamService } from '@/module/team/application/service/team.service';
 import { TeamSchema } from '@/module/team/infrastructure/database/team.schema';
 import { TeamController as Controller } from '@/module/team/interface/team.controller';
 
@@ -23,8 +23,8 @@ const RepositoryProvider: Provider = {
     TypeOrmModule.forFeature([TeamSchema]),
     StellarModule,
   ],
-  providers: [Service, TeamMapper, TeamResponseAdapter, RepositoryProvider],
+  providers: [TeamService, TeamMapper, TeamResponseAdapter, RepositoryProvider],
   controllers: [Controller],
-  exports: [Service, TeamMapper, RepositoryProvider],
+  exports: [TeamService, TeamMapper, RepositoryProvider],
 })
 export class TeamModule {}
