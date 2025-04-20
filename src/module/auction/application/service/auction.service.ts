@@ -16,6 +16,7 @@ import { Auction } from '@module/auction/domain/auction.domain';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerService } from '@module/player/application/service/player.service';
 import { PlayerNotOwnedByUserException } from '@module/player/infrastructure/database/exception/player.exception';
+import { TeamService } from '@module/team/application/service/team.service';
 import {
   Inject,
   Injectable,
@@ -51,6 +52,7 @@ export class AuctionService {
     private readonly stellarAccountAdapter: StellarAccountAdapter,
     @Inject(forwardRef(() => StellarNftAdapter))
     private readonly stellarNFTAdapter: StellarNftAdapter,
+    private readonly teamService: TeamService,
   ) {}
 
   async getAll(
@@ -141,7 +143,6 @@ export class AuctionService {
     );
     const { returnValue } =
       await this.stellarTransactionAdapter.getSorobanTransaction(txHash);
-
     const txReturnValue = returnValue as unknown as xdr.ScVal;
 
     const auctionSC = scValToNative(txReturnValue);
@@ -236,6 +237,7 @@ export class AuctionService {
     await this.sorobanContractAdapter.submitSorobanTransaction(
       submitClaimDto.xdr,
     );
+
     const account = await this.stellarAccountAdapter.getAccount(
       currentUser.publicKey,
     );
@@ -244,7 +246,20 @@ export class AuctionService {
       account,
       auction.externalId,
     );
+    const hasUserTeam = await this.teamService.getOneByUserIdOrFail(
+      currentUser.id,
+    );
+    const player = await this.playerService.getOnePlayer({
+      address: auctionSc.player_address,
+    });
 
+    if (hasUserTeam) {
+      player.teamId = hasUserTeam.id;
+    } else {
+      player.teamId = null;
+      player.team = null;
+    }
+    await this.playerService.saveOnePlayer(player);
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
       this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSc),
     );

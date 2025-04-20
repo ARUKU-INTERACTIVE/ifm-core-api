@@ -2,6 +2,7 @@ import { PlayerFieldsQueryParamsDto } from '@module/player/application/dto/param
 import { PlayerFilterQueryParamsDto } from '@module/player/application/dto/params/player-filter-query-params.dto';
 import { PlayerIncludeQueryParamsDto } from '@module/player/application/dto/params/player-include-query-params.dto';
 import { PlayerSortQueryParamsDto } from '@module/player/application/dto/params/player-sort-query-params.dto';
+import { PlayerResponseUpdateDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { PlayerService } from '@module/player/application/service/player.service';
@@ -12,6 +13,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UploadedFile,
@@ -90,8 +92,12 @@ export class PlayerController {
   @Post('/submit/mint')
   async submitMintPlayer(
     @Body() submitMintPlayerDto: SubmitMintPlayerDto,
+    @CurrentUser() currentUser: User,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
-    return await this.playerService.submitMintPlayerXdr(submitMintPlayerDto);
+    return await this.playerService.submitMintPlayerXdr(
+      currentUser,
+      submitMintPlayerDto,
+    );
   }
 
   @Post('/sac/:id')
@@ -108,5 +114,12 @@ export class PlayerController {
     @Body() transactionXDRDTO: TransactionXDRDTO,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     return this.playerService.submitSACXdr(id, transactionXDRDTO);
+  }
+
+  @Patch('/sync/team')
+  async syncUserPlayersWithBlockchain(
+    @CurrentUser() user: User,
+  ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
+    return await this.playerService.syncUserPlayersWithBlockchain(user);
   }
 }

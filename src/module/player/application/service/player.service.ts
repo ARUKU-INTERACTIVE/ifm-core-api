@@ -1,4 +1,5 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
+import { PlayerResponseUpdateDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
@@ -9,12 +10,17 @@ import {
 } from '@module/player/application/repository/player.repository.interface';
 import { Player } from '@module/player/domain/player.domain';
 import { PlayerAddressAlreadyExistsException } from '@module/player/infrastructure/database/exception/player.exception';
+import { TeamRelation } from '@module/team/application/enum/team-relation.enum';
+import { TeamService } from '@module/team/application/service/team.service';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
-import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
+import {
+  FilterOptions,
+  IGetAllOptions,
+} from '@common/base/application/interface/get-all-options.interface';
 import { IPinataPlayerCid } from '@common/infrastructure/ipfs/application/interfaces/pinata-player-cid.interface';
 import { PinataAdapter } from '@common/infrastructure/ipfs/pinata.adapter';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
@@ -41,6 +47,8 @@ export class PlayerService {
     private readonly pinataAdapter: PinataAdapter,
     @Inject(forwardRef(() => StellarNftAdapter))
     private readonly stellarNFTAdapter: StellarNftAdapter,
+    @Inject(forwardRef(() => TeamService))
+    private readonly teamService: TeamService,
   ) {}
 
   async getAll(
@@ -71,7 +79,19 @@ export class PlayerService {
     );
   }
 
+  async getOnePlayer(
+    filter: FilterOptions<Player>,
+    relations?: PlayerRelation[],
+  ): Promise<Player> {
+    return await this.playerRepository.getOnePlayer(filter, relations);
+  }
+
+  async saveOnePlayer(player: Player) {
+    return await this.playerRepository.saveOne(player);
+  }
+
   async submitMintPlayerXdr(
+    currentUser: User,
     submitMintPlayerDto: SubmitMintPlayerDto,
   ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
     await this.sorobanContractAdapter.submitSorobanTransaction(
@@ -80,9 +100,12 @@ export class PlayerService {
 
     const player =
       this.playerMapper.fromSubmitMintPlayerDtoToPlayer(submitMintPlayerDto);
+    const hasUserTeam = await this.teamService.getOneByUserIdOrFail(
+      currentUser.id,
+    );
 
-    const savedPlayer = await this.playerRepository.saveOne(
-      this.playerMapper.fromCreatePlayerDtoToPlayer(player),
+    const savedPlayer = await this.saveOnePlayer(
+      this.playerMapper.fromCreatePlayerDtoToPlayer(player, hasUserTeam?.id),
     );
 
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
@@ -161,7 +184,56 @@ export class PlayerService {
       this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
     );
   }
+
+  async syncUserPlayersWithBlockchain(
+    currentUser: User,
+  ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
+    const ownedNftIssuers =
+      await this.stellarNFTAdapter.getPlayerNftIssuersFromWallet(
+        currentUser.publicKey,
+      );
+    const userTeam = await this.teamService.getOneByUserIdOrFail(
+      currentUser.id,
+      [TeamRelation.PLAYER_ENTITY],
+    );
+    const playersToAssignToTeam: Player[] = [];
+    for (const issuer of ownedNftIssuers || []) {
+      const player = await this.getOnePlayer({
+        issuer,
+      });
+
+      if (player && player.teamId !== userTeam.id) {
+        player.teamId = userTeam.id;
+        playersToAssignToTeam.push(player);
+      }
+    }
+
+    const teamPlayersNotInUserWallet = userTeam.players.filter(
+      (player) => !ownedNftIssuers.includes(player.issuer),
+    );
+
+    const playersToRemoveFromTeam = teamPlayersNotInUserWallet.map(
+      (player) => ({
+        ...player,
+        team: null,
+        teamId: null,
+      }),
+    );
+
+    await this.unsetPlayersFromTeam([
+      ...playersToRemoveFromTeam,
+      ...playersToAssignToTeam,
+    ]);
+
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseUpdateDto>(
+      this.playerMapper.fromCountPlayerToPlayerResponseUpdateDto(
+        playersToAssignToTeam.length,
+        playersToRemoveFromTeam.length,
+      ),
+    );
+  }
+
   async unsetPlayersFromTeam(players: Player[]) {
-    this.playerRepository.unsetPlayersFromTeam(players);
+    return await this.playerRepository.unsetPlayersFromTeam(players);
   }
 }

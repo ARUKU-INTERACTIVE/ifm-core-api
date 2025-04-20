@@ -6,7 +6,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
 import { ICollection } from '@common/base/application/dto/collection.interface';
-import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
+import {
+  FilterOptions,
+  IGetAllOptions,
+} from '@common/base/application/interface/get-all-options.interface';
 
 export class PlayerRepository implements IPlayerRepository {
   constructor(
@@ -53,6 +56,16 @@ export class PlayerRepository implements IPlayerRepository {
       where: {
         id,
       },
+      relations,
+    });
+  }
+
+  async getOnePlayer(
+    where: FilterOptions<Player>,
+    relations?: PlayerRelation[],
+  ): Promise<Player> {
+    return await this.repository.findOne({
+      where,
       relations,
     });
   }

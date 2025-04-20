@@ -1,11 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 import { ICreateDto } from '@/module/team/application/dto/create-team.dto.interface';
 
@@ -19,10 +13,4 @@ export class CreateDto implements ICreateDto {
   @IsString()
   @IsNotEmpty()
   logoUri: string;
-
-  @ApiPropertyOptional({ type: Array, example: [1, 2, 3] })
-  @IsArray()
-  @IsNumber({}, { each: true })
-  @IsOptional()
-  players: number[];
 }

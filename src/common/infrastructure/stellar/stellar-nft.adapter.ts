@@ -196,6 +196,22 @@ export class StellarNftAdapter {
     );
   }
 
+  async getPlayerNftIssuersFromWallet(publicKey: string): Promise<string[]> {
+    const ownedNftIssuers = [];
+    const account = await this.stellarAccountAdapter.getAccount(publicKey);
+    account.balances.forEach((balance) => {
+      if (
+        (balance.asset_type === 'credit_alphanum4' ||
+          balance.asset_type === 'credit_alphanum12') &&
+        balance.asset_code === this.code &&
+        +balance.balance > 0
+      ) {
+        ownedNftIssuers.push(balance.asset_issuer);
+      }
+    });
+    return ownedNftIssuers;
+  }
+
   async createPlaceBidTransaction(
     userPublickey: string,
     createPlaceBIdDto: CreatePlaceBIdDto,

@@ -1,6 +1,6 @@
 import { PlayerModule } from '@module/player/player.module';
-import { MySqlRepository } from '@module/team/infrastructure/database/team.postgres.repository';
-import { Module, Provider } from '@nestjs/common';
+import { TeamPostgresRepository } from '@module/team/infrastructure/database/team.postgres.repository';
+import { Module, Provider, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { StellarModule } from '@common/infrastructure/stellar/stellar.module';
@@ -14,13 +14,13 @@ import { TeamController as Controller } from '@/module/team/interface/team.contr
 
 const RepositoryProvider: Provider = {
   provide: TEAM_REPOSITORY_KEY,
-  useClass: MySqlRepository,
+  useClass: TeamPostgresRepository,
 };
 
 @Module({
   imports: [
-    PlayerModule,
     TypeOrmModule.forFeature([TeamSchema]),
+    forwardRef(() => PlayerModule),
     StellarModule,
   ],
   providers: [TeamService, TeamMapper, TeamResponseAdapter, RepositoryProvider],

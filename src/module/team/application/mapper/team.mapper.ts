@@ -8,11 +8,15 @@ import { Team } from '@/module/team/domain/team.entity';
 
 @Injectable()
 export class TeamMapper {
-  fromCreateTeamDtoToTeam(teamDto: ICreateDto, userId: number): Team {
+  fromCreateTeamDtoToTeam(
+    teamDto: ICreateDto,
+    ownedPlayerNftIds: number[],
+    userId: number,
+  ): Team {
     const team = new Team();
     team.name = teamDto.name;
     team.logoUri = teamDto.logoUri;
-    team.players = (teamDto?.players?.map((id) => ({ id })) || []) as Player[];
+    team.players = (ownedPlayerNftIds?.map((id) => ({ id })) || []) as Player[];
     team.userId = userId;
     return team;
   }

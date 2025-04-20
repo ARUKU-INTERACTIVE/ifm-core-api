@@ -6,12 +6,12 @@ import { ICollection } from '@common/base/application/dto/collection.interface';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 
 import { TeamRelation } from '@/module/team/application/enum/team-relation.enum';
-import { IRepository } from '@/module/team/application/repository/team.repository.interface';
+import { ITeamRepository } from '@/module/team/application/repository/team.repository.interface';
 import { Team } from '@/module/team/domain/team.entity';
 import { TeamNotFoundException } from '@/module/team/infrastructure/database/exception/team-not-found.exception';
 import { TeamSchema } from '@/module/team/infrastructure/database/team.schema';
 
-export class MySqlRepository implements IRepository {
+export class TeamPostgresRepository implements ITeamRepository {
   constructor(
     @InjectRepository(TeamSchema)
     private readonly repository: Repository<Team>,
@@ -64,6 +64,23 @@ export class MySqlRepository implements IRepository {
       where: { id },
       relations,
     });
+  }
+
+  async getOneByUserIdOrFail(
+    userId: number,
+    relations: TeamRelation[] = [],
+  ): Promise<Team> {
+    const team = await this.repository.findOne({
+      where: { userId },
+      relations,
+    });
+    if (!team) {
+      throw new TeamNotFoundException({
+        message: `No team assigned to user with ID ${userId}`,
+      });
+    }
+
+    return team;
   }
 
   async saveOne(team: Team, relations: TeamRelation[] = []): Promise<Team> {

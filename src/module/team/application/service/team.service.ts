@@ -1,5 +1,5 @@
 import { PlayerService } from '@module/player/application/service/player.service';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
@@ -16,7 +16,7 @@ import { IUpdateDto } from '@/module/team/application/dto/update-team.dto.interf
 import { TeamRelation } from '@/module/team/application/enum/team-relation.enum';
 import { TeamMapper } from '@/module/team/application/mapper/team.mapper';
 import {
-  IRepository,
+  ITeamRepository,
   TEAM_REPOSITORY_KEY,
 } from '@/module/team/application/repository/team.repository.interface';
 import { Team } from '@/module/team/domain/team.entity';
@@ -25,10 +25,11 @@ import { Team } from '@/module/team/domain/team.entity';
 export class TeamService {
   constructor(
     @Inject(TEAM_REPOSITORY_KEY)
-    private readonly repository: IRepository,
+    private readonly teamRepository: ITeamRepository,
     private readonly teamMapper: TeamMapper,
     private readonly teamResponseAdapter: TeamResponseAdapter,
     private readonly stellarNFTAdapter: StellarNftAdapter,
+    @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
   ) {}
 
@@ -39,7 +40,7 @@ export class TeamService {
 
     if (include && fields && !fields.includes('id')) fields.push('id');
 
-    const collection = await this.repository.getAll(options);
+    const collection = await this.teamRepository.getAll(options);
     const collectionDto = new CollectionDto({
       ...collection,
       data: collection.data.map((team: Team) =>
@@ -57,10 +58,17 @@ export class TeamService {
     id: number,
     relations?: TeamRelation[],
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    const team = await this.repository.getOneByIdOrFail(id, relations);
+    const team = await this.teamRepository.getOneByIdOrFail(id, relations);
     return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
       this.teamMapper.fromTeamToTeamResponseDto(team),
     );
+  }
+
+  async getOneByUserIdOrFail(
+    userId: number,
+    relations?: TeamRelation[],
+  ): Promise<Team> {
+    return await this.teamRepository.getOneByUserIdOrFail(userId, relations);
   }
 
   async saveOne(
@@ -68,22 +76,25 @@ export class TeamService {
     currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const ownedPlayerIds = [];
-    const unownedPlayerIds = [];
-    for (const playerId of createDto?.players || []) {
-      const currentPlayer = await this.playerService.getOneById(playerId);
-      const isOwner = await this.stellarNFTAdapter.checkNFTBalance(
+    const ownedNftIssuers =
+      await this.stellarNFTAdapter.getPlayerNftIssuersFromWallet(
         currentUser.publicKey,
-        currentPlayer.data.attributes.issuer,
       );
-      if (isOwner) {
-        ownedPlayerIds.push(playerId);
-      } else {
-        unownedPlayerIds.push(playerId);
+    for (const issuer of ownedNftIssuers || []) {
+      const player = await this.playerService.getOnePlayer({
+        issuer,
+      });
+
+      if (player) {
+        ownedPlayerIds.push(player.id);
       }
     }
-    createDto.players = ownedPlayerIds;
-    const team = await this.repository.saveOne(
-      this.teamMapper.fromCreateTeamDtoToTeam(createDto, currentUser.id),
+    const team = await this.teamRepository.saveOne(
+      this.teamMapper.fromCreateTeamDtoToTeam(
+        createDto,
+        ownedPlayerIds,
+        currentUser.id,
+      ),
     );
     return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
       this.teamMapper.fromTeamToTeamResponseDto(team),
@@ -94,7 +105,7 @@ export class TeamService {
     id: number,
     updateDto: IUpdateDto,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    const team = await this.repository.updateOneOrFail(
+    const team = await this.teamRepository.updateOneOrFail(
       id,
       this.teamMapper.fromUpdateTeamDtoToTeam(updateDto),
     );
@@ -104,6 +115,6 @@ export class TeamService {
   }
 
   async deleteOneOrFail(id: number): Promise<void> {
-    return this.repository.deleteOneOrFail(id);
+    return this.teamRepository.deleteOneOrFail(id);
   }
 }

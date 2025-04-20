@@ -6,12 +6,15 @@ import { Team } from '@/module/team/domain/team.entity';
 
 export const TEAM_REPOSITORY_KEY = 'team_repository';
 
-export interface IRepository {
+export interface ITeamRepository {
   getAll(
     options?: IGetAllOptions<Team, TeamRelation[]>,
   ): Promise<ICollection<Team>>;
   getOneByIdOrFail(id: number, relations?: TeamRelation[]): Promise<Team>;
-  getOneById(id: number, relations?: TeamRelation[]): Promise<Team>;
+  getOneByUserIdOrFail(
+    userId: number,
+    relations?: TeamRelation[],
+  ): Promise<Team>;
   saveOne(team: Team): Promise<Team>;
   updateOneOrFail(
     id: number,
