@@ -71,6 +71,13 @@ export class TeamService {
     return await this.teamRepository.getOneByUserIdOrFail(userId, relations);
   }
 
+  async getOneByUserId(
+    userId: number,
+    relations?: TeamRelation[],
+  ): Promise<Team> {
+    return await this.teamRepository.getOneByUserId(userId, relations);
+  }
+
   async saveOne(
     createDto: ICreateDto,
     currentUser: User,
@@ -81,7 +88,7 @@ export class TeamService {
         currentUser.publicKey,
       );
     for (const issuer of ownedNftIssuers || []) {
-      const player = await this.playerService.getOnePlayer({
+      const player = await this.playerService.getPlayerEntity({
         issuer,
       });
 

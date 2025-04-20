@@ -83,6 +83,16 @@ export class TeamPostgresRepository implements ITeamRepository {
     return team;
   }
 
+  async getOneByUserId(
+    userId: number,
+    relations: TeamRelation[] = [],
+  ): Promise<Team> {
+    return await this.repository.findOne({
+      where: { userId },
+      relations,
+    });
+  }
+
   async saveOne(team: Team, relations: TeamRelation[] = []): Promise<Team> {
     const savedTeam = await this.repository.save(team);
     return this.repository.findOne({ where: { id: savedTeam.id }, relations });

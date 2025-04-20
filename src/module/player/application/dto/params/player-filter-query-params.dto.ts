@@ -18,6 +18,11 @@ export class PlayerFilterQueryParamsDto {
   issuer?: string;
 
   @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  address?: string;
+
+  @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
   externalId?: number;

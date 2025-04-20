@@ -38,7 +38,7 @@ describe('Team Module', () => {
   });
 
   describe('GET - /team', () => {
-    it('should return paginated teams', async () => {
+    it('Should return paginated teams', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/team')
         .auth(adminToken, { type: 'bearer' })
@@ -70,7 +70,7 @@ describe('Team Module', () => {
           expect(body).toEqual(expectedResponse);
         });
     });
-    it('should allow to select specific attributes', async () => {
+    it('Should allow to select specific attributes', async () => {
       const attributes = ['name'] as (keyof TeamResponseDto)[];
 
       await request(app.getHttpServer())
@@ -87,7 +87,7 @@ describe('Team Module', () => {
           });
         });
     });
-    it('should allow to filter by attributes', async () => {
+    it('Should allow to filter by attributes', async () => {
       const name = 'John';
 
       await request(app.getHttpServer())
@@ -110,7 +110,7 @@ describe('Team Module', () => {
   });
 
   describe('GET - /team/:id', () => {
-    it('should return a specific team', async () => {
+    it('Should return a specific team', async () => {
       const teamId = 1;
 
       await request(app.getHttpServer())
@@ -127,7 +127,7 @@ describe('Team Module', () => {
         });
     });
 
-    it('should throw an error if team is not found', async () => {
+    it('Should throw an error if team is not found', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/team/9999')
         .auth(adminToken, { type: 'bearer' })
@@ -139,7 +139,7 @@ describe('Team Module', () => {
   });
 
   describe('POST - /team', () => {
-    it('should create a new team', async () => {
+    it('Should create a new team', async () => {
       const createTeamDto = {
         name: 'Mary',
         logoUri: 'http://example.com',
@@ -162,12 +162,11 @@ describe('Team Module', () => {
         });
     });
 
-    it('should create a new team with players', async () => {
+    it('Should create a new team with players', async () => {
       const playerId = 1;
       const createTeamDto = {
         name: 'Mary2',
         logoUri: 'http://example2.com',
-        players: [playerId],
       } as CreateDto;
       let teamId: number = 0;
       const userToken = createAccessToken({
@@ -203,7 +202,7 @@ describe('Team Module', () => {
   });
 
   describe('PATCH - /team/:id', () => {
-    it('should update an existing team', async () => {
+    it('Should update an existing team', async () => {
       const updateTeamDto = { name: 'Jane' } as UpdateDto;
       const createTeamDto = {
         name: 'Mary',
@@ -250,7 +249,7 @@ describe('Team Module', () => {
         });
     });
 
-    it('should throw an error if team is not found', async () => {
+    it('Should throw an error if team is not found', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/team/9999')
         .send({ name: 'non-existing-team' } as UpdateDto)
@@ -263,7 +262,7 @@ describe('Team Module', () => {
   });
 
   describe('DELETE - /team/:id', () => {
-    it('should delete a team', async () => {
+    it('Should delete a team', async () => {
       const createTeamDto = {
         name: 'Mary',
         logoUri: 'http://example3.com',

@@ -15,6 +15,7 @@ export interface ITeamRepository {
     userId: number,
     relations?: TeamRelation[],
   ): Promise<Team>;
+  getOneByUserId(userId: number, relations?: TeamRelation[]): Promise<Team>;
   saveOne(team: Team): Promise<Team>;
   updateOneOrFail(
     id: number,

@@ -79,11 +79,21 @@ export class PlayerService {
     );
   }
 
-  async getOnePlayer(
+  async getPlayerEntity(
     filter: FilterOptions<Player>,
     relations?: PlayerRelation[],
   ): Promise<Player> {
     return await this.playerRepository.getOnePlayer(filter, relations);
+  }
+
+  async getPlayerResponse(
+    filter: FilterOptions<Player>,
+    relations?: PlayerRelation[],
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
+    const player = await this.playerRepository.getOnePlayer(filter, relations);
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+      this.playerMapper.fromPlayerToPlayerResponseDto(player),
+    );
   }
 
   async saveOnePlayer(player: Player) {
@@ -100,14 +110,10 @@ export class PlayerService {
 
     const player =
       this.playerMapper.fromSubmitMintPlayerDtoToPlayer(submitMintPlayerDto);
-    const hasUserTeam = await this.teamService.getOneByUserIdOrFail(
-      currentUser.id,
-    );
-
+    const team = await this.teamService.getOneByUserId(currentUser.id);
     const savedPlayer = await this.saveOnePlayer(
-      this.playerMapper.fromCreatePlayerDtoToPlayer(player, hasUserTeam?.id),
+      this.playerMapper.fromCreatePlayerDtoToPlayer(player, team?.id),
     );
-
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
     );
@@ -192,23 +198,23 @@ export class PlayerService {
       await this.stellarNFTAdapter.getPlayerNftIssuersFromWallet(
         currentUser.publicKey,
       );
-    const userTeam = await this.teamService.getOneByUserIdOrFail(
-      currentUser.id,
-      [TeamRelation.PLAYER_ENTITY],
-    );
+    const team = await this.teamService.getOneByUserIdOrFail(currentUser.id, [
+      TeamRelation.PLAYER_ENTITY,
+    ]);
+
     const playersToAssignToTeam: Player[] = [];
     for (const issuer of ownedNftIssuers || []) {
-      const player = await this.getOnePlayer({
+      const player = await this.getPlayerEntity({
         issuer,
       });
 
-      if (player && player.teamId !== userTeam.id) {
-        player.teamId = userTeam.id;
+      if (player && player.teamId !== team.id) {
+        player.teamId = team.id;
         playersToAssignToTeam.push(player);
       }
     }
 
-    const teamPlayersNotInUserWallet = userTeam.players.filter(
+    const teamPlayersNotInUserWallet = team.players.filter(
       (player) => !ownedNftIssuers.includes(player.issuer),
     );
 

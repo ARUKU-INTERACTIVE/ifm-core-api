@@ -69,7 +69,7 @@ export class PlayerMapper {
   ) {
     const playerResponseUpdateDto = new PlayerResponseUpdateDto();
     playerResponseUpdateDto.updatedCount = updatedCount;
-    playerResponseUpdateDto.updatedCount = deletedCount;
+    playerResponseUpdateDto.deletedCount = deletedCount;
     return playerResponseUpdateDto;
   }
 }

@@ -60,6 +60,13 @@ export class PlayerController {
     });
   }
 
+  @Get('/one')
+  getPlayer(
+    @Query('filter') filter: PlayerFilterQueryParamsDto,
+  ): Promise<OneSerializedResponseDto<PlayerResponseDto>> {
+    return this.playerService.getPlayerResponse(filter);
+  }
+
   @Get('/:id')
   getPlayerById(
     @Param('id') id: number,

@@ -200,7 +200,6 @@ export class AuctionService {
     const txReturnValue = returnValue as unknown as xdr.ScVal;
 
     const auctionSC: ISCAuctionDto = scValToNative(txReturnValue);
-
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
       this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSC),
     );
@@ -246,15 +245,12 @@ export class AuctionService {
       account,
       auction.externalId,
     );
-    const hasUserTeam = await this.teamService.getOneByUserIdOrFail(
-      currentUser.id,
-    );
-    const player = await this.playerService.getOnePlayer({
+    const team = await this.teamService.getOneByUserId(currentUser.id);
+    const player = await this.playerService.getPlayerEntity({
       address: auctionSc.player_address,
     });
-
-    if (hasUserTeam) {
-      player.teamId = hasUserTeam.id;
+    if (team) {
+      player.teamId = team.id;
     } else {
       player.teamId = null;
       player.team = null;
