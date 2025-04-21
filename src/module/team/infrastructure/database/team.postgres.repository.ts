@@ -118,27 +118,4 @@ export class TeamPostgresRepository implements ITeamRepository {
 
     return this.repository.findOne({ where: { id: savedTeam.id }, relations });
   }
-
-  async deleteOneOrFail(id: number): Promise<void> {
-    const teamToDelete = await this.repository.findOne({
-      where: { id },
-      relations: [TeamRelation.PLAYER_ENTITY],
-    });
-
-    if (!teamToDelete) {
-      throw new TeamNotFoundException({
-        message: `TeamModule with ID ${id} not found`,
-      });
-    }
-    for (const player of teamToDelete.players) {
-      player.team = null;
-      player.teamId = null;
-      player.roster = null;
-      player.rosterId = null;
-    }
-    teamToDelete.userId = null;
-    await this.repository.save(teamToDelete);
-    await this.playerService.unsetPlayersFromTeam(teamToDelete.players);
-    await this.repository.softRemove({ id });
-  }
 }

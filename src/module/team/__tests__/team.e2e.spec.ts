@@ -260,46 +260,4 @@ describe('Team Module', () => {
         });
     });
   });
-
-  describe('DELETE - /team/:id', () => {
-    it('Should delete a team', async () => {
-      const createTeamDto = {
-        name: 'Mary',
-        logoUri: 'http://example3.com',
-      } as CreateDto;
-      let teamId: number;
-      const user2Token = createAccessToken({
-        publicKey: 'GXXX-XXXX-XXXX-XXXX3',
-        sub: '00000000-0000-0000-0000-000000000XXX',
-      });
-
-      await request(app.getHttpServer())
-        .post('/api/v1/team')
-        .auth(user2Token, { type: 'bearer' })
-        .send(createTeamDto)
-        .expect(HttpStatus.CREATED)
-        .then(({ body }) => {
-          const expectedResponse = expect.objectContaining({
-            data: expect.objectContaining({
-              id: expect.any(String),
-              attributes: expect.objectContaining({
-                name: createTeamDto.name,
-              }),
-            }),
-          });
-          expect(body).toEqual(expectedResponse);
-          teamId = body.data.id;
-        });
-
-      await request(app.getHttpServer())
-        .delete(`/api/v1/team/${teamId}`)
-        .auth(adminToken, { type: 'bearer' })
-        .expect(HttpStatus.OK);
-
-      await request(app.getHttpServer())
-        .get(`/api/v1/team/${teamId}`)
-        .auth(adminToken, { type: 'bearer' })
-        .expect(HttpStatus.NOT_FOUND);
-    });
-  });
 });
