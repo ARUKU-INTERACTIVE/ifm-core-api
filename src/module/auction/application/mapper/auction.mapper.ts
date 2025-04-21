@@ -20,6 +20,7 @@ export class AuctionMapper {
     auctionResponseDto.playerAddress = auctionSC.player_address;
     auctionResponseDto.startTime = Number(auctionSC.start_time);
     auctionResponseDto.endTime = Number(auctionSC.end_time);
+    auctionResponseDto.ownerAddress = auctionSC.owner_address;
     auctionResponseDto.createdAt = auction.createdAt;
     auctionResponseDto.updatedAt = auction.updatedAt;
     auctionResponseDto.deletedAt = auction.deletedAt;
