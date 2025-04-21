@@ -1,4 +1,5 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
+import { UpdatePlayerRosterDto } from '@module/player/application/dto/add-player-roster.dto';
 import { PlayerResponseUpdateDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
@@ -10,6 +11,7 @@ import {
 } from '@module/player/application/repository/player.repository.interface';
 import { Player } from '@module/player/domain/player.domain';
 import { PlayerAddressAlreadyExistsException } from '@module/player/infrastructure/database/exception/player.exception';
+import { RosterService } from '@module/roster/application/service/roster.service';
 import { TeamRelation } from '@module/team/application/enum/team-relation.enum';
 import { TeamService } from '@module/team/application/service/team.service';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
@@ -45,6 +47,7 @@ export class PlayerService {
     private readonly sorobanContractAdapter: SorobanContractAdapter,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
     private readonly pinataAdapter: PinataAdapter,
+    private readonly rosterService: RosterService,
     @Inject(forwardRef(() => StellarNftAdapter))
     private readonly stellarNFTAdapter: StellarNftAdapter,
     @Inject(forwardRef(() => TeamService))
@@ -241,5 +244,44 @@ export class PlayerService {
 
   async unsetPlayersFromTeam(players: Player[]) {
     return await this.playerRepository.unsetPlayersFromTeam(players);
+  }
+
+  async addPlayerToRoster(
+    user: User,
+    updatePlayerRosterDto: UpdatePlayerRosterDto,
+  ) {
+    const player = await this.playerRepository.getOneByIdOrFail(
+      updatePlayerRosterDto.playerId,
+    );
+    const roster = await this.rosterService.getOneRosterOrFail({
+      userId: user.id,
+    });
+
+    player.rosterId = roster.id;
+    const savedPlayer = await this.saveOnePlayer(player);
+
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+      this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
+    );
+  }
+
+  async removePlayerFromRoster(
+    user: User,
+    updatePlayerRosterDto: UpdatePlayerRosterDto,
+  ) {
+    const player = await this.playerRepository.getOneByIdOrFail(
+      updatePlayerRosterDto.playerId,
+    );
+    await this.rosterService.getOneRosterOrFail({
+      userId: user.id,
+    });
+
+    player.rosterId = null;
+    player.roster = null;
+    const savedPlayer = await this.saveOnePlayer(player);
+
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+      this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
+    );
   }
 }

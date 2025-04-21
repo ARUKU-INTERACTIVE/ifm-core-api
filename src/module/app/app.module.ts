@@ -23,6 +23,7 @@ import { AppService } from '@/module/app/application/service/app.service';
 import { ResponseSerializerService } from '@/module/app/application/service/response-serializer.service';
 import { HealthController } from '@/module/health/interface/health.controller';
 import { PaymentModule } from '@/module/payment/payment.module';
+import { RosterModule } from '@/module/roster/roster.module';
 import { TeamModule } from '@/module/team/team.module';
 import { StellarModule } from '@/stellar/stellar.module';
 
@@ -53,6 +54,7 @@ import { StellarModule } from '@/stellar/stellar.module';
     TomlModule,
     PinataModule,
     TeamModule,
+    RosterModule,
   ],
   providers: [AppService, ResponseSerializerService],
   exports: [AppService, ResponseSerializerService],

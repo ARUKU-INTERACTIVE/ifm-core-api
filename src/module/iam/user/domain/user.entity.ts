@@ -1,3 +1,4 @@
+import { Roster } from '@module/roster/domain/roster.entity';
 import { Team } from '@module/team/domain/team.entity';
 
 import { Base } from '@common/base/domain/base.entity';
@@ -12,6 +13,7 @@ export class User extends Base {
   isVerified: boolean;
   team?: Team;
   teamId?: number;
+  roster?: Roster;
   constructor(
     publicKey?: string,
     username?: string,

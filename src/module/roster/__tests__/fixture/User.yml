@@ -1,0 +1,12 @@
+entity: User
+items:
+  admin-user:
+    username: 'admin@test.com'
+    publicKey: 'GXXX-XXXX-XXXX-XXXX1'
+    externalId: '00000000-0000-0000-0000-00000000000X'
+    roles: admin
+  user1:
+    username: '{{internet.email}}'
+    publicKey: 'GXXX-XXXX-XXXX-XXXX2'
+    externalId: '{{string.uuid}}'
+    roles: regular

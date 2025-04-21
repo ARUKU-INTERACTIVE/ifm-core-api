@@ -37,6 +37,9 @@ export class PlayerResponseDto {
   teamId: number;
 
   @ApiProperty()
+  rosterId: number;
+
+  @ApiProperty()
   updatedAt: string;
 
   @ApiPropertyOptional()

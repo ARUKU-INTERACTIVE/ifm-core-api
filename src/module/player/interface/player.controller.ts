@@ -1,3 +1,4 @@
+import { UpdatePlayerRosterDto } from '@module/player/application/dto/add-player-roster.dto';
 import { PlayerFieldsQueryParamsDto } from '@module/player/application/dto/params/player-fields-query-params.dto';
 import { PlayerFilterQueryParamsDto } from '@module/player/application/dto/params/player-filter-query-params.dto';
 import { PlayerIncludeQueryParamsDto } from '@module/player/application/dto/params/player-include-query-params.dto';
@@ -128,5 +129,27 @@ export class PlayerController {
     @CurrentUser() user: User,
   ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
     return await this.playerService.syncUserPlayersWithBlockchain(user);
+  }
+
+  @Patch('/add/roster')
+  async addPlayerRoster(
+    @CurrentUser() user: User,
+    updatePlayerRosterDto: UpdatePlayerRosterDto,
+  ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
+    return await this.playerService.addPlayerToRoster(
+      user,
+      updatePlayerRosterDto,
+    );
+  }
+
+  @Patch('/remove/roster')
+  async removePlayerRoster(
+    @CurrentUser() user: User,
+    updatePlayerRosterDto: UpdatePlayerRosterDto,
+  ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
+    return await this.playerService.removePlayerFromRoster(
+      user,
+      updatePlayerRosterDto,
+    );
   }
 }

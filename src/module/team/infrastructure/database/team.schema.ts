@@ -20,6 +20,10 @@ export const TeamSchema = new EntitySchema<Team>({
       type: Number,
       nullable: true,
     },
+    rosterId: {
+      type: Number,
+      nullable: true,
+    },
   }),
   relations: {
     players: {
@@ -34,6 +38,11 @@ export const TeamSchema = new EntitySchema<Team>({
       joinColumn: {
         name: 'user_id',
       },
+    },
+    roster: {
+      type: 'one-to-one',
+      target: 'Roster',
+      inverseSide: 'team',
     },
   },
 });

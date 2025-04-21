@@ -18,6 +18,7 @@ import { PlayerService } from '@module/player/application/service/player.service
 import { PlayerNotOwnedByUserException } from '@module/player/infrastructure/database/exception/player.exception';
 import { TeamService } from '@module/team/application/service/team.service';
 import {
+  BadRequestException,
   Inject,
   Injectable,
   NotFoundException,
@@ -117,6 +118,11 @@ export class AuctionService {
     const player = await this.playerService.getOneById(
       createTransactionAuctionDto.playerId,
     );
+    if (player.data.attributes.rosterId) {
+      throw new BadRequestException(
+        `The player with ID ${player.data.id} is already part of a roster. You must remove them from the current roster before creating an auction.`,
+      );
+    }
     const isCurrentOwner = await this.stellarNFTAdapter.checkNFTBalance(
       user.publicKey,
       player.data.attributes.issuer,

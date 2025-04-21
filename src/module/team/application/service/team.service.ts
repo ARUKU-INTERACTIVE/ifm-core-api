@@ -1,4 +1,5 @@
 import { PlayerService } from '@module/player/application/service/player.service';
+import { RosterService } from '@module/roster/application/service/roster.service';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
@@ -29,6 +30,7 @@ export class TeamService {
     private readonly teamMapper: TeamMapper,
     private readonly teamResponseAdapter: TeamResponseAdapter,
     private readonly stellarNFTAdapter: StellarNftAdapter,
+    private readonly rosterService: RosterService,
     @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
   ) {}
@@ -103,6 +105,10 @@ export class TeamService {
         currentUser.id,
       ),
     );
+    await this.rosterService.saveOne({
+      teamId: team.id,
+      userId: currentUser.id,
+    });
     return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
       this.teamMapper.fromTeamToTeamResponseDto(team),
     );

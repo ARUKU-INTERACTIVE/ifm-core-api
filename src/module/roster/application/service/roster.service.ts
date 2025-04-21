@@ -1,0 +1,78 @@
+import { Inject, Injectable } from '@nestjs/common';
+
+import { CollectionDto } from '@common/base/application/dto/collection.dto';
+import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
+import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
+import {
+  FilterOptions,
+  IGetAllOptions,
+} from '@common/base/application/interface/get-all-options.interface';
+
+import { RosterResponseAdapter } from '@/module/roster/application/adapter/roster-response.adapter';
+import { ICreateDto } from '@/module/roster/application/dto/create-roster.dto.interface';
+import { RosterResponseDto } from '@/module/roster/application/dto/roster-response.dto';
+import { RosterRelation } from '@/module/roster/application/enum/roster-relation.enum';
+import { RosterMapper } from '@/module/roster/application/mapper/roster.mapper';
+import {
+  IRosterPostgresRepository,
+  ROSTER_REPOSITORY_KEY,
+} from '@/module/roster/application/repository/roster.repository.interface';
+import { Roster } from '@/module/roster/domain/roster.entity';
+
+@Injectable()
+export class RosterService {
+  constructor(
+    @Inject(ROSTER_REPOSITORY_KEY)
+    private readonly repository: IRosterPostgresRepository,
+    private readonly mapper: RosterMapper,
+    private readonly responseAdapter: RosterResponseAdapter,
+  ) {}
+
+  async getAll(
+    options: IGetAllOptions<Roster, RosterRelation[]>,
+  ): Promise<ManySerializedResponseDto<RosterResponseDto>> {
+    const { fields, include } = options || {};
+
+    if (include && fields && !fields.includes('id')) fields.push('id');
+
+    const collection = await this.repository.getAll(options);
+    const collectionDto = new CollectionDto({
+      ...collection,
+      data: collection.data.map((roster: Roster) =>
+        this.mapper.fromRosterToRosterResponseDto(roster),
+      ),
+    });
+
+    return this.responseAdapter.manyEntitiesResponse<RosterResponseDto>(
+      collectionDto,
+      include,
+    );
+  }
+
+  async getOneByIdOrFail(
+    id: number,
+  ): Promise<OneSerializedResponseDto<RosterResponseDto>> {
+    const roster = await this.repository.getOneByIdOrFail(id);
+    return this.responseAdapter.oneEntityResponse<RosterResponseDto>(
+      this.mapper.fromRosterToRosterResponseDto(roster),
+    );
+  }
+
+  async saveOne(
+    createDto: ICreateDto,
+  ): Promise<OneSerializedResponseDto<RosterResponseDto>> {
+    const roster = await this.repository.saveOne(
+      this.mapper.fromCreateRosterDtoToRoster(createDto),
+    );
+    return this.responseAdapter.oneEntityResponse<RosterResponseDto>(
+      this.mapper.fromRosterToRosterResponseDto(roster),
+    );
+  }
+
+  async getOneRosterOrFail(
+    where: FilterOptions<Roster>,
+    relations?: RosterRelation[],
+  ): Promise<Roster> {
+    return await this.repository.getOneRosterOrFail(where, relations);
+  }
+}

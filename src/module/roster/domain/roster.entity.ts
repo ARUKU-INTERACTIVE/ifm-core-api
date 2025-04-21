@@ -1,16 +1,14 @@
 import { Player } from '@module/player/domain/player.domain';
-import { Roster } from '@module/roster/domain/roster.entity';
+import { Team } from '@module/team/domain/team.entity';
 
 import { Base } from '@common/base/domain/base.entity';
 
 import { User } from '@iam/user/domain/user.entity';
 
-export class Team extends Base {
-  name: string;
-  logoUri: string;
-  players: Player[];
+export class Roster extends Base {
+  team: Team;
+  teamId: number;
   user: User;
   userId: number;
-  roster: Roster;
-  rosterId: number;
+  players: Player[];
 }

@@ -1,4 +1,5 @@
 import { PlayerModule } from '@module/player/player.module';
+import { RosterModule } from '@module/roster/roster.module';
 import { TeamPostgresRepository } from '@module/team/infrastructure/database/team.postgres.repository';
 import { Module, Provider, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -22,6 +23,7 @@ const RepositoryProvider: Provider = {
     TypeOrmModule.forFeature([TeamSchema]),
     forwardRef(() => PlayerModule),
     StellarModule,
+    RosterModule,
   ],
   providers: [TeamService, TeamMapper, TeamResponseAdapter, RepositoryProvider],
   controllers: [Controller],

@@ -5,6 +5,7 @@ import { PlayerService } from '@module/player/application/service/player.service
 import { PlayerRepository } from '@module/player/infrastructure/database/player.mysql.repository';
 import { PlayerSChema } from '@module/player/infrastructure/database/player.schema';
 import { PlayerController } from '@module/player/interface/player.controller';
+import { RosterModule } from '@module/roster/roster.module';
 import { TeamModule } from '@module/team/team.module';
 import { Module, Provider, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,6 +27,7 @@ export const playerRepositoryProvider: Provider = {
     forwardRef(() => TeamModule),
     UserModule,
     PinataModule,
+    RosterModule,
   ],
   providers: [
     playerRepositoryProvider,
