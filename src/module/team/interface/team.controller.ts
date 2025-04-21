@@ -1,20 +1,13 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
@@ -97,15 +90,5 @@ export class TeamController {
     @Body() updateDto: UpdateDto,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     return this.teamService.updateOneOrFail(id, updateDto);
-  }
-
-  @Delete(':id')
-  @ApiParam({ name: 'id', type: Number })
-  @ApiOperation({
-    summary: 'Delete one Team by id or throw not found',
-  })
-  @ApiOkResponse({ status: 200 })
-  deleteOneOrFail(@Param('id') id: number) {
-    return this.teamService.deleteOneOrFail(id);
   }
 }

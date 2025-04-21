@@ -120,8 +120,4 @@ export class TeamService {
       this.teamMapper.fromTeamToTeamResponseDto(team),
     );
   }
-
-  async deleteOneOrFail(id: number): Promise<void> {
-    return this.teamRepository.deleteOneOrFail(id);
-  }
 }

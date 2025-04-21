@@ -22,5 +22,4 @@ export interface ITeamRepository {
     updates: Partial<Omit<Team, 'id'>>,
     relations?: string[],
   ): Promise<Team>;
-  deleteOneOrFail(id: number): Promise<void>;
 }
