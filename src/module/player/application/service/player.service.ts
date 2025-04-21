@@ -194,10 +194,9 @@ export class PlayerService {
   async syncUserPlayersWithBlockchain(
     currentUser: User,
   ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
-    const ownedNftIssuers =
-      await this.stellarNFTAdapter.getPlayerNftIssuersFromWallet(
-        currentUser.publicKey,
-      );
+    const ownedNftIssuers = await this.stellarNFTAdapter.getUserOwnedNftIssuers(
+      currentUser.publicKey,
+    );
     const team = await this.teamService.getOneByUserIdOrFail(currentUser.id, [
       TeamRelation.PLAYER_ENTITY,
     ]);
@@ -232,7 +231,7 @@ export class PlayerService {
     ]);
 
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseUpdateDto>(
-      this.playerMapper.fromCountPlayerToPlayerResponseUpdateDto(
+      this.playerMapper.fromPlayerCountToPlayerResponseUpdateDto(
         playersToAssignToTeam.length,
         playersToRemoveFromTeam.length,
       ),

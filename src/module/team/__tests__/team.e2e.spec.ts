@@ -9,9 +9,9 @@ import { datasourceOptions } from '@config/orm.config';
 import { testModuleBootstrapper } from '@test/test.module.bootstrapper';
 import { createAccessToken } from '@test/test.util';
 
-import { CreateDto } from '@/module/team/application/dto/create-team.dto';
+import { CreateTeamDto } from '@/module/team/application/dto/create-team.dto';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
-import { UpdateDto } from '@/module/team/application/dto/update-team.dto';
+import { UpdateTeamDto } from '@/module/team/application/dto/update-team.dto';
 import { TEAM_ENTITY_NAME } from '@/module/team/domain/team.name';
 
 describe('Team Module', () => {
@@ -143,7 +143,7 @@ describe('Team Module', () => {
       const createTeamDto = {
         name: 'Mary',
         logoUri: 'http://example.com',
-      } as CreateDto;
+      } as CreateTeamDto;
 
       await request(app.getHttpServer())
         .post('/api/v1/team/')
@@ -167,7 +167,7 @@ describe('Team Module', () => {
       const createTeamDto = {
         name: 'Mary2',
         logoUri: 'http://example2.com',
-      } as CreateDto;
+      } as CreateTeamDto;
       let teamId: number = 0;
       const userToken = createAccessToken({
         publicKey: 'GXXX-XXXX-XXXX-XXXX2',
@@ -203,11 +203,11 @@ describe('Team Module', () => {
 
   describe('PATCH - /team/:id', () => {
     it('Should update an existing team', async () => {
-      const updateTeamDto = { name: 'Jane' } as UpdateDto;
+      const updateTeamDto = { name: 'Jane' } as UpdateTeamDto;
       const createTeamDto = {
         name: 'Mary',
         logoUri: 'http://example3.com',
-      } as CreateDto;
+      } as CreateTeamDto;
       let teamId: number;
       const user4Token = createAccessToken({
         publicKey: 'GXXX-XXXX-XXXX-XXXX4',
@@ -252,7 +252,7 @@ describe('Team Module', () => {
     it('Should throw an error if team is not found', async () => {
       await request(app.getHttpServer())
         .patch('/api/v1/team/9999')
-        .send({ name: 'non-existing-team' } as UpdateDto)
+        .send({ name: 'non-existing-team' } as UpdateTeamDto)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {

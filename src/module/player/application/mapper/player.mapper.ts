@@ -63,7 +63,7 @@ export class PlayerMapper {
     return player;
   }
 
-  fromCountPlayerToPlayerResponseUpdateDto(
+  fromPlayerCountToPlayerResponseUpdateDto(
     updatedCount: number,
     deletedCount: number,
   ) {

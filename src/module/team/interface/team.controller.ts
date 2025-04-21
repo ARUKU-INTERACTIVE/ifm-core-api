@@ -20,12 +20,12 @@ import { GetOneSwaggerDecorator } from '@common/base/application/interface/getOn
 import { CurrentUser } from '@iam/authentication/infrastructure/decorator/current-user.decorator';
 import { User } from '@iam/user/domain/user.entity';
 
-import { CreateDto } from '@/module/team/application/dto/create-team.dto';
+import { CreateTeamDto } from '@/module/team/application/dto/create-team.dto';
 import { TeamFieldsQueryParamsDto } from '@/module/team/application/dto/query-param/team-fields-query-params.dto';
 import { TeamFilterQueryParamsDto } from '@/module/team/application/dto/query-param/team-filter-query-params.dto';
 import { IncludeQueryParamsDto } from '@/module/team/application/dto/team-include-query-params.dto';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
-import { UpdateDto } from '@/module/team/application/dto/update-team.dto';
+import { UpdateTeamDto } from '@/module/team/application/dto/update-team.dto';
 import { TeamService } from '@/module/team/application/service/team.service';
 import { TEAM_ENTITY_NAME } from '@/module/team/domain/team.name';
 
@@ -69,10 +69,10 @@ export class TeamController {
 
   @Post()
   @ApiOperation({ summary: 'Create new Team' })
-  @ApiBody({ type: CreateDto })
+  @ApiBody({ type: CreateTeamDto })
   @GetOneSwaggerDecorator(TeamResponseDto)
   saveOne(
-    @Body() createDto: CreateDto,
+    @Body() createDto: CreateTeamDto,
     @CurrentUser() currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     return this.teamService.saveOne(createDto, currentUser);
@@ -83,11 +83,11 @@ export class TeamController {
   @ApiOperation({
     summary: 'Update one Team by id or throw not found',
   })
-  @ApiBody({ type: UpdateDto })
+  @ApiBody({ type: UpdateTeamDto })
   @GetOneSwaggerDecorator(TeamResponseDto)
   updateOneOrFail(
     @Param('id') id: number,
-    @Body() updateDto: UpdateDto,
+    @Body() updateDto: UpdateTeamDto,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     return this.teamService.updateOneOrFail(id, updateDto);
   }
