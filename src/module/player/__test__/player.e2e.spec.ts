@@ -1,3 +1,4 @@
+import { UpdatePlayerRosterDto } from '@module/player/application/dto/add-player-roster.dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { IPlayerDto } from '@module/player/application/dto/player.dto.interface';
 import { PlayerAddressAlreadyExistsException } from '@module/player/infrastructure/database/exception/player.exception';
@@ -529,6 +530,134 @@ describe('Player Module', () => {
           expect(body.error.detail).toEqual(
             `No team assigned to user with ID ${userId}`,
           );
+        });
+    });
+  });
+
+  describe('PATCH - /player/add/roster', () => {
+    it('Should correctly add the player to the roster.', async () => {
+      const playerId = 1;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/add/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                rosterId: expect.any(Number),
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+    });
+
+    it('Should show an error message if the player does not exist.', async () => {
+      const playerId = 9999999;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/add/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.NOT_FOUND)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(
+            `Player with ID ${playerId} not found`,
+          );
+        });
+    });
+
+    it('Should show an error message if the user has no team assigned.', async () => {
+      const playerId = 1;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+
+      const user5Token = createAccessToken({
+        publicKey: 'GXXX-XXXX-XXXX-XXXX5',
+        sub: '00000000-0000-0000-0000-0000000XXXXX',
+      });
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/add/roster')
+        .auth(user5Token, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.NOT_FOUND)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe('No team assigned to user with ID 6');
+        });
+    });
+
+    it('Should show an error message if the user does not own the NFT.', async () => {
+      const playerId = 3;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/add/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.FORBIDDEN)
+        .then(({ body }) => {
+          expect(body.error.detail).toEqual('Player not owned by user');
+        });
+    });
+  });
+
+  describe('PATCH - /player/remove/roster', () => {
+    it('Should correctly remove the player to the roster.', async () => {
+      const playerId = 6;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/remove/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                rosterId: null,
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+    });
+
+    it('Should show an error message if the player does not exist.', async () => {
+      const playerId = 9999999;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/remove/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.NOT_FOUND)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(
+            `Player with ID ${playerId} not found`,
+          );
+        });
+    });
+
+    it('Should show an error message if the user does not have a roster.', async () => {
+      const playerId = 1;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+
+      const user6Token = createAccessToken({
+        publicKey: 'GXXX-XXXX-XXXX-XXXX6',
+        sub: '00000000-0000-0000-0000-000000XXXXXX',
+      });
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/remove/roster')
+        .auth(user6Token, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.NOT_FOUND)
+        .then(({ body }) => {
+          expect(body.error.detail).toEqual('Roster not found');
         });
     });
   });

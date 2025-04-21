@@ -10,10 +10,14 @@ import {
   PLAYER_REPOSITORY_KEY,
 } from '@module/player/application/repository/player.repository.interface';
 import { Player } from '@module/player/domain/player.domain';
-import { PlayerAddressAlreadyExistsException } from '@module/player/infrastructure/database/exception/player.exception';
+import {
+  PlayerAddressAlreadyExistsException,
+  PlayerNotOwnedByUserException,
+} from '@module/player/infrastructure/database/exception/player.exception';
 import { RosterService } from '@module/roster/application/service/roster.service';
 import { TeamRelation } from '@module/team/application/enum/team-relation.enum';
 import { TeamService } from '@module/team/application/service/team.service';
+import { TeamBadRequestException } from '@module/team/infrastructure/database/exception/team-bad-request.exception';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
@@ -250,16 +254,29 @@ export class PlayerService {
     user: User,
     updatePlayerRosterDto: UpdatePlayerRosterDto,
   ) {
+    const team = await this.teamService.getOneByUserIdOrFail(user.id);
     const player = await this.playerRepository.getOneByIdOrFail(
       updatePlayerRosterDto.playerId,
     );
+    const playerIsOwnedByUser = await this.stellarNFTAdapter.checkNFTBalance(
+      user.publicKey,
+      player.issuer,
+    );
+    if (!playerIsOwnedByUser) {
+      throw new PlayerNotOwnedByUserException();
+    }
+    if (player.teamId !== team.id) {
+      throw new TeamBadRequestException({
+        message: `The player with ID ${player.id} is not part of the team of the user with ID ${user.id}.`,
+      });
+    }
+
     const roster = await this.rosterService.getOneRosterOrFail({
       userId: user.id,
     });
 
     player.rosterId = roster.id;
     const savedPlayer = await this.saveOnePlayer(player);
-
     return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
       this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
     );

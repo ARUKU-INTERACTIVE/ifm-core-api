@@ -20,8 +20,18 @@ items:
     username: 'user3@test.com'
     externalId: '00000000-0000-0000-0000-00000000XXXX'
     roles: regular
-  user{4..23}:
+  user4:
     publicKey: '{{string.uuid}}'
     username: '{{internet.email}}'
     externalId: '{{string.uuid}}'
+    roles: regular
+  user5:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX5'
+    username: '{{internet.email}}'
+    externalId: '00000000-0000-0000-0000-0000000XXXXX'
+    roles: regular
+  user6:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX6'
+    username: '{{internet.email}}'
+    externalId: '00000000-0000-0000-0000-000000XXXXXX'
     roles: regular

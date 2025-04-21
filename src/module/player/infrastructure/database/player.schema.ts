@@ -37,6 +37,10 @@ export const PlayerSChema = new EntitySchema<Player>({
       type: Number,
       nullable: true,
     },
+    rosterId: {
+      type: Number,
+      nullable: true,
+    },
   }),
   relations: {
     auctions: {
@@ -50,6 +54,16 @@ export const PlayerSChema = new EntitySchema<Player>({
       inverseSide: 'players',
       joinColumn: {
         name: 'team_id',
+      },
+      nullable: true,
+      onDelete: 'SET NULL',
+    },
+    roster: {
+      type: 'many-to-one',
+      target: 'Roster',
+      inverseSide: 'players',
+      joinColumn: {
+        name: 'roster_id',
       },
       nullable: true,
       onDelete: 'SET NULL',

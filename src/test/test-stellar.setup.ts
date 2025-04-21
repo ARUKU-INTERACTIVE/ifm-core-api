@@ -63,19 +63,30 @@ jest.mock('@stellar/stellar-sdk', () => ({
         } else if (publicKey === ERROR_PREPARE_TRANSACTION) {
           return ERROR_PREPARE_TRANSACTION;
         }
+        const baseBalance = {
+          balance: '0.0000001',
+          limit: '0.0000001',
+          buying_liabilities: '0.0000000',
+          selling_liabilities: '0.0000000',
+          last_modified_ledger: 393875,
+          is_authorized: true,
+          is_authorized_to_maintain_liabilities: true,
+          asset_type: 'credit_alphanum4',
+          asset_code: 'NFT',
+        };
         return {
           balances: [
             {
-              balance: '0.0000001',
-              limit: '0.0000001',
-              buying_liabilities: '0.0000000',
-              selling_liabilities: '0.0000000',
-              last_modified_ledger: 393875,
-              is_authorized: true,
-              is_authorized_to_maintain_liabilities: true,
-              asset_type: 'credit_alphanum4',
-              asset_code: 'NFT',
+              ...baseBalance,
               asset_issuer: 'ISSUER',
+            },
+            {
+              ...baseBalance,
+              asset_issuer: 'ISSUER4',
+            },
+            {
+              ...baseBalance,
+              asset_issuer: 'ISSUER5',
             },
           ],
         };
