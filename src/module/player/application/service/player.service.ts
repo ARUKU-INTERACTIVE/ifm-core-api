@@ -14,11 +14,17 @@ import {
   PlayerAddressAlreadyExistsException,
   PlayerNotOwnedByUserException,
 } from '@module/player/infrastructure/database/exception/player.exception';
+import { RosterRelation } from '@module/roster/application/enum/roster-relation.enum';
 import { RosterService } from '@module/roster/application/service/roster.service';
 import { TeamRelation } from '@module/team/application/enum/team-relation.enum';
 import { TeamService } from '@module/team/application/service/team.service';
 import { TeamBadRequestException } from '@module/team/infrastructure/database/exception/team-bad-request.exception';
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
@@ -264,6 +270,7 @@ export class PlayerService {
       user.publicKey,
       player.issuer,
     );
+
     if (!playerIsOwnedByUser) {
       throw new PlayerNotOwnedByUserException();
     }
@@ -273,9 +280,24 @@ export class PlayerService {
       });
     }
 
-    const roster = await this.rosterService.getOneRosterOrFail({
-      userId: user.id,
-    });
+    const roster = await this.rosterService.getOneRosterOrFail(
+      {
+        userId: user.id,
+      },
+      [RosterRelation.Player],
+    );
+
+    if (player.rosterId && player.rosterId === roster.id) {
+      throw new ConflictException(
+        `Player with ID ${player.id} is already assigned to roster ID ${roster.id}`,
+      );
+    }
+
+    if (roster.players.length >= this.rosterService.MAX_PLAYERS) {
+      throw new ConflictException(
+        `The roster already has the maximum of ${this.rosterService.MAX_PLAYERS} players.`,
+      );
+    }
 
     player.rosterId = roster.id;
     const savedPlayer = await this.saveOnePlayer(player);

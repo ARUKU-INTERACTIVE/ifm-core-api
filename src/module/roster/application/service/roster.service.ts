@@ -21,6 +21,7 @@ import { Roster } from '@/module/roster/domain/roster.entity';
 
 @Injectable()
 export class RosterService {
+  MAX_PLAYERS = 11;
   constructor(
     @Inject(ROSTER_REPOSITORY_KEY)
     private readonly repository: IRosterPostgresRepository,

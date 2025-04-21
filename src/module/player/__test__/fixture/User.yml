@@ -35,3 +35,9 @@ items:
     username: '{{internet.email}}'
     externalId: '00000000-0000-0000-0000-000000XXXXXX'
     roles: regular
+  user7:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX7'
+    username: '{{internet.email}}'
+    externalId: '00000000-0000-0000-0000-00000XXXXXXX'
+    roles: regular
+      

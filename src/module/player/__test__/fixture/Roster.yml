@@ -6,3 +6,6 @@ items:
   roster2:
     team: '@team2'
     user: '@user1'
+  roster3:
+    team: '@team3'
+    user: '@user7'

@@ -10,3 +10,8 @@ items:
     name: '{{string.alpha}}'
     logoUri: '{{string.alpha}}'
     user: '@user1'
+  team3:
+    id: 3
+    name: '{{string.alpha}}'
+    logoUri: '{{string.alpha}}'
+    user: '@user7'

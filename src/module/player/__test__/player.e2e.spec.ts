@@ -39,7 +39,6 @@ describe('Player Module', () => {
   });
 
   beforeAll(async () => {
-    await loadFixtures(`${__dirname}/fixture`, datasourceOptions);
     const moduleRef = await testModuleBootstrapper();
     app = moduleRef.createNestApplication({ logger: false });
 
@@ -47,7 +46,9 @@ describe('Player Module', () => {
 
     await app.init();
   });
-  beforeEach(() => {
+  beforeEach(async () => {
+    await loadFixtures(`${__dirname}/fixture`, datasourceOptions);
+
     TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
       sign: jest.fn(),
       toXDR: jest.fn().mockReturnValue('xdr'),
@@ -96,7 +97,7 @@ describe('Player Module', () => {
             links: expect.objectContaining({
               self: expect.any(String),
               last: expect.any(String),
-              next: null,
+              next: expect.any(String),
             }),
           };
 
@@ -536,12 +537,17 @@ describe('Player Module', () => {
 
   describe('PATCH - /player/add/roster', () => {
     it('Should correctly add the player to the roster.', async () => {
-      const playerId = 1;
+      const playerId = 19;
       const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+
+      const user7Token = createAccessToken({
+        publicKey: 'GXXX-XXXX-XXXX-XXXX7',
+        sub: '00000000-0000-0000-0000-00000XXXXXXX',
+      });
 
       await request(app.getHttpServer())
         .patch('/api/v1/player/add/roster')
-        .auth(adminToken, { type: 'bearer' })
+        .auth(user7Token, { type: 'bearer' })
         .send(updatePlayerRosterDto)
         .expect(HttpStatus.OK)
         .then(({ body }) => {
@@ -601,6 +607,38 @@ describe('Player Module', () => {
         .expect(HttpStatus.FORBIDDEN)
         .then(({ body }) => {
           expect(body.error.detail).toEqual('Player not owned by user');
+        });
+    });
+
+    it('Should show an error message if the player is already assigned to the roster.', async () => {
+      const playerId = 7;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/add/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.CONFLICT)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(
+            `Player with ID ${playerId} is already assigned to roster ID 1`,
+          );
+        });
+    });
+
+    it('Should show an error message if trying to add a player when the roster already has 11 players.', async () => {
+      const playerId = 18;
+      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/add/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.CONFLICT)
+        .then(({ body }) => {
+          expect(body.error.detail).toBe(
+            'The roster already has the maximum of 11 players.',
+          );
         });
     });
   });
