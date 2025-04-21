@@ -1,11 +1,16 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
-import { CreateDto } from '@/module/team/application/dto/create-team.dto';
+import { CreateTeamDto } from '@/module/team/application/dto/create-team.dto';
 
-export class UpdateDto extends PartialType(CreateDto) {
-  @ApiProperty({ type: String, required: false, example: 'John' })
+export class UpdateTeamDto extends PartialType(CreateTeamDto) {
+  @ApiProperty({ type: String, required: false, example: 'Barcelona' })
   @IsString()
   @IsOptional()
   name?: string;
+
+  @ApiProperty({ type: String, required: false, example: 'http://example.com' })
+  @IsString()
+  @IsOptional()
+  logo?: string;
 }

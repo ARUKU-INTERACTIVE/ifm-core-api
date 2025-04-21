@@ -1,7 +1,7 @@
 import { Player } from '@module/player/domain/player.domain';
 import { Injectable } from '@nestjs/common';
 
-import { ICreateDto } from '@/module/team/application/dto/create-team.dto.interface';
+import { ICreateTeamDto } from '@/module/team/application/dto/create-team.dto.interface';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
 import { IUpdateDto } from '@/module/team/application/dto/update-team.dto.interface';
 import { Team } from '@/module/team/domain/team.entity';
@@ -9,7 +9,7 @@ import { Team } from '@/module/team/domain/team.entity';
 @Injectable()
 export class TeamMapper {
   fromCreateTeamDtoToTeam(
-    teamDto: ICreateDto,
+    teamDto: ICreateTeamDto,
     ownedPlayerNftIds: number[],
     userId: number,
   ): Team {

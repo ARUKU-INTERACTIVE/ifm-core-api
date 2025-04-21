@@ -11,7 +11,7 @@ import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.ad
 import { User } from '@iam/user/domain/user.entity';
 
 import { TeamResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
-import { ICreateDto } from '@/module/team/application/dto/create-team.dto.interface';
+import { ICreateTeamDto } from '@/module/team/application/dto/create-team.dto.interface';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
 import { IUpdateDto } from '@/module/team/application/dto/update-team.dto.interface';
 import { TeamRelation } from '@/module/team/application/enum/team-relation.enum';
@@ -81,14 +81,13 @@ export class TeamService {
   }
 
   async saveOne(
-    createDto: ICreateDto,
+    createDto: ICreateTeamDto,
     currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const ownedPlayerIds = [];
-    const ownedNftIssuers =
-      await this.stellarNFTAdapter.getPlayerNftIssuersFromWallet(
-        currentUser.publicKey,
-      );
+    const ownedNftIssuers = await this.stellarNFTAdapter.getUserOwnedNftIssuers(
+      currentUser.publicKey,
+    );
     for (const issuer of ownedNftIssuers || []) {
       const player = await this.playerService.getPlayerEntity({
         issuer,

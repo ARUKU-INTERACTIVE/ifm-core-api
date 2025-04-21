@@ -1,4 +1,4 @@
-export interface ICreateDto {
+export interface ICreateTeamDto {
   name: string;
   logoUri: string;
 }

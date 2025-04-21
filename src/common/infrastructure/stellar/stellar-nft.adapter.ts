@@ -196,7 +196,7 @@ export class StellarNftAdapter {
     );
   }
 
-  async getPlayerNftIssuersFromWallet(publicKey: string): Promise<string[]> {
+  async getUserOwnedNftIssuers(publicKey: string): Promise<string[]> {
     const ownedNftIssuers = [];
     const account = await this.stellarAccountAdapter.getAccount(publicKey);
     account.balances.forEach((balance) => {
