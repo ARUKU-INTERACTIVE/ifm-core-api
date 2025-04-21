@@ -230,6 +230,8 @@ export class PlayerService {
         ...player,
         team: null,
         teamId: null,
+        roster: null,
+        rosterId: null,
       }),
     );
 

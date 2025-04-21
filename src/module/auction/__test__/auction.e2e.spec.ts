@@ -279,6 +279,28 @@ describe('Auction Module', () => {
         });
     });
 
+    it('Should show an error message when trying to create an auction with a player that is already in a roster.', async () => {
+      const playerId = 9;
+      const user9Token = createAccessToken({
+        publicKey: 'BIDDER-5',
+        sub: '00000000-0000-0000-0000-00000000BID5',
+      });
+      await request(app.getHttpServer())
+        .post('/api/v1/auction/create/transaction')
+        .auth(user9Token, { type: 'bearer' })
+        .send({
+          playerId,
+          startingPrice: 100,
+          auctionTimeMs: 100,
+        })
+        .expect(HttpStatus.BAD_REQUEST)
+        .then(({ body }) => {
+          expect(body.error.detail).toEqual(
+            `The player with ID ${playerId} is already part of a roster. You must remove them from the current roster before creating an auction.`,
+          );
+        });
+    });
+
     it('Should return an error message and status code 403 if the user is not the owner of the player', async () => {
       const user = createAccessToken({
         publicKey: 'PK-USER',

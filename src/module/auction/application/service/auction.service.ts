@@ -260,6 +260,8 @@ export class AuctionService {
     } else {
       player.teamId = null;
       player.team = null;
+      player.rosterId = null;
+      player.roster = null;
     }
     await this.playerService.saveOnePlayer(player);
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(

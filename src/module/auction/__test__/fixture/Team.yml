@@ -4,3 +4,7 @@ items:
     name: 'John'
     logoUri: "{{string.alpha}}"
     user: '@user8'
+  team2:
+    name: 'Santos'
+    logoUri: "{{string.alpha}}"
+    user: '@user9'

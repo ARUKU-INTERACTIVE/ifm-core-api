@@ -132,6 +132,9 @@ export class TeamPostgresRepository implements ITeamRepository {
     }
     for (const player of teamToDelete.players) {
       player.team = null;
+      player.teamId = null;
+      player.roster = null;
+      player.rosterId = null;
     }
     teamToDelete.userId = null;
     await this.repository.save(teamToDelete);
