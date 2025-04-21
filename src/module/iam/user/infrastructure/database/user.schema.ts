@@ -31,10 +31,6 @@ export const UserSchema = new EntitySchema<User>({
       type: String,
       unique: true,
     },
-    teamId: {
-      type: Number,
-      nullable: true,
-    },
   }),
   relations: {
     team: {

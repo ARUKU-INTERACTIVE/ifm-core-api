@@ -1,4 +1,3 @@
-import { AuctionStatus } from '@module/auction/application/enum/auction-status.enum';
 import { Auction } from '@module/auction/domain/auction.domain';
 import { PlayerNotOwnedByUserException } from '@module/player/infrastructure/database/exception/player.exception';
 import {
@@ -81,7 +80,6 @@ describe('Auction Module', () => {
               expect.objectContaining({
                 attributes: expect.objectContaining({
                   externalId: expect.any(Number),
-                  status: expect.any(String),
                   highestBidAmount: expect.any(Number),
                   highestBidderAddress: null,
                   playerAddress: expect.any(String),
@@ -115,10 +113,10 @@ describe('Auction Module', () => {
     });
 
     it('Should allow to filter by attributes', async () => {
-      const status = AuctionStatus.Open;
+      const externalId = 1;
 
       await request(app.getHttpServer())
-        .get(`/api/v1/auction?filter[status]=${status}`)
+        .get(`/api/v1/auction?filter[externalId]=${externalId}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.OK)
         .then(({ body }) => {
@@ -126,7 +124,7 @@ describe('Auction Module', () => {
             data: expect.arrayContaining([
               expect.objectContaining({
                 attributes: expect.objectContaining({
-                  status: expect.any(String),
+                  externalId: expect.any(Number),
                 }),
               }),
             ]),
@@ -149,32 +147,33 @@ describe('Auction Module', () => {
     });
 
     it('Should allow to sort by attributes', async () => {
-      const firstPlayer = { status: AuctionStatus.Open };
-      const lastPlayer = { status: AuctionStatus.Open };
+      const firstPlayer = { externalId: 0 };
+      const lastPlayer = { externalId: 0 };
       let pageCount: number;
 
       await request(app.getHttpServer())
-        .get('/api/v1/auction?sort[status]=DESC')
+        .get('/api/v1/auction?sort[externalId]=DESC')
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.OK)
         .then(({ body }) => {
-          firstPlayer.status = body.data[0].attributes.status;
+          firstPlayer.externalId = body.data[0].attributes.externalId;
           pageCount = body.meta.pageCount;
         });
 
       await request(app.getHttpServer())
-        .get(`/api/v1/auction?sort[status]=ASC&page[number]=${pageCount}`)
+        .get(`/api/v1/auction?sort[externalId]=ASC&page[number]=${pageCount}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.OK)
         .then(({ body }) => {
           const resources = body.data;
-          lastPlayer.status = resources[resources.length - 1].attributes.status;
-          expect(lastPlayer.status).toBe(firstPlayer.status);
+          lastPlayer.externalId =
+            resources[resources.length - 1].attributes.externalId;
+          expect(lastPlayer.externalId).toBe(firstPlayer.externalId);
         });
     });
 
     it('Should allow to select specific attributes', async () => {
-      const attributes = ['externalId', 'status'] as (keyof Auction)[];
+      const attributes = ['externalId'] as (keyof Auction)[];
 
       await request(app.getHttpServer())
         .get(`/api/v1/auction?fields[target]=${attributes.join(',')}`)
@@ -185,7 +184,6 @@ describe('Auction Module', () => {
           expect(resourceAttributes).toEqual(
             expect.objectContaining({
               externalId: expect.any(Number),
-              status: expect.any(String),
             }),
           );
         });
@@ -227,7 +225,6 @@ describe('Auction Module', () => {
               attributes: expect.objectContaining({
                 uuid: expect.any(String),
                 externalId: expect.any(Number),
-                status: expect.any(String),
                 highestBidAmount: expect.any(Number),
                 highestBidderAddress: null,
                 playerAddress: expect.any(String),
@@ -318,7 +315,6 @@ describe('Auction Module', () => {
               attributes: expect.objectContaining({
                 uuid: expect.any(String),
                 externalId: expect.any(Number),
-                status: expect.any(String),
                 highestBidAmount: expect.any(Number),
                 highestBidderAddress: null,
                 playerAddress: expect.any(String),
@@ -458,7 +454,6 @@ describe('Auction Module', () => {
               attributes: expect.objectContaining({
                 uuid: expect.any(String),
                 externalId: expect.any(Number),
-                status: expect.any(String),
                 highestBidAmount: expect.any(Number),
                 highestBidderAddress: expect.any(String),
                 playerAddress: expect.any(String),
@@ -628,7 +623,6 @@ describe('Auction Module', () => {
               attributes: expect.objectContaining({
                 uuid: expect.any(String),
                 externalId: expect.any(Number),
-                status: expect.any(String),
                 highestBidAmount: expect.any(Number),
                 highestBidderAddress: expect.any(String),
                 playerAddress: expect.any(String),
@@ -698,7 +692,6 @@ describe('Auction Module', () => {
               attributes: expect.objectContaining({
                 uuid: expect.any(String),
                 externalId: expect.any(Number),
-                status: expect.any(String),
                 highestBidAmount: expect.any(Number),
                 highestBidderAddress: expect.any(String),
                 playerAddress: expect.any(String),

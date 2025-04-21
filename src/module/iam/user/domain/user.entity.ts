@@ -12,7 +12,6 @@ export class User extends Base {
   roles: AppRole[];
   isVerified: boolean;
   team?: Team;
-  teamId?: number;
   roster?: Roster;
   constructor(
     publicKey?: string,
@@ -24,6 +23,8 @@ export class User extends Base {
     updatedAt?: string,
     deletedAt?: string,
     isVerified?: boolean,
+    team?: Team,
+    roster?: Roster,
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this.publicKey = publicKey;
@@ -31,5 +32,7 @@ export class User extends Base {
     this.externalId = externalId;
     this.roles = roles;
     this.isVerified = isVerified;
+    this.team = team;
+    this.roster = roster;
   }
 }
