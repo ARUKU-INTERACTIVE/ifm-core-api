@@ -135,7 +135,7 @@ export class PlayerController {
   async addPlayerRoster(
     @CurrentUser() user: User,
     @Body() updatePlayerRosterDto: UpdatePlayerRosterDto,
-  ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
+  ): Promise<OneSerializedResponseDto<UpdatePlayerResponseDto>> {
     return await this.playerService.addPlayerToRoster(
       user,
       updatePlayerRosterDto,
@@ -146,7 +146,7 @@ export class PlayerController {
   async removePlayerRoster(
     @CurrentUser() user: User,
     @Body() updatePlayerRosterDto: UpdatePlayerRosterDto,
-  ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
+  ): Promise<OneSerializedResponseDto<UpdatePlayerResponseDto>> {
     return await this.playerService.removePlayerFromRoster(
       user,
       updatePlayerRosterDto,
