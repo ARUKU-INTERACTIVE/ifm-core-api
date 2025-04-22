@@ -68,6 +68,11 @@ export class AuctionResponseDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  ownerAddress: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   createdAt: string;
 
   @ApiProperty()
