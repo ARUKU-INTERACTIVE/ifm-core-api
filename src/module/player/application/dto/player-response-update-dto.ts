@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { EntityName } from '@common/decorators/entity-name.decorator';
 
 @EntityName(PLAYER_ENTITY_NAME)
-export class PlayerResponseUpdateDto {
+export class UpdatePlayerResponseDto {
   @ApiProperty()
   updatedCount: number;
 

@@ -1,6 +1,6 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
 import { UpdatePlayerRosterDto } from '@module/player/application/dto/add-player-roster.dto';
-import { PlayerResponseUpdateDto } from '@module/player/application/dto/player-response-update-dto';
+import { UpdatePlayerResponseDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
@@ -206,7 +206,7 @@ export class PlayerService {
 
   async syncUserPlayersWithBlockchain(
     currentUser: User,
-  ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
+  ): Promise<OneSerializedResponseDto<UpdatePlayerResponseDto>> {
     const ownedNftIssuers = await this.stellarNFTAdapter.getUserOwnedNftIssuers(
       currentUser.publicKey,
     );
@@ -245,7 +245,7 @@ export class PlayerService {
       ...playersToAssignToTeam,
     ]);
 
-    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseUpdateDto>(
+    return this.playerResponseAdapter.oneEntityResponse<UpdatePlayerResponseDto>(
       this.playerMapper.fromPlayerCountToPlayerResponseUpdateDto(
         playersToAssignToTeam.length,
         playersToRemoveFromTeam.length,
