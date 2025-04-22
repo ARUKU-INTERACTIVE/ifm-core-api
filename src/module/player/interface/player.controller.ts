@@ -2,7 +2,7 @@ import { PlayerFieldsQueryParamsDto } from '@module/player/application/dto/param
 import { PlayerFilterQueryParamsDto } from '@module/player/application/dto/params/player-filter-query-params.dto';
 import { PlayerIncludeQueryParamsDto } from '@module/player/application/dto/params/player-include-query-params.dto';
 import { PlayerSortQueryParamsDto } from '@module/player/application/dto/params/player-sort-query-params.dto';
-import { PlayerResponseUpdateDto } from '@module/player/application/dto/player-response-update-dto';
+import { UpdatePlayerResponseDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
 import { PlayerService } from '@module/player/application/service/player.service';
@@ -126,7 +126,7 @@ export class PlayerController {
   @Patch('/sync/team')
   async syncUserPlayersWithBlockchain(
     @CurrentUser() user: User,
-  ): Promise<OneSerializedResponseDto<PlayerResponseUpdateDto>> {
+  ): Promise<OneSerializedResponseDto<UpdatePlayerResponseDto>> {
     return await this.playerService.syncUserPlayersWithBlockchain(user);
   }
 }

@@ -1,4 +1,4 @@
-import { PlayerResponseUpdateDto } from '@module/player/application/dto/player-response-update-dto';
+import { UpdatePlayerResponseDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerDto } from '@module/player/application/dto/player.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
@@ -67,7 +67,7 @@ export class PlayerMapper {
     updatedCount: number,
     deletedCount: number,
   ) {
-    const playerResponseUpdateDto = new PlayerResponseUpdateDto();
+    const playerResponseUpdateDto = new UpdatePlayerResponseDto();
     playerResponseUpdateDto.updatedCount = updatedCount;
     playerResponseUpdateDto.deletedCount = deletedCount;
     return playerResponseUpdateDto;
