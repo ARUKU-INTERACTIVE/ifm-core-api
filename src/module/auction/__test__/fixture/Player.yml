@@ -47,4 +47,11 @@ items:
     metadataCid: 'metadataCid7'
     imageCid: 'imageCid7'
     issuer: '{{string.alpha}}'
-    address: 'CXXXXXXX7'
+    address: 'CCX7BU3F5E2G3CZE2HTXT46PSWNSRNUR5HA4AKKGPG5V6ZORWFXU7IGH'
+  player8:
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid8'
+    imageCid: 'imageCid8'
+    issuer: '{{string.alpha}}'
+    address: 'CXXXXXXX8'    

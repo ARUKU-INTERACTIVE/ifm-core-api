@@ -10,9 +10,12 @@ type PlayerFields = IGetAllOptions<Player>['fields'];
 
 export class PlayerFieldsQueryParamsDto {
   @ApiPropertyOptional()
-  @IsIn(['name', 'metadataCid', 'issuer', 'description'] as PlayerFields, {
-    each: true,
-  })
+  @IsIn(
+    ['name', 'metadataCid', 'issuer', 'player', 'description'] as PlayerFields,
+    {
+      each: true,
+    },
+  )
   @Transform((params) => fromCommaSeparatedToArray(params.value))
   @IsOptional()
   target?: PlayerFields;

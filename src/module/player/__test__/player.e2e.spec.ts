@@ -46,7 +46,12 @@ describe('Player Module', () => {
 
     await app.init();
   });
-
+  beforeEach(() => {
+    TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+      sign: jest.fn(),
+      toXDR: jest.fn().mockReturnValue('xdr'),
+    });
+  });
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -210,11 +215,8 @@ describe('Player Module', () => {
       name,
       description: 'description',
     } as IPlayerDto;
-    it('Should return the XDR of the mintPlayer transaction.', async () => {
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
+
+    it('Should mint a player and assign it to the team already associated with the user.', async () => {
       await request(app.getHttpServer())
         .post('/api/v1/player/mint')
         .auth(adminToken, { type: 'bearer' })
@@ -265,6 +267,71 @@ describe('Player Module', () => {
                 imageUri: expect.any(String),
                 description: expect.any(String),
                 issuer: expect.any(String),
+                teamId: expect.any(Number),
+              }),
+            }),
+          });
+          expect(expectedResponse).toEqual(body);
+        });
+    });
+
+    it('Should assign the player to the team of the user who correctly claimed it.', async () => {
+      const userNoTeamToken = createAccessToken({
+        publicKey: 'USER-NO-TEAM',
+        sub: '00000000-0000-0000-0000-00000000XXXX',
+      });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/player/mint')
+        .auth(userNoTeamToken, { type: 'bearer' })
+        .field('name', createPlayerDto.name)
+        .field('description', createPlayerDto.description)
+        .attach('file', `${__dirname}/fixture/nft.jpeg`)
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                imageCid: expect.any(String),
+                metadataCid: expect.any(String),
+                issuer: expect.any(String),
+                xdr: expect.any(String),
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+      TransactionBuilder.fromXDR = jest.fn().mockReturnValue('xdr');
+      (scValToNative as jest.Mock).mockReturnValue({
+        id: externalId,
+        name,
+        issuer,
+        metadata_uri: metadataUri,
+      });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/player/submit/mint')
+        .auth(userNoTeamToken, { type: 'bearer' })
+        .send({
+          xdr: 'xdr',
+          imageCid: 'imageCid22',
+          metadataCid: 'metadataCid22',
+          issuer: 'issuer-2',
+          name: 'name',
+          description: 'description',
+        })
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                uuid: expect.any(String),
+                name: expect.any(String),
+                metadataUri: expect.any(String),
+                imageUri: expect.any(String),
+                description: expect.any(String),
+                issuer: expect.any(String),
+                teamId: null,
               }),
             }),
           });
@@ -347,10 +414,6 @@ describe('Player Module', () => {
   describe('POST - /player/sac', () => {
     it('Should deploy the NFT in SAC for Soroban handling', async () => {
       const playerId = 2;
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
       await request(app.getHttpServer())
         .post(`/api/v1/player/sac/${playerId}`)
         .auth(adminToken, { type: 'bearer' })
@@ -419,6 +482,52 @@ describe('Player Module', () => {
         .then(({ body }) => {
           expect(body.error.detail).toBe(
             new PlayerAddressAlreadyExistsException().message,
+          );
+        });
+    });
+  });
+
+  describe('POST - /player/sync/team', () => {
+    it("Should synchronize the user's team and return a message indicating how many players were affected.", async () => {
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/sync/team')
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                updatedCount: expect.any(Number),
+                deletedCount: expect.any(Number),
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+    });
+
+    it('Should return an error message if the user has no team assigned.', async () => {
+      const userNoTeamToken = createAccessToken({
+        publicKey: 'USER-NO-TEAM',
+        sub: '00000000-0000-0000-0000-00000000XXXX',
+      });
+
+      let userId: number = 0;
+      await request(app.getHttpServer())
+        .get('/api/v1/user/me')
+        .auth(userNoTeamToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          userId = body.data.id;
+        });
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/sync/team')
+        .auth(userNoTeamToken, { type: 'bearer' })
+        .expect(HttpStatus.NOT_FOUND)
+        .then(({ body }) => {
+          expect(body.error.detail).toEqual(
+            `No team assigned to user with ID ${userId}`,
           );
         });
     });

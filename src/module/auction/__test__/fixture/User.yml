@@ -35,8 +35,13 @@ items:
     username: 'user3@bid.com'
     externalId: '00000000-0000-0000-0000-00000000BID3'
     roles: regular
-  user{7..23}:
+  user7:
     publicKey: '{{string.uuid}}'
     username: '{{internet.email}}'
     externalId: '{{string.uuid}}'
+    roles: regular
+  user8:
+    publicKey: 'BIDDER-4'
+    username: '{{internet.email}}'
+    externalId: '00000000-0000-0000-0000-00000000BID4'
     roles: regular

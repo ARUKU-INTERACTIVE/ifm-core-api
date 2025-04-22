@@ -6,6 +6,7 @@ import { AuctionRepository } from '@module/auction/infrastructure/database/aucti
 import { AuctionSchema } from '@module/auction/infrastructure/database/auction.schema';
 import { AuctionController } from '@module/auction/interface/auction.controller';
 import { PlayerModule } from '@module/player/player.module';
+import { TeamModule } from '@module/team/team.module';
 import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -21,6 +22,7 @@ const auctionRepositoryProvider: Provider = {
     TypeOrmModule.forFeature([AuctionSchema]),
     PlayerModule,
     StellarModule,
+    TeamModule,
   ],
   controllers: [AuctionController],
   providers: [

@@ -24,20 +24,20 @@ import { createAccessToken } from '@test/test.util';
 const { MINT_PLAYER } = getTransactionResponse;
 const { externalId } = MINT_PLAYER.returnValue;
 const { ERROR, ERROR_PREPARE_TRANSACTION } = transactionUseCases;
-
+const returnValueAuctionSc = {
+  end_time: 1744266314n,
+  highest_bid_amount: 300n,
+  highest_bidder_address: null,
+  id: 1n,
+  owner_address: 'GDBTYMYAM7MUQZKKLHVWZWJLNUXKNZBAITUJY6ES7RYZ5VSD72LP3YPL',
+  player_address: 'CCX7BU3F5E2G3CZE2HTXT46PSWNSRNUR5HA4AKKGPG5V6ZORWFXU7IGH',
+  start_time: 1744266014n,
+  status: ['Open'],
+};
 describe('Auction Module', () => {
   let app: INestApplication;
 
-  (scValToNative as jest.Mock).mockReturnValue({
-    end_time: 1744266314n,
-    highest_bid_amount: 300n,
-    highest_bidder_address: null,
-    id: 1n,
-    owner_address: 'GDBTYMYAM7MUQZKKLHVWZWJLNUXKNZBAITUJY6ES7RYZ5VSD72LP3YPL',
-    player_address: 'CCX7BU3F5E2G3CZE2HTXT46PSWNSRNUR5HA4AKKGPG5V6ZORWFXU7IGH',
-    start_time: 1744266014n,
-    status: ['Open'],
-  });
+  (scValToNative as jest.Mock).mockReturnValue(returnValueAuctionSc);
 
   const adminToken = createAccessToken({
     publicKey: 'GXXX-XXXX-XXXX-XXXX1',
@@ -52,6 +52,13 @@ describe('Auction Module', () => {
     setupApp(app);
 
     await app.init();
+  });
+
+  beforeEach(() => {
+    TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
+      sign: jest.fn(),
+      toXDR: jest.fn().mockReturnValue('xdr'),
+    });
   });
 
   afterEach(() => {
@@ -254,10 +261,6 @@ describe('Auction Module', () => {
 
   describe('POST - /auction/create/transaction', () => {
     it('Should return the XDR of the createAuction transaction', async () => {
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
       await request(app.getHttpServer())
         .post('/api/v1/auction/create/transaction')
         .auth(adminToken, { type: 'bearer' })
@@ -280,11 +283,6 @@ describe('Auction Module', () => {
     });
 
     it('Should return an error message and status code 403 if the user is not the owner of the player', async () => {
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
-
       const user = createAccessToken({
         publicKey: 'PK-USER',
         sub: '00000000-0000-0000-0000-000000000PKX',
@@ -309,12 +307,6 @@ describe('Auction Module', () => {
   describe('POST - /auction/submit/transaction', () => {
     it('Should return the auction created in Soroban', async () => {
       const playerId = 1;
-
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
-
       await request(app.getHttpServer())
         .post('/api/v1/auction/submit/transaction')
         .auth(adminToken, { type: 'bearer' })
@@ -364,11 +356,7 @@ describe('Auction Module', () => {
   });
 
   describe('POST - /auction/create/transaction/place-bid', () => {
-    it('should return the XDR to submit bids to the auction', async () => {
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
+    it('Should return the XDR to submit bids to the auction', async () => {
       const bidder1Token = createAccessToken({
         publicKey: 'BIDDER-1',
         sub: '00000000-0000-0000-0000-00000000BID1',
@@ -393,7 +381,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the auction does not exist', async () => {
+    it('Should return an error message if the auction does not exist', async () => {
       const bidder4Token = createAccessToken({
         publicKey: 'BIDDER-2',
         sub: '00000000-0000-0000-0000-00000000BID2',
@@ -418,7 +406,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the transaction could not be submitted to the Soroban network', async () => {
+    it('Should return an error message if the transaction could not be submitted to the Soroban network', async () => {
       const bidder3Token = createAccessToken({
         publicKey: 'ERROR_PREPARE_TRANSACTION',
         sub: '00000000-0000-0000-0000-00000000BID3',
@@ -447,27 +435,11 @@ describe('Auction Module', () => {
   });
 
   describe('POST - /auction/submit/transaction/place-bid', () => {
-    beforeEach(() => {
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
-    });
-    it('should return the XDR to submit bids to the auction', async () => {
+    it('Should return the XDR to submit bids to the auction', async () => {
       (scValToNative as jest.Mock).mockReturnValue({
-        end_time: 1744266314n,
-        highest_bid_amount: 300n,
-        highest_bidder_address:
-          'GBVGKQFIRR2XB2SI5IALEP6PU4QOUHYZF6S5TYVPITIA3NS7SVQ44TL4',
-        id: 1n,
-        owner_address:
-          'GDBTYMYAM7MUQZKKLHVWZWJLNUXKNZBAITUJY6ES7RYZ5VSD72LP3YPL',
-        player_address:
-          'CCX7BU3F5E2G3CZE2HTXT46PSWNSRNUR5HA4AKKGPG5V6ZORWFXU7IGH',
-        start_time: 1744266014n,
-        status: ['Open'],
+        ...returnValueAuctionSc,
+        highest_bidder_address: 'GXXXX',
       });
-
       const bidder1Token = createAccessToken({
         publicKey: 'BIDDER-1',
         sub: '00000000-0000-0000-0000-00000000BID1',
@@ -501,7 +473,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the auction does not exist', async () => {
+    it('Should return an error message if the auction does not exist', async () => {
       const bidder4Token = createAccessToken({
         publicKey: 'BIDDER-2',
         sub: '00000000-0000-0000-0000-00000000BID2',
@@ -525,7 +497,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the transaction could not be submitted to the Soroban network', async () => {
+    it('Should return an error message if the transaction could not be submitted to the Soroban network', async () => {
       const bidder3Token = createAccessToken({
         publicKey: 'BIDDER-1',
         sub: '00000000-0000-0000-0000-00000000BID1',
@@ -554,11 +526,7 @@ describe('Auction Module', () => {
   });
 
   describe('POST - /auction/create/transaction/claim', () => {
-    it('should return the XDR for creating the claim transaction', async () => {
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
+    it('Should return the XDR for creating the claim transaction', async () => {
       const bidder1Token = createAccessToken({
         publicKey: 'BIDDER-1',
         sub: '00000000-0000-0000-0000-00000000BID1',
@@ -582,7 +550,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the auction does not exist', async () => {
+    it('Should return an error message if the auction does not exist', async () => {
       const bidder4Token = createAccessToken({
         publicKey: 'BIDDER-2',
         sub: '00000000-0000-0000-0000-00000000BID2',
@@ -606,7 +574,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the transaction could not be submitted to the Soroban network', async () => {
+    it('Should return an error message if the transaction could not be submitted to the Soroban network', async () => {
       const bidder3Token = createAccessToken({
         publicKey: 'ERROR_PREPARE_TRANSACTION',
         sub: '00000000-0000-0000-0000-00000000BID3',
@@ -634,27 +602,14 @@ describe('Auction Module', () => {
   });
 
   describe('POST - /auction/submit/transaction/claim', () => {
-    beforeEach(() => {
-      TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
-        sign: jest.fn(),
-        toXDR: jest.fn().mockReturnValue('xdr'),
-      });
-    });
-    it('should return the auction claimed by the new owner', async () => {
+    it("Should unset the player's team if the user doesn't have an assigned team.", async () => {
+      const playerAddress =
+        'CCX7BU3F5E2G3CZE2HTXT46PSWNSRNUR5HA4AKKGPG5V6ZORWFXU7IGH';
       (scValToNative as jest.Mock).mockReturnValue({
-        end_time: 1744266314n,
-        highest_bid_amount: 300n,
-        highest_bidder_address:
-          'GBVGKQFIRR2XB2SI5IALEP6PU4QOUHYZF6S5TYVPITIA3NS7SVQ44TL4',
-        id: 1n,
-        owner_address:
-          'GDBTYMYAM7MUQZKKLHVWZWJLNUXKNZBAITUJY6ES7RYZ5VSD72LP3YPL',
-        player_address:
-          'CCX7BU3F5E2G3CZE2HTXT46PSWNSRNUR5HA4AKKGPG5V6ZORWFXU7IGH',
-        start_time: 1744266014n,
-        status: ['Open'],
+        ...returnValueAuctionSc,
+        player_address: playerAddress,
+        highest_bidder_address: 'GXXXX',
       });
-
       const bidder1Token = createAccessToken({
         publicKey: 'BIDDER-1',
         sub: '00000000-0000-0000-0000-00000000BID1',
@@ -686,9 +641,94 @@ describe('Auction Module', () => {
           });
           expect(body).toEqual(expectedResponse);
         });
+      await request(app.getHttpServer())
+        .get(`/api/v1/player/one?filter[address]=${playerAddress}`)
+        .auth(bidder1Token, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                teamId: null,
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
     });
 
-    it('should return an error message if the auction does not exist', async () => {
+    it("Should synchronize the user's team and return a message indicating how many players were affected", async () => {
+      const playerAddress = 'CXXXXXXX8';
+      (scValToNative as jest.Mock).mockReturnValue({
+        ...returnValueAuctionSc,
+        player_address: playerAddress,
+        highest_bidder_address: 'GXXXX',
+      });
+
+      const bidder4Token = createAccessToken({
+        publicKey: 'BIDDER-4',
+        sub: '00000000-0000-0000-0000-00000000BID1',
+      });
+      await request(app.getHttpServer())
+        .get(`/api/v1/player/one?filter[address]=${playerAddress}`)
+        .auth(bidder4Token, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                teamId: null,
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+
+      await request(app.getHttpServer())
+        .post('/api/v1/auction/submit/transaction/claim')
+        .auth(bidder4Token, { type: 'bearer' })
+        .send({
+          xdr: 'xdr',
+          auctionId: 4,
+        })
+        .expect(HttpStatus.CREATED)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                uuid: expect.any(String),
+                externalId: expect.any(Number),
+                status: expect.any(String),
+                highestBidAmount: expect.any(Number),
+                highestBidderAddress: expect.any(String),
+                playerAddress: expect.any(String),
+                startTime: expect.any(Number),
+                endTime: expect.any(Number),
+                createdAt: expect.any(String),
+                updatedAt: expect.any(String),
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+
+      await request(app.getHttpServer())
+        .get(`/api/v1/player/one?filter[address]=${playerAddress}`)
+        .auth(bidder4Token, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          const expectedResponse = expect.objectContaining({
+            data: expect.objectContaining({
+              attributes: expect.objectContaining({
+                teamId: expect.any(Number),
+              }),
+            }),
+          });
+          expect(body).toEqual(expectedResponse);
+        });
+    });
+
+    it('Should return an error message if the auction does not exist', async () => {
       const bidder4Token = createAccessToken({
         publicKey: 'BIDDER-2',
         sub: '00000000-0000-0000-0000-00000000BID2',
@@ -712,7 +752,7 @@ describe('Auction Module', () => {
         });
     });
 
-    it('should return an error message if the transaction could not be submitted to the Soroban network', async () => {
+    it('Should return an error message if the transaction could not be submitted to the Soroban network', async () => {
       const bidder3Token = createAccessToken({
         publicKey: 'BIDDER-1',
         sub: '00000000-0000-0000-0000-00000000BID1',

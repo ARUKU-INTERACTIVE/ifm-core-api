@@ -31,5 +31,16 @@ export const UserSchema = new EntitySchema<User>({
       type: String,
       unique: true,
     },
+    teamId: {
+      type: Number,
+      nullable: true,
+    },
   }),
+  relations: {
+    team: {
+      type: 'one-to-one',
+      target: 'Team',
+      inverseSide: 'team',
+    },
+  },
 });

@@ -1,3 +1,4 @@
+import { UpdatePlayerResponseDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerDto } from '@module/player/application/dto/player.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
@@ -18,7 +19,7 @@ export class PlayerMapper {
     return `https://${this.pinataGatewayUrl}/ipfs/${cid}`;
   }
 
-  private mapPlayerDtoToPlayer(playerDto: PlayerDto): Player {
+  fromCreatePlayerDtoToPlayer(playerDto: PlayerDto, teamId?: number): Player {
     const player = new Player();
     player.name = playerDto.name;
     player.metadataCid = playerDto.metadataCid;
@@ -26,16 +27,10 @@ export class PlayerMapper {
     player.description = playerDto.description;
     player.issuer = playerDto.issuer;
     player.address = playerDto.address;
+    if (teamId) {
+      player.teamId = teamId;
+    }
     return player;
-  }
-
-  fromCreatePlayerDtoToPlayer(playerDto: PlayerDto): Player {
-    const player = this.mapPlayerDtoToPlayer(playerDto);
-    return player;
-  }
-
-  fromUpdatePlayerDtoToPlayer(playerDto: PlayerDto): Player {
-    return this.mapPlayerDtoToPlayer(playerDto);
   }
 
   fromPlayerToPlayerResponseDto(player: Player): PlayerResponseDto {
@@ -45,6 +40,7 @@ export class PlayerMapper {
     playerResponseDto.name = player.name;
     playerResponseDto.description = player.description;
     playerResponseDto.issuer = player.issuer;
+    playerResponseDto.teamId = player.teamId;
     playerResponseDto.metadataUri = this.getPinataUri(player.metadataCid);
     playerResponseDto.imageUri = this.getPinataUri(player.imageCid);
     playerResponseDto.createdAt = player.createdAt;
@@ -57,7 +53,7 @@ export class PlayerMapper {
 
   fromSubmitMintPlayerDtoToPlayer(
     submitMintPlayerDto: SubmitMintPlayerDto,
-  ): PlayerDto {
+  ): Player {
     const player = new Player();
     player.name = submitMintPlayerDto.name;
     player.issuer = submitMintPlayerDto.issuer;
@@ -65,5 +61,15 @@ export class PlayerMapper {
     player.imageCid = submitMintPlayerDto.imageCid;
     player.description = submitMintPlayerDto.description;
     return player;
+  }
+
+  fromPlayerCountToPlayerResponseUpdateDto(
+    updatedCount: number,
+    deletedCount: number,
+  ) {
+    const playerResponseUpdateDto = new UpdatePlayerResponseDto();
+    playerResponseUpdateDto.updatedCount = updatedCount;
+    playerResponseUpdateDto.deletedCount = deletedCount;
+    return playerResponseUpdateDto;
   }
 }
