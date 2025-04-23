@@ -29,7 +29,7 @@ export class TeamPostgresRepository implements ITeamRepository {
       select: fields,
       take: page.size,
       skip: page.offset,
-      relations: include,
+      relations: [...include, TeamRelation.ROSTER_ENTITY],
     });
 
     return {
@@ -47,7 +47,7 @@ export class TeamPostgresRepository implements ITeamRepository {
   ): Promise<Team> {
     const team = await this.repository.findOne({
       where: { id },
-      relations,
+      relations: [TeamRelation.ROSTER_ENTITY, ...relations],
     });
 
     if (!team) {
@@ -62,7 +62,7 @@ export class TeamPostgresRepository implements ITeamRepository {
   async getOneById(id: number, relations: TeamRelation[] = []): Promise<Team> {
     return this.repository.findOne({
       where: { id },
-      relations,
+      relations: [TeamRelation.ROSTER_ENTITY, ...relations],
     });
   }
 
@@ -72,7 +72,7 @@ export class TeamPostgresRepository implements ITeamRepository {
   ): Promise<Team> {
     const team = await this.repository.findOne({
       where: { userId },
-      relations,
+      relations: [TeamRelation.ROSTER_ENTITY, ...relations],
     });
     if (!team) {
       throw new TeamNotFoundException({
@@ -89,13 +89,16 @@ export class TeamPostgresRepository implements ITeamRepository {
   ): Promise<Team> {
     return await this.repository.findOne({
       where: { userId },
-      relations,
+      relations: [TeamRelation.ROSTER_ENTITY, ...relations],
     });
   }
 
   async saveOne(team: Team, relations: TeamRelation[] = []): Promise<Team> {
     const savedTeam = await this.repository.save(team);
-    return this.repository.findOne({ where: { id: savedTeam.id }, relations });
+    return this.repository.findOne({
+      where: { id: savedTeam.id },
+      relations,
+    });
   }
 
   async updateOneOrFail(
@@ -116,6 +119,9 @@ export class TeamPostgresRepository implements ITeamRepository {
 
     const savedTeam = await this.repository.save(teamToUpdate);
 
-    return this.repository.findOne({ where: { id: savedTeam.id }, relations });
+    return this.repository.findOne({
+      where: { id: savedTeam.id },
+      relations: [TeamRelation.ROSTER_ENTITY, ...relations],
+    });
   }
 }
