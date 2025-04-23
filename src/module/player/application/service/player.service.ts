@@ -262,7 +262,9 @@ export class PlayerService {
     user: User,
     updatePlayerRosterDto: UpdatePlayerRosterDto,
   ) {
-    const team = await this.teamService.getOneByUserIdOrFail(user.id);
+    const team = await this.teamService.getOneByUserIdOrFail(user.id, [
+      TeamRelation.ROSTER_ENTITY,
+    ]);
     const player = await this.playerRepository.getOneByIdOrFail(
       updatePlayerRosterDto.playerId,
     );
@@ -270,7 +272,6 @@ export class PlayerService {
       user.publicKey,
       player.issuer,
     );
-
     if (!playerIsOwnedByUser) {
       throw new PlayerNotOwnedByUserException();
     }
@@ -279,13 +280,15 @@ export class PlayerService {
         message: `The player with ID ${player.id} is not part of the team of the user with ID ${user.id}.`,
       });
     }
-
     const roster = await this.rosterService.getOneRosterOrFail(
       {
-        teamId: team.id,
+        id: updatePlayerRosterDto.rosterId,
       },
       [RosterRelation.Player],
     );
+    if (team.roster.id !== roster.teamId) {
+      throw new UserNotRosterOwnerException();
+    }
 
     if (player.rosterId && player.rosterId === roster.id) {
       throw new ConflictException(
@@ -310,17 +313,20 @@ export class PlayerService {
     user: User,
     updatePlayerRosterDto: UpdatePlayerRosterDto,
   ) {
+    const player = await this.playerRepository.getOneByIdOrFail(
+      updatePlayerRosterDto.playerId,
+    );
     const roster = await this.rosterService.getOneRosterOrFail({
       id: updatePlayerRosterDto.rosterId,
     });
 
-    const team = await this.teamService.getOneByUserIdOrFail(user.id);
-    if (team.rosterId !== roster.teamId) {
+    const team = await this.teamService.getOneByUserIdOrFail(user.id, [
+      TeamRelation.ROSTER_ENTITY,
+    ]);
+    if (team.roster.id !== roster.teamId) {
       throw new UserNotRosterOwnerException();
     }
-    const player = await this.playerRepository.getOneByIdOrFail(
-      updatePlayerRosterDto.playerId,
-    );
+
     player.rosterId = null;
     player.roster = null;
     const savedPlayer = await this.saveOnePlayer(player);

@@ -8,7 +8,6 @@ import { Roster } from '@/module/roster/domain/roster.entity';
 export class RosterMapper {
   fromCreateRosterDtoToRoster(rosterDto: ICreateDto): Roster {
     const roster = new Roster();
-    roster.userId = rosterDto.userId;
     roster.teamId = rosterDto.teamId;
     return roster;
   }
@@ -17,7 +16,6 @@ export class RosterMapper {
     const rosterResponseDto = new RosterResponseDto();
     rosterResponseDto.id = roster.id;
     rosterResponseDto.uuid = roster.uuid;
-    rosterResponseDto.userId = roster.userId;
     rosterResponseDto.teamId = roster.teamId;
     rosterResponseDto.createdAt = roster.createdAt;
     rosterResponseDto.updatedAt = roster.updatedAt;

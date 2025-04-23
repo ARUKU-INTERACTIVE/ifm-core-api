@@ -50,7 +50,6 @@ describe('Roster Module', () => {
                     expect.stringMatching(
                       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
                     ) || expect(undefined),
-                  userId: expect.any(Number),
                   teamId: expect.any(Number),
                   createdAt: expect.any(String),
                   updatedAt: expect.any(String),
@@ -72,7 +71,7 @@ describe('Roster Module', () => {
         });
     });
     it('should allow to select specific attributes', async () => {
-      const attributes = ['userId'] as (keyof RosterResponseDto)[];
+      const attributes = ['teamId'] as (keyof RosterResponseDto)[];
 
       await request(app.getHttpServer())
         .get(`/api/v1/roster?fields[target]=${attributes.join(',')}`)
@@ -84,24 +83,22 @@ describe('Roster Module', () => {
             attributes.length,
           );
           expect(resourceAttributes).toEqual({
-            userId: expect.any(Number),
+            teamId: expect.any(Number),
           });
         });
     });
     it('should allow to filter by attributes', async () => {
-      const userId = 1;
+      const id = 1;
 
       await request(app.getHttpServer())
-        .get(`/api/v1/roster?filter[userId]=${userId}`)
+        .get(`/api/v1/roster?filter[id]=${id}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.OK)
         .then(({ body }) => {
           const expectedResponse = expect.objectContaining({
             data: expect.arrayContaining([
               expect.objectContaining({
-                attributes: expect.objectContaining({
-                  userId,
-                }),
+                id: id.toString(),
               }),
             ]),
           });

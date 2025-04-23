@@ -12,5 +12,4 @@ export class Team extends Base {
   user: User;
   userId: number;
   roster: Roster;
-  rosterId: number;
 }

@@ -20,10 +20,6 @@ export const TeamSchema = new EntitySchema<Team>({
       type: Number,
       nullable: true,
     },
-    rosterId: {
-      type: Number,
-      nullable: true,
-    },
   }),
   relations: {
     players: {

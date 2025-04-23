@@ -17,6 +17,8 @@ import {
 import { setupApp } from '@config/app.config';
 import { datasourceOptions } from '@config/orm.config';
 
+import { UserNotRosterOwnerException } from '@iam/user/infrastructure/database/exception/user-not-roster-owner.exception';
+
 import {
   getTransactionResponse,
   loadAccountUseCases,
@@ -538,7 +540,10 @@ describe('Player Module', () => {
   describe('PATCH - /player/add/roster', () => {
     it('Should correctly add the player to the roster.', async () => {
       const playerId = 19;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 3,
+      } as UpdatePlayerRosterDto;
 
       const user7Token = createAccessToken({
         publicKey: 'GXXX-XXXX-XXXX-XXXX7',
@@ -564,7 +569,10 @@ describe('Player Module', () => {
 
     it('Should show an error message if the player does not exist.', async () => {
       const playerId = 9999999;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 3,
+      } as UpdatePlayerRosterDto;
       await request(app.getHttpServer())
         .patch('/api/v1/player/add/roster')
         .auth(adminToken, { type: 'bearer' })
@@ -579,7 +587,10 @@ describe('Player Module', () => {
 
     it('Should show an error message if the user has no team assigned.', async () => {
       const playerId = 1;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 3,
+      } as UpdatePlayerRosterDto;
 
       const user5Token = createAccessToken({
         publicKey: 'GXXX-XXXX-XXXX-XXXX5',
@@ -598,7 +609,10 @@ describe('Player Module', () => {
 
     it('Should show an error message if the user does not own the NFT.', async () => {
       const playerId = 3;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 3,
+      } as UpdatePlayerRosterDto;
 
       await request(app.getHttpServer())
         .patch('/api/v1/player/add/roster')
@@ -612,7 +626,10 @@ describe('Player Module', () => {
 
     it('Should show an error message if the player is already assigned to the roster.', async () => {
       const playerId = 7;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 1,
+      } as UpdatePlayerRosterDto;
 
       await request(app.getHttpServer())
         .patch('/api/v1/player/add/roster')
@@ -628,7 +645,10 @@ describe('Player Module', () => {
 
     it('Should show an error message if trying to add a player when the roster already has 11 players.', async () => {
       const playerId = 18;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 1,
+      } as UpdatePlayerRosterDto;
 
       await request(app.getHttpServer())
         .patch('/api/v1/player/add/roster')
@@ -641,13 +661,34 @@ describe('Player Module', () => {
           );
         });
     });
+
+    it('Should display an error message if the user is not the owner of the roster.', async () => {
+      const playerId = 20;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 3,
+      } as UpdatePlayerRosterDto;
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/add/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.BAD_REQUEST)
+        .then(({ body }) => {
+          expect(body.error.detail).toEqual(
+            new UserNotRosterOwnerException().message,
+          );
+        });
+    });
   });
 
   describe('PATCH - /player/remove/roster', () => {
     it('Should correctly remove the player to the roster.', async () => {
       const playerId = 6;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
-
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 1,
+      } as UpdatePlayerRosterDto;
       await request(app.getHttpServer())
         .patch('/api/v1/player/remove/roster')
         .auth(adminToken, { type: 'bearer' })
@@ -667,7 +708,10 @@ describe('Player Module', () => {
 
     it('Should show an error message if the player does not exist.', async () => {
       const playerId = 9999999;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 3,
+      } as UpdatePlayerRosterDto;
       await request(app.getHttpServer())
         .patch('/api/v1/player/remove/roster')
         .auth(adminToken, { type: 'bearer' })
@@ -682,8 +726,11 @@ describe('Player Module', () => {
 
     it('Should show an error message if the user does not have a roster.', async () => {
       const playerId = 1;
-      const updatePlayerRosterDto = { playerId } as UpdatePlayerRosterDto;
-
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 3,
+      } as UpdatePlayerRosterDto;
+      const userId = 7;
       const user6Token = createAccessToken({
         publicKey: 'GXXX-XXXX-XXXX-XXXX6',
         sub: '00000000-0000-0000-0000-000000XXXXXX',
@@ -695,7 +742,28 @@ describe('Player Module', () => {
         .send(updatePlayerRosterDto)
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
-          expect(body.error.detail).toEqual('Roster not found');
+          expect(body.error.detail).toEqual(
+            `No team assigned to user with ID ${userId}`,
+          );
+        });
+    });
+
+    it('Should display an error message if the user is not the owner of the roster.', async () => {
+      const playerId = 1;
+      const updatePlayerRosterDto = {
+        playerId,
+        rosterId: 3,
+      } as UpdatePlayerRosterDto;
+
+      await request(app.getHttpServer())
+        .patch('/api/v1/player/remove/roster')
+        .auth(adminToken, { type: 'bearer' })
+        .send(updatePlayerRosterDto)
+        .expect(HttpStatus.BAD_REQUEST)
+        .then(({ body }) => {
+          expect(body.error.detail).toEqual(
+            new UserNotRosterOwnerException().message,
+          );
         });
     });
   });

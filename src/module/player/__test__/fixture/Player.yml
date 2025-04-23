@@ -169,3 +169,12 @@ items:
     issuer: 'ISSUER19'
     address: 'CXXXXXXX19'
     team: '@team3'
+  player20:
+    id: 20
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid20'
+    imageCid: 'imageCid20'
+    issuer: 'ISSUER20'
+    address: 'CXXXXXXX20'
+    team: '@team1'

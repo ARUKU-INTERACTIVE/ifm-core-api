@@ -1,11 +1,11 @@
 entity: Roster
 items:
   roster1:
+    id: 1
     team: '@team1'
-    user: '@admin-user'
   roster2:
+    id: 2
     team: '@team2'
-    user: '@user1'
   roster3:
+    id: 3
     team: '@team3'
-    user: '@user7'

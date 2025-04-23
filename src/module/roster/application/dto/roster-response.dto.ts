@@ -18,10 +18,6 @@ export class RosterResponseDto {
 
   @DtoProperty
   @IsNumber()
-  userId: number;
-
-  @DtoProperty
-  @IsNumber()
   teamId: number;
 
   @DtoProperty

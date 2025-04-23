@@ -2,4 +2,3 @@ entity: Roster
 items:
   roster1:
     team: '@team2'
-    user: '@user9'
