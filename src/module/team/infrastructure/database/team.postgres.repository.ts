@@ -22,14 +22,13 @@ export class TeamPostgresRepository implements ITeamRepository {
     options?: IGetAllOptions<Team, Partial<TeamRelation[]>>,
   ): Promise<ICollection<Team>> {
     const { filter, page, sort, fields, include } = options || {};
-
     const [items, itemCount] = await this.repository.findAndCount({
       where: filter,
       order: sort,
       select: fields,
       take: page.size,
       skip: page.offset,
-      relations: [...include, TeamRelation.ROSTER_ENTITY],
+      relations: include ? [...include, TeamRelation.ROSTER_ENTITY] : include,
     });
 
     return {

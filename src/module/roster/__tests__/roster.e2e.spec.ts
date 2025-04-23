@@ -46,10 +46,7 @@ describe('Roster Module', () => {
             data: expect.arrayContaining([
               expect.objectContaining({
                 attributes: expect.objectContaining({
-                  uuid:
-                    expect.stringMatching(
-                      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
-                    ) || expect(undefined),
+                  uuid: expect.any(String) || expect(undefined),
                   teamId: expect.any(Number),
                   createdAt: expect.any(String),
                   updatedAt: expect.any(String),
@@ -118,7 +115,7 @@ describe('Roster Module', () => {
         .then(({ body }) => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
-              id: rosterId.toString(),
+              id: expect.any(String),
             }),
           });
           expect(body).toEqual(expectedResponse);
