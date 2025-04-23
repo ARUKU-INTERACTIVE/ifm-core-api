@@ -32,4 +32,7 @@ export class UserResponseDto {
 
   @ApiPropertyOptional()
   publicKey?: string;
+
+  @ApiPropertyOptional()
+  teamId?: number;
 }
