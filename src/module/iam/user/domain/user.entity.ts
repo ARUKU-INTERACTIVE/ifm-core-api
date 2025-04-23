@@ -1,4 +1,3 @@
-import { Roster } from '@module/roster/domain/roster.entity';
 import { Team } from '@module/team/domain/team.entity';
 
 import { Base } from '@common/base/domain/base.entity';
@@ -12,7 +11,7 @@ export class User extends Base {
   roles: AppRole[];
   isVerified: boolean;
   team?: Team;
-  roster?: Roster;
+  teamId?: number;
   constructor(
     publicKey?: string,
     username?: string,
@@ -24,7 +23,6 @@ export class User extends Base {
     deletedAt?: string,
     isVerified?: boolean,
     team?: Team,
-    roster?: Roster,
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this.publicKey = publicKey;
@@ -33,6 +31,5 @@ export class User extends Base {
     this.roles = roles;
     this.isVerified = isVerified;
     this.team = team;
-    this.roster = roster;
   }
 }

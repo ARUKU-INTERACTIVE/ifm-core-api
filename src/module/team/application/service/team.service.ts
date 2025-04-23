@@ -8,7 +8,9 @@ import { OneSerializedResponseDto } from '@common/base/application/dto/one-seria
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.adapter';
 
+import { UserService } from '@iam/user/application/service/user.service';
 import { User } from '@iam/user/domain/user.entity';
+import { UserAlreadyHasTeamException } from '@iam/user/infrastructure/database/exception/user-already-has-team.exception';
 
 import { TeamResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
 import { ICreateTeamDto } from '@/module/team/application/dto/create-team.dto.interface';
@@ -31,6 +33,7 @@ export class TeamService {
     private readonly teamResponseAdapter: TeamResponseAdapter,
     private readonly stellarNFTAdapter: StellarNftAdapter,
     private readonly rosterService: RosterService,
+    private readonly userService: UserService,
     @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
   ) {}
@@ -88,6 +91,11 @@ export class TeamService {
     const ownedNftIssuers = await this.stellarNFTAdapter.getUserOwnedNftIssuers(
       currentUser.publicKey,
     );
+
+    if (currentUser.teamId) {
+      throw new UserAlreadyHasTeamException();
+    }
+
     for (const issuer of ownedNftIssuers || []) {
       const player = await this.playerService.getPlayerEntity({
         issuer,
@@ -104,6 +112,9 @@ export class TeamService {
         currentUser.id,
       ),
     );
+
+    this.userService.updateOne(currentUser.id, { teamId: team.id });
+
     await this.rosterService.saveOne({
       teamId: team.id,
       userId: currentUser.id,

@@ -4,4 +4,8 @@ export class UpdatePlayerRosterDto {
   @IsNumber()
   @IsNotEmpty()
   playerId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  rosterId: number;
 }

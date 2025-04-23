@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { StellarModule } from '@common/infrastructure/stellar/stellar.module';
 
+import { UserModule } from '@iam/user/user.module';
+
 import { TeamResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
 import { TeamMapper } from '@/module/team/application/mapper/team.mapper';
 import { TEAM_REPOSITORY_KEY } from '@/module/team/application/repository/team.repository.interface';
 import { TeamService } from '@/module/team/application/service/team.service';
 import { TeamSchema } from '@/module/team/infrastructure/database/team.schema';
-import { TeamController as Controller } from '@/module/team/interface/team.controller';
+import { TeamController } from '@/module/team/interface/team.controller';
 
 const RepositoryProvider: Provider = {
   provide: TEAM_REPOSITORY_KEY,
@@ -24,9 +26,10 @@ const RepositoryProvider: Provider = {
     forwardRef(() => PlayerModule),
     StellarModule,
     RosterModule,
+    UserModule,
   ],
   providers: [TeamService, TeamMapper, TeamResponseAdapter, RepositoryProvider],
-  controllers: [Controller],
+  controllers: [TeamController],
   exports: [TeamService, TeamMapper, RepositoryProvider],
 })
 export class TeamModule {}

@@ -44,6 +44,7 @@ import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.ad
 import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
 import { User } from '@iam/user/domain/user.entity';
+import { UserNotRosterOwnerException } from '@iam/user/infrastructure/database/exception/user-not-roster-owner.exception';
 
 @Injectable()
 export class PlayerService {
@@ -281,7 +282,7 @@ export class PlayerService {
 
     const roster = await this.rosterService.getOneRosterOrFail(
       {
-        userId: user.id,
+        teamId: team.id,
       },
       [RosterRelation.Player],
     );
@@ -309,13 +310,17 @@ export class PlayerService {
     user: User,
     updatePlayerRosterDto: UpdatePlayerRosterDto,
   ) {
+    const roster = await this.rosterService.getOneRosterOrFail({
+      id: updatePlayerRosterDto.rosterId,
+    });
+
+    const team = await this.teamService.getOneByUserIdOrFail(user.id);
+    if (team.rosterId !== roster.teamId) {
+      throw new UserNotRosterOwnerException();
+    }
     const player = await this.playerRepository.getOneByIdOrFail(
       updatePlayerRosterDto.playerId,
     );
-    await this.rosterService.getOneRosterOrFail({
-      userId: user.id,
-    });
-
     player.rosterId = null;
     player.roster = null;
     const savedPlayer = await this.saveOnePlayer(player);

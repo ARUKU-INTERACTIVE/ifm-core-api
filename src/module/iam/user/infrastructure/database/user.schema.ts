@@ -31,14 +31,14 @@ export const UserSchema = new EntitySchema<User>({
       type: String,
       unique: true,
     },
+    teamId: {
+      type: Number,
+      unique: true,
+      nullable: true,
+    },
   }),
   relations: {
     team: {
-      type: 'one-to-one',
-      target: 'Team',
-      inverseSide: 'team',
-    },
-    roster: {
       type: 'one-to-one',
       target: 'Team',
       inverseSide: 'team',

@@ -12,19 +12,8 @@ export const RosterSchema = new EntitySchema<Roster>({
     teamId: {
       type: Number,
     },
-    userId: {
-      type: Number,
-    },
   }),
   relations: {
-    user: {
-      type: 'one-to-one',
-      target: 'User',
-      inverseSide: 'roster',
-      joinColumn: {
-        name: 'user_id',
-      },
-    },
     team: {
       type: 'one-to-one',
       target: 'Team',
