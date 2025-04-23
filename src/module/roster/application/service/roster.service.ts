@@ -50,23 +50,19 @@ export class RosterService {
     );
   }
 
-  async getOneByIdOrFail(
-    id: number,
+  async getOneByUiidOrFail(
+    uiid: string,
+    relations?: RosterRelation[],
   ): Promise<OneSerializedResponseDto<RosterResponseDto>> {
-    const roster = await this.repository.getOneByIdOrFail(id);
+    const roster = await this.repository.getOneByUiidOrFail(uiid, relations);
     return this.responseAdapter.oneEntityResponse<RosterResponseDto>(
       this.mapper.fromRosterToRosterResponseDto(roster),
     );
   }
 
-  async saveOne(
-    createDto: ICreateDto,
-  ): Promise<OneSerializedResponseDto<RosterResponseDto>> {
-    const roster = await this.repository.saveOne(
+  async saveOne(createDto: ICreateDto): Promise<Roster> {
+    return await this.repository.saveOne(
       this.mapper.fromCreateRosterDtoToRoster(createDto),
-    );
-    return this.responseAdapter.oneEntityResponse<RosterResponseDto>(
-      this.mapper.fromRosterToRosterResponseDto(roster),
     );
   }
 

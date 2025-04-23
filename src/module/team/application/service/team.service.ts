@@ -115,10 +115,13 @@ export class TeamService {
 
     this.userService.updateOne(currentUser.id, { teamId: team.id });
 
-    await this.rosterService.saveOne({
+    const roster = await this.rosterService.saveOne({
       teamId: team.id,
       userId: currentUser.id,
     });
+
+    team.roster = roster;
+
     return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
       this.teamMapper.fromTeamToTeamResponseDto(team),
     );

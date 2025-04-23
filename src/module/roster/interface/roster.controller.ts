@@ -44,13 +44,14 @@ export class RosterController {
     });
   }
 
-  @Get(':id')
-  @ApiParam({ name: 'id', type: Number })
+  @Get(':uuid')
+  @ApiParam({ name: 'uuid', type: String })
   @ApiOperation({ summary: 'Get one Roster by id or throw not found' })
   @GetOneSwaggerDecorator(RosterResponseDto)
-  getOneByIdOrFail(
-    @Param('id') id: number,
+  getOneByUiidOrFail(
+    @Param('uuid') uuid: string,
+    @Query('include') include: IncludeQueryParamsDto,
   ): Promise<OneSerializedResponseDto<RosterResponseDto>> {
-    return this.rosterService.getOneByIdOrFail(id);
+    return this.rosterService.getOneByUiidOrFail(uuid, include.fields);
   }
 }

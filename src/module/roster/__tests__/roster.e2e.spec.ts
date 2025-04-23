@@ -107,9 +107,9 @@ describe('Roster Module', () => {
     });
   });
 
-  describe('GET - /roster/:id', () => {
+  describe('GET - /roster/:uuid', () => {
     it('should return a specific roster', async () => {
-      const rosterId = 1;
+      const rosterId = 'xxxx-xxxx-xxxx-xxxx-xxx1';
 
       await request(app.getHttpServer())
         .get(`/api/v1/roster/${rosterId}`)
@@ -126,12 +126,15 @@ describe('Roster Module', () => {
     });
 
     it('should throw an error if roster is not found', async () => {
+      const rosterId = 'xxxx-xxxx-xxxx-xxxx-9999';
       await request(app.getHttpServer())
-        .get('/api/v1/roster/9999')
+        .get(`/api/v1/roster/${rosterId}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
-          expect(body.error.detail).toBe('Roster with ID 9999 not found');
+          expect(body.error.detail).toBe(
+            `Roster with ID ${rosterId} not found`,
+          );
         });
     });
   });

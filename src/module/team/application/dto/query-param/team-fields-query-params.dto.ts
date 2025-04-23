@@ -15,5 +15,7 @@ export class TeamFieldsQueryParamsDto extends FieldsQueryParamsDto<TeamResponseD
   @IsIn(getDtoProperties(TeamResponseDto), {
     each: true,
   })
-  target = getDtoProperties(TeamResponseDto) as FieldOptions<TeamResponseDto>;
+  target = getDtoProperties(TeamResponseDto) as FieldOptions<
+    Omit<TeamResponseDto, 'rosterId'>
+  >;
 }

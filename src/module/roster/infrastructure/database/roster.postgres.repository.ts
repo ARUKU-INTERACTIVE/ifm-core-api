@@ -42,22 +42,22 @@ export class RosterPostgresRepository implements IRosterPostgresRepository {
     };
   }
 
-  async getOneByIdOrFail(
-    id: number,
+  async getOneByUiidOrFail(
+    uuid: string,
     relations: RosterRelation[] = [],
   ): Promise<Roster> {
-    const Roster = await this.repository.findOne({
-      where: { id },
+    const rooster = await this.repository.findOne({
+      where: { uuid },
       relations,
     });
 
-    if (!Roster) {
+    if (!rooster) {
       throw new RosterNotFoundException({
-        message: `Roster with ID ${id} not found`,
+        message: `Roster with ID ${uuid} not found`,
       });
     }
 
-    return Roster;
+    return rooster;
   }
 
   async getOneRosterOrFail(

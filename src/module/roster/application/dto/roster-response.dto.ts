@@ -1,4 +1,13 @@
-import { IsDate, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Player } from '@module/player/domain/player.domain';
+import { Type } from 'class-transformer';
+import {
+  IsDate,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 import { DtoProperty } from '@common/base/application/dto/base.dto';
 import { EntityName } from '@common/decorators/entity-name.decorator';
@@ -19,6 +28,11 @@ export class RosterResponseDto {
   @DtoProperty
   @IsNumber()
   teamId: number;
+
+  @DtoProperty
+  @ValidateNested({ each: true })
+  @Type(() => Player)
+  players: Player[];
 
   @DtoProperty
   @IsDate()

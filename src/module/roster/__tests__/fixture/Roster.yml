@@ -1,8 +1,10 @@
 entity: Roster
 items:
   roster1:
+    uuid: 'xxxx-xxxx-xxxx-xxxx-xxx1'
     team: '@team1'
     user: '@admin-user'
   roster2:
+    uuid: 'xxxx-xxxx-xxxx-xxxx-xxx2'
     team: '@team2'
     user: '@user1'

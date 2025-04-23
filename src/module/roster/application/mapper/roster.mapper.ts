@@ -17,6 +17,7 @@ export class RosterMapper {
     rosterResponseDto.id = roster.id;
     rosterResponseDto.uuid = roster.uuid;
     rosterResponseDto.teamId = roster.teamId;
+    rosterResponseDto.players = roster.players;
     rosterResponseDto.createdAt = roster.createdAt;
     rosterResponseDto.updatedAt = roster.updatedAt;
     rosterResponseDto.deletedAt = roster.deletedAt;

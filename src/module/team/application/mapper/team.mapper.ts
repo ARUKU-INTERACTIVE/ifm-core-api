@@ -33,6 +33,7 @@ export class TeamMapper {
     teamResponseDto.id = team.id;
     teamResponseDto.uuid = team.uuid;
     teamResponseDto.name = team.name;
+    teamResponseDto.rosterId = team?.roster?.uuid;
     teamResponseDto.logoUri = team.logoUri;
     teamResponseDto.createdAt = team.createdAt;
     teamResponseDto.updatedAt = team.updatedAt;
