@@ -90,7 +90,15 @@ jest.mock('@stellar/stellar-sdk', () => ({
             },
             {
               ...baseBalance,
+              asset_issuer: 'ISSUER6',
+            },
+            {
+              ...baseBalance,
               asset_issuer: 'ISSUER7',
+            },
+            {
+              ...baseBalance,
+              asset_issuer: 'ISSUER8',
             },
             { ...baseBalance, asset_issuer: 'ISSUER18' },
             { ...baseBalance, asset_issuer: 'ISSUER19' },

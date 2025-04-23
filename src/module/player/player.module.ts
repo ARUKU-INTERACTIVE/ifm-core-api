@@ -27,7 +27,7 @@ export const playerRepositoryProvider: Provider = {
     forwardRef(() => TeamModule),
     UserModule,
     PinataModule,
-    RosterModule,
+    forwardRef(() => RosterModule),
   ],
   providers: [
     playerRepositoryProvider,

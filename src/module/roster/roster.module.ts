@@ -1,5 +1,6 @@
+import { PlayerModule } from '@module/player/player.module';
 import { RosterPostgresRepository } from '@module/roster/infrastructure/database/roster.postgres.repository';
-import { Module, Provider } from '@nestjs/common';
+import { Module, Provider, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { RosterResponseAdapter } from '@/module/roster/application/adapter/roster-response.adapter';
@@ -15,7 +16,10 @@ const RepositoryProvider: Provider = {
 };
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RosterSchema])],
+  imports: [
+    TypeOrmModule.forFeature([RosterSchema]),
+    forwardRef(() => PlayerModule),
+  ],
   providers: [
     RosterService,
     RosterMapper,

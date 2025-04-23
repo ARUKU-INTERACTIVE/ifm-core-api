@@ -61,20 +61,20 @@ export class PlayerRepository implements IPlayerRepository {
     });
   }
 
-  async getOneByIdOrFail(
-    id: number,
+  async getOneByUuIdOrFail(
+    uuid: string,
     relations?: PlayerRelation[],
   ): Promise<Player> {
     const player = await this.repository.findOne({
       where: {
-        id,
+        uuid,
       },
       relations,
     });
 
     if (!player) {
       throw new PlayerNotFoundException({
-        message: `Player with ID ${id} not found`,
+        message: `Player with ID ${uuid} not found`,
       });
     }
     return player;

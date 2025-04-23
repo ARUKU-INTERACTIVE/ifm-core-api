@@ -58,6 +58,7 @@ export class PlayerService {
     private readonly sorobanContractAdapter: SorobanContractAdapter,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
     private readonly pinataAdapter: PinataAdapter,
+    @Inject(forwardRef(() => RosterService))
     private readonly rosterService: RosterService,
     @Inject(forwardRef(() => StellarNftAdapter))
     private readonly stellarNFTAdapter: StellarNftAdapter,
@@ -265,7 +266,7 @@ export class PlayerService {
     const team = await this.teamService.getOneByUserIdOrFail(user.id, [
       TeamRelation.ROSTER_ENTITY,
     ]);
-    const player = await this.playerRepository.getOneByIdOrFail(
+    const player = await this.playerRepository.getOneByUuIdOrFail(
       updatePlayerRosterDto.playerId,
     );
     const playerIsOwnedByUser = await this.stellarNFTAdapter.checkNFTBalance(
@@ -282,20 +283,19 @@ export class PlayerService {
     }
     const roster = await this.rosterService.getOneRosterOrFail(
       {
-        id: updatePlayerRosterDto.rosterId,
+        uuid: updatePlayerRosterDto.rosterId,
       },
       [RosterRelation.Player],
     );
-    if (team.roster.id !== roster.teamId) {
+    if (team.id !== roster.teamId) {
       throw new UserNotRosterOwnerException();
     }
 
     if (player.rosterId && player.rosterId === roster.id) {
       throw new ConflictException(
-        `Player with ID ${player.id} is already assigned to roster ID ${roster.id}`,
+        `Player with uuid ${player.uuid} is already assigned to roster uuid ${roster.uuid}`,
       );
     }
-
     if (roster.players.length >= this.rosterService.MAX_PLAYERS) {
       throw new ConflictException(
         `The roster already has the maximum of ${this.rosterService.MAX_PLAYERS} players.`,
@@ -313,11 +313,11 @@ export class PlayerService {
     user: User,
     updatePlayerRosterDto: UpdatePlayerRosterDto,
   ) {
-    const player = await this.playerRepository.getOneByIdOrFail(
+    const player = await this.playerRepository.getOneByUuIdOrFail(
       updatePlayerRosterDto.playerId,
     );
     const roster = await this.rosterService.getOneRosterOrFail({
-      id: updatePlayerRosterDto.rosterId,
+      uuid: updatePlayerRosterDto.rosterId,
     });
 
     const team = await this.teamService.getOneByUserIdOrFail(user.id, [

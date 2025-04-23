@@ -1,4 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { UpdatePlayerRosterDto } from '@module/player/application/dto/add-player-roster.dto';
+import { PlayerService } from '@module/player/application/service/player.service';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
@@ -7,6 +9,8 @@ import {
   FilterOptions,
   IGetAllOptions,
 } from '@common/base/application/interface/get-all-options.interface';
+
+import { User } from '@iam/user/domain/user.entity';
 
 import { RosterResponseAdapter } from '@/module/roster/application/adapter/roster-response.adapter';
 import { ICreateDto } from '@/module/roster/application/dto/create-roster.dto.interface';
@@ -27,6 +31,8 @@ export class RosterService {
     private readonly repository: IRosterPostgresRepository,
     private readonly mapper: RosterMapper,
     private readonly responseAdapter: RosterResponseAdapter,
+    @Inject(forwardRef(() => PlayerService))
+    private readonly playerService: PlayerService,
   ) {}
 
   async getAll(
@@ -71,5 +77,24 @@ export class RosterService {
     relations?: RosterRelation[],
   ): Promise<Roster> {
     return await this.repository.getOneRosterOrFail(where, relations);
+  }
+  async addPlayerToRoster(
+    user: User,
+    updatePlayerRosterDto: UpdatePlayerRosterDto,
+  ) {
+    return await this.playerService.addPlayerToRoster(
+      user,
+      updatePlayerRosterDto,
+    );
+  }
+
+  async removePlayerFromRoster(
+    user: User,
+    updatePlayerRosterDto: UpdatePlayerRosterDto,
+  ) {
+    return await this.playerService.removePlayerFromRoster(
+      user,
+      updatePlayerRosterDto,
+    );
   }
 }

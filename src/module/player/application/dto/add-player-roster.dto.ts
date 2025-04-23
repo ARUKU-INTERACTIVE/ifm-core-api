@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class UpdatePlayerRosterDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  playerId: number;
+  playerId: string;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  rosterId: number;
+  rosterId: string;
 }

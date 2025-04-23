@@ -10,3 +10,34 @@ items:
     publicKey: 'GXXX-XXXX-XXXX-XXXX2'
     externalId: '{{string.uuid}}'
     roles: regular
+  user2:
+    publicKey: 'ERROR-ACCOUNT'
+    username: 'user2@test.com'
+    externalId: '00000000-0000-0000-0000-000000000XXX'
+    roles: regular
+  user3:
+    publicKey: 'USER-NO-TEAM'
+    username: 'user3@test.com'
+    externalId: '00000000-0000-0000-0000-00000000XXXX'
+    roles: regular
+  user4:
+    publicKey: '{{string.uuid}}'
+    username: '{{internet.email}}'
+    externalId: '{{string.uuid}}'
+    roles: regular
+  user5:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX5'
+    username: '{{internet.email}}'
+    externalId: '00000000-0000-0000-0000-0000000XXXXX'
+    roles: regular
+  user6:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX6'
+    username: '{{internet.email}}'
+    externalId: '00000000-0000-0000-0000-000000XXXXXX'
+    roles: regular
+  user7:
+    publicKey: 'GXXX-XXXX-XXXX-XXXX7'
+    username: '{{internet.email}}'
+    externalId: '00000000-0000-0000-0000-00000XXXXXXX'
+    roles: regular
+      
