@@ -19,9 +19,11 @@ export class RosterMapper {
     rosterResponseDto.id = roster.id;
     rosterResponseDto.uuid = roster.uuid;
     rosterResponseDto.teamId = roster.teamId;
-    rosterResponseDto.players = roster.players.map((player) =>
-      this.playerMapper.fromPlayerToPlayerResponseDto(player),
-    );
+    if (roster.players) {
+      rosterResponseDto.players = roster.players?.map((player) =>
+        this.playerMapper.fromPlayerToPlayerResponseDto(player),
+      );
+    }
     rosterResponseDto.createdAt = roster.createdAt;
     rosterResponseDto.updatedAt = roster.updatedAt;
     rosterResponseDto.deletedAt = roster.deletedAt;
