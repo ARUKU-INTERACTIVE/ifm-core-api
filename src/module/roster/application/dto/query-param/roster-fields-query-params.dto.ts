@@ -15,7 +15,7 @@ export class RosterFieldsQueryParamsDto extends FieldsQueryParamsDto<RosterRespo
   @IsIn(getDtoProperties(RosterResponseDto), {
     each: true,
   })
-  target = getDtoProperties(
-    RosterResponseDto,
-  ) as FieldOptions<RosterResponseDto>;
+  target = getDtoProperties(RosterResponseDto) as FieldOptions<
+    Omit<RosterResponseDto, 'players'>
+  >;
 }

@@ -1,3 +1,4 @@
+import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { Player } from '@module/player/domain/player.domain';
 import { Type } from 'class-transformer';
 import {
@@ -32,7 +33,7 @@ export class RosterResponseDto {
   @DtoProperty
   @ValidateNested({ each: true })
   @Type(() => Player)
-  players: Player[];
+  players: PlayerResponseDto[];
 
   @DtoProperty
   @IsDate()

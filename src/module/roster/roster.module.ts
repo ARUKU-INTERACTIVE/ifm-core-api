@@ -1,3 +1,4 @@
+import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import { RosterPostgresRepository } from '@module/roster/infrastructure/database/roster.postgres.repository';
 import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -21,6 +22,7 @@ const RepositoryProvider: Provider = {
     RosterMapper,
     RosterResponseAdapter,
     RepositoryProvider,
+    PlayerMapper,
   ],
   controllers: [Controller],
   exports: [RosterService, RosterMapper, RepositoryProvider],
