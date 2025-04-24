@@ -138,7 +138,7 @@ describe('Roster Module', () => {
     });
   });
 
-  describe('PATCH - roster/add/roster/:rosterId/player/:playerId', () => {
+  describe('PATCH - /roster/:rosterId/player/:playerId', () => {
     it('Should correctly add the player to the roster.', async () => {
       const playerId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx19';
       const rosterId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx3';
@@ -148,7 +148,7 @@ describe('Roster Module', () => {
       });
 
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/add/roster/${rosterId}/player/${playerId}`)
+        .patch(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(user7Token, { type: 'bearer' })
         .expect(HttpStatus.OK)
         .then(({ body }) => {
@@ -167,7 +167,7 @@ describe('Roster Module', () => {
       const playerId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx999';
       const rosterId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx3';
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/add/roster/${rosterId}/player/${playerId}`)
+        .patch(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
@@ -186,7 +186,7 @@ describe('Roster Module', () => {
       });
 
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/add/roster/${rosterId}/player/${playerId}`)
+        .patch(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(user5Token, { type: 'bearer' })
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
@@ -199,7 +199,7 @@ describe('Roster Module', () => {
       const rosterId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx3';
 
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/add/roster/${rosterId}/player/${playerId}`)
+        .patch(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.FORBIDDEN)
         .then(({ body }) => {
@@ -212,7 +212,7 @@ describe('Roster Module', () => {
       const rosterId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1';
 
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/add/roster/${rosterId}/player/${playerId}`)
+        .patch(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.CONFLICT)
         .then(({ body }) => {
@@ -226,12 +226,12 @@ describe('Roster Module', () => {
       const playerId6 = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx6';
       const rosterId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1';
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/add/roster/${rosterId}/player/${playerId6}`)
+        .patch(`/api/v1/roster/${rosterId}/player/${playerId6}`)
         .auth(adminToken, { type: 'bearer' });
 
       const playerId8 = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx8';
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/add/roster/${rosterId}/player/${playerId8}`)
+        .patch(`/api/v1/roster/${rosterId}/player/${playerId8}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.CONFLICT)
         .then(({ body }) => {
@@ -250,7 +250,7 @@ describe('Roster Module', () => {
       });
 
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/add/roster/${rosterId}/player/${playerId}`)
+        .patch(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(user7Token, { type: 'bearer' })
         .expect(HttpStatus.BAD_REQUEST)
         .then(({ body }) => {
@@ -261,13 +261,13 @@ describe('Roster Module', () => {
     });
   });
 
-  describe('PATCH - roster/remove/roster/:rosterId/player/:playerId', () => {
+  describe('DELETE - /roster/:rosterId/player/:playerId', () => {
     it('Should correctly remove the player to the roster.', async () => {
       const playerId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx6';
       const rosterId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1';
 
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/remove/roster/${rosterId}/player/${playerId}`)
+        .delete(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.OK)
         .then(({ body }) => {
@@ -286,7 +286,7 @@ describe('Roster Module', () => {
       const playerId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx999';
       const rosterId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx3';
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/remove/roster/${rosterId}/player/${playerId}`)
+        .delete(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
@@ -308,7 +308,7 @@ describe('Roster Module', () => {
       });
 
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/remove/roster/${rosterId}/player/${playerId}`)
+        .delete(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(user6Token, { type: 'bearer' })
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
@@ -323,7 +323,7 @@ describe('Roster Module', () => {
       const rosterId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx3';
 
       await request(app.getHttpServer())
-        .patch(`/api/v1/roster/remove/roster/${rosterId}/player/${playerId}`)
+        .delete(`/api/v1/roster/${rosterId}/player/${playerId}`)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.BAD_REQUEST)
         .then(({ body }) => {

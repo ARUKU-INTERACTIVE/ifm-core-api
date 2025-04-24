@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class UpdatePlayerRosterDto {
+export class AddPlayerToRosterDto {
   @IsString()
   @IsNotEmpty()
-  playerId: string;
+  playerUuid: string;
 
   @IsString()
   @IsNotEmpty()
-  rosterId: string;
+  rosterUuid: string;
 }

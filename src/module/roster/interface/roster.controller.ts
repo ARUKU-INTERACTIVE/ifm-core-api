@@ -1,5 +1,5 @@
 import { UpdatePlayerResponseDto } from '@module/player/application/dto/player-response-update-dto';
-import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Patch, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
@@ -62,24 +62,27 @@ export class RosterController {
     return this.rosterService.getOneByUuidOrFail(uuid, include.fields);
   }
 
-  @Patch('/add/roster/:rosterId/player/:playerId')
+  @Patch('/:rosterUuid/player/:playerUuid')
   async addPlayerRoster(
     @CurrentUser() user: User,
-    @Param('rosterId') rosterId: string,
-    @Param('playerId') playerId: string,
+    @Param('rosterUuid') rosterUuid: string,
+    @Param('playerUuid') playerUuid: string,
   ): Promise<OneSerializedResponseDto<UpdatePlayerResponseDto>> {
-    return this.rosterService.addPlayerToRoster(user, { playerId, rosterId });
+    return this.rosterService.addPlayerToRoster(user, {
+      playerUuid,
+      rosterUuid,
+    });
   }
 
-  @Patch('/remove/roster/:rosterId/player/:playerId')
+  @Delete('/:rosterUuid/player/:playerUuid')
   async removePlayerRoster(
     @CurrentUser() user: User,
-    @Param('rosterId') rosterId: string,
-    @Param('playerId') playerId: string,
+    @Param('rosterUuid') rosterUuid: string,
+    @Param('playerUuid') playerUuid: string,
   ): Promise<OneSerializedResponseDto<UpdatePlayerResponseDto>> {
     return await this.rosterService.removePlayerFromRoster(user, {
-      playerId,
-      rosterId,
+      playerUuid,
+      rosterUuid,
     });
   }
 }

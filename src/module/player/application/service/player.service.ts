@@ -1,5 +1,5 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
-import { UpdatePlayerRosterDto } from '@module/player/application/dto/add-player-roster.dto';
+import { AddPlayerToRosterDto } from '@module/player/application/dto/add-player-roster.dto';
 import { UpdatePlayerResponseDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
@@ -10,21 +10,18 @@ import {
   PLAYER_REPOSITORY_KEY,
 } from '@module/player/application/repository/player.repository.interface';
 import { Player } from '@module/player/domain/player.domain';
+import { PlayerAlreadyInRoster } from '@module/player/infrastructure/database/exception/player-already-in-roster.exception';
 import {
   PlayerAddressAlreadyExistsException,
   PlayerNotOwnedByUserException,
 } from '@module/player/infrastructure/database/exception/player.exception';
 import { RosterRelation } from '@module/roster/application/enum/roster-relation.enum';
 import { RosterService } from '@module/roster/application/service/roster.service';
+import { RosterCapacityExceeded } from '@module/roster/infrastructure/database/exception/roster-capacity-exceeded.exception';
 import { TeamRelation } from '@module/team/application/enum/team-relation.enum';
 import { TeamService } from '@module/team/application/service/team.service';
 import { TeamBadRequestException } from '@module/team/infrastructure/database/exception/team-bad-request.exception';
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  forwardRef,
-} from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
@@ -261,13 +258,13 @@ export class PlayerService {
 
   async addPlayerToRoster(
     user: User,
-    updatePlayerRosterDto: UpdatePlayerRosterDto,
+    updatePlayerRosterDto: AddPlayerToRosterDto,
   ) {
     const team = await this.teamService.getOneByUserIdOrFail(user.id, [
       TeamRelation.ROSTER_ENTITY,
     ]);
     const player = await this.playerRepository.getOneByUuIdOrFail(
-      updatePlayerRosterDto.playerId,
+      updatePlayerRosterDto.playerUuid,
     );
     const playerIsOwnedByUser = await this.stellarNFTAdapter.checkNFTBalance(
       user.publicKey,
@@ -283,7 +280,7 @@ export class PlayerService {
     }
     const roster = await this.rosterService.getOneRosterOrFail(
       {
-        uuid: updatePlayerRosterDto.rosterId,
+        uuid: updatePlayerRosterDto.rosterUuid,
       },
       [RosterRelation.Player],
     );
@@ -292,14 +289,15 @@ export class PlayerService {
     }
 
     if (player.rosterId && player.rosterId === roster.id) {
-      throw new ConflictException(
-        `Player with uuid ${player.uuid} is already assigned to roster uuid ${roster.uuid}`,
-      );
+      throw new PlayerAlreadyInRoster({
+        playerUuid: player.uuid,
+        rosterUuid: roster.uuid,
+      });
     }
     if (roster.players.length >= this.rosterService.MAX_PLAYERS) {
-      throw new ConflictException(
-        `The roster already has the maximum of ${this.rosterService.MAX_PLAYERS} players.`,
-      );
+      throw new RosterCapacityExceeded({
+        maxPlayers: this.rosterService.MAX_PLAYERS,
+      });
     }
 
     player.rosterId = roster.id;
@@ -311,13 +309,13 @@ export class PlayerService {
 
   async removePlayerFromRoster(
     user: User,
-    updatePlayerRosterDto: UpdatePlayerRosterDto,
+    updatePlayerRosterDto: AddPlayerToRosterDto,
   ) {
     const player = await this.playerRepository.getOneByUuIdOrFail(
-      updatePlayerRosterDto.playerId,
+      updatePlayerRosterDto.playerUuid,
     );
     const roster = await this.rosterService.getOneRosterOrFail({
-      uuid: updatePlayerRosterDto.rosterId,
+      uuid: updatePlayerRosterDto.rosterUuid,
     });
 
     const team = await this.teamService.getOneByUserIdOrFail(user.id, [

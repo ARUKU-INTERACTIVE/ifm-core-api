@@ -42,7 +42,9 @@ export class TeamService {
     options: IGetAllOptions<Team, TeamRelation[]>,
   ): Promise<ManySerializedResponseDto<TeamResponseDto>> {
     const { fields, include } = options || {};
-    if (include && fields && !fields.includes('id')) fields.push('id');
+    if (include && fields && !fields.includes('id')) {
+      fields.push('id');
+    }
 
     const collection = await this.teamRepository.getAll(options);
     const collectionDto = new CollectionDto({

@@ -1,4 +1,4 @@
-import { UpdatePlayerRosterDto } from '@module/player/application/dto/add-player-roster.dto';
+import { AddPlayerToRosterDto } from '@module/player/application/dto/add-player-roster.dto';
 import { PlayerService } from '@module/player/application/service/player.service';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
@@ -25,11 +25,11 @@ import { Roster } from '@/module/roster/domain/roster.entity';
 
 @Injectable()
 export class RosterService {
-  MAX_PLAYERS = 11;
+  public readonly MAX_PLAYERS = 11;
   constructor(
     @Inject(ROSTER_REPOSITORY_KEY)
     private readonly repository: IRosterPostgresRepository,
-    private readonly mapper: RosterMapper,
+    private readonly rosterMapper: RosterMapper,
     private readonly responseAdapter: RosterResponseAdapter,
     @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
@@ -40,13 +40,15 @@ export class RosterService {
   ): Promise<ManySerializedResponseDto<RosterResponseDto>> {
     const { fields, include } = options || {};
 
-    if (include && fields && !fields.includes('id')) fields.push('id');
+    if (include && fields && !fields.includes('id')) {
+      fields.push('id');
+    }
 
     const collection = await this.repository.getAll(options);
     const collectionDto = new CollectionDto({
       ...collection,
       data: collection.data.map((roster: Roster) =>
-        this.mapper.fromRosterToRosterResponseDto(roster),
+        this.rosterMapper.fromRosterToRosterResponseDto(roster),
       ),
     });
 
@@ -62,13 +64,13 @@ export class RosterService {
   ): Promise<OneSerializedResponseDto<RosterResponseDto>> {
     const roster = await this.repository.getOneByUuidOrFail(uuid, relations);
     return this.responseAdapter.oneEntityResponse<RosterResponseDto>(
-      this.mapper.fromRosterToRosterResponseDto(roster),
+      this.rosterMapper.fromRosterToRosterResponseDto(roster),
     );
   }
 
   async saveOne(createRosterDto: ICreateRosterDto): Promise<Roster> {
     return await this.repository.saveOne(
-      this.mapper.fromCreateRosterDtoToRoster(createRosterDto),
+      this.rosterMapper.fromCreateRosterDtoToRoster(createRosterDto),
     );
   }
 
@@ -80,7 +82,7 @@ export class RosterService {
   }
   async addPlayerToRoster(
     user: User,
-    updatePlayerRosterDto: UpdatePlayerRosterDto,
+    updatePlayerRosterDto: AddPlayerToRosterDto,
   ) {
     return await this.playerService.addPlayerToRoster(
       user,
@@ -90,7 +92,7 @@ export class RosterService {
 
   async removePlayerFromRoster(
     user: User,
-    updatePlayerRosterDto: UpdatePlayerRosterDto,
+    updatePlayerRosterDto: AddPlayerToRosterDto,
   ) {
     return await this.playerService.removePlayerFromRoster(
       user,
