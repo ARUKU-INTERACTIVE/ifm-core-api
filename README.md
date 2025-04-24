@@ -1,6 +1,6 @@
-# Template API
+# IFM API
 
-Template for creating REST APIs.
+This API contains all Invincible Football Manager core business logic.
 
 **Table of contents:**
 
@@ -8,5 +8,7 @@ Template for creating REST APIs.
 - [How to run](./docs/readme/HOW-TO-RUN.md)
 - [Migrations](./docs/readme/MIGRATIONS.md)
 - [Testing](./docs/readme/TESTING.md)
-- [Generators](./docs/readme/GENERATORS.md)
 - [Responses](./docs/readme/RESPONSES.MD)
+- [Integrations](./docs/readme/INTEGRATIONS.md)
+- [Environment Variables](./docs/readme/ENVIRONMENT-VARIABLES.md)
+- [Project Structure](./docs/readme/PROJECT-STRUCTURE.md)
