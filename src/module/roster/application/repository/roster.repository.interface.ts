@@ -13,7 +13,7 @@ export interface IRosterPostgresRepository {
   getAll(
     options?: IGetAllOptions<Roster, RosterRelation[]>,
   ): Promise<ICollection<Roster>>;
-  getOneByUiidOrFail(
+  getOneByUuidOrFail(
     uuid: string,
     relations: RosterRelation[],
   ): Promise<Roster>;

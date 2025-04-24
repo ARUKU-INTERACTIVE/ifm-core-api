@@ -55,11 +55,11 @@ export class RosterController {
   @ApiParam({ name: 'uuid', type: String })
   @ApiOperation({ summary: 'Get one Roster by id or throw not found' })
   @GetOneSwaggerDecorator(RosterResponseDto)
-  getOneByUiidOrFail(
+  getOneByUuidOrFail(
     @Param('uuid') uuid: string,
     @Query('include') include: IncludeQueryParamsDto,
   ): Promise<OneSerializedResponseDto<RosterResponseDto>> {
-    return this.rosterService.getOneByUiidOrFail(uuid, include.fields);
+    return this.rosterService.getOneByUuidOrFail(uuid, include.fields);
   }
 
   @Patch('/add/roster/:rosterId/player/:playerId')

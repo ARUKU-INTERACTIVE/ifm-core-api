@@ -1,14 +1,14 @@
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import { Injectable } from '@nestjs/common';
 
-import { ICreateDto } from '@/module/roster/application/dto/create-roster.dto.interface';
+import { ICreateRosterDto } from '@/module/roster/application/dto/create-roster.dto.interface';
 import { RosterResponseDto } from '@/module/roster/application/dto/roster-response.dto';
 import { Roster } from '@/module/roster/domain/roster.entity';
 
 @Injectable()
 export class RosterMapper {
   constructor(private readonly playerMapper: PlayerMapper) {}
-  fromCreateRosterDtoToRoster(rosterDto: ICreateDto): Roster {
+  fromCreateRosterDtoToRoster(rosterDto: ICreateRosterDto): Roster {
     const roster = new Roster();
     roster.teamId = rosterDto.teamId;
     return roster;

@@ -15,7 +15,7 @@ import { UserAlreadyHasTeamException } from '@iam/user/infrastructure/database/e
 import { TeamResponseAdapter } from '@/module/team/application/adapter/team-response.adapter';
 import { ICreateTeamDto } from '@/module/team/application/dto/create-team.dto.interface';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
-import { IUpdateDto } from '@/module/team/application/dto/update-team.dto.interface';
+import { IUpdateTeamDto } from '@/module/team/application/dto/update-team.dto.interface';
 import { TeamRelation } from '@/module/team/application/enum/team-relation.enum';
 import { TeamMapper } from '@/module/team/application/mapper/team.mapper';
 import {
@@ -83,7 +83,7 @@ export class TeamService {
   }
 
   async saveOne(
-    createDto: ICreateTeamDto,
+    createTeamDto: ICreateTeamDto,
     currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const ownedPlayerIds = [];
@@ -106,7 +106,7 @@ export class TeamService {
     }
     const team = await this.teamRepository.saveOne(
       this.teamMapper.fromCreateTeamDtoToTeam(
-        createDto,
+        createTeamDto,
         ownedPlayerIds,
         currentUser.id,
       ),
@@ -128,11 +128,11 @@ export class TeamService {
 
   async updateOneOrFail(
     id: number,
-    updateDto: IUpdateDto,
+    updateTeamDto: IUpdateTeamDto,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
     const team = await this.teamRepository.updateOneOrFail(
       id,
-      this.teamMapper.fromUpdateTeamDtoToTeam(updateDto),
+      this.teamMapper.fromUpdateTeamDtoToTeam(updateTeamDto),
     );
     return this.teamResponseAdapter.oneEntityResponse<TeamResponseDto>(
       this.teamMapper.fromTeamToTeamResponseDto(team),

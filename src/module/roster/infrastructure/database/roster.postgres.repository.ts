@@ -42,7 +42,7 @@ export class RosterPostgresRepository implements IRosterPostgresRepository {
     };
   }
 
-  async getOneByUiidOrFail(
+  async getOneByUuidOrFail(
     uuid: string,
     relations: RosterRelation[] = [],
   ): Promise<Roster> {

@@ -13,7 +13,7 @@ import {
 import { User } from '@iam/user/domain/user.entity';
 
 import { RosterResponseAdapter } from '@/module/roster/application/adapter/roster-response.adapter';
-import { ICreateDto } from '@/module/roster/application/dto/create-roster.dto.interface';
+import { ICreateRosterDto } from '@/module/roster/application/dto/create-roster.dto.interface';
 import { RosterResponseDto } from '@/module/roster/application/dto/roster-response.dto';
 import { RosterRelation } from '@/module/roster/application/enum/roster-relation.enum';
 import { RosterMapper } from '@/module/roster/application/mapper/roster.mapper';
@@ -56,19 +56,19 @@ export class RosterService {
     );
   }
 
-  async getOneByUiidOrFail(
-    uiid: string,
+  async getOneByUuidOrFail(
+    uuid: string,
     relations?: RosterRelation[],
   ): Promise<OneSerializedResponseDto<RosterResponseDto>> {
-    const roster = await this.repository.getOneByUiidOrFail(uiid, relations);
+    const roster = await this.repository.getOneByUuidOrFail(uuid, relations);
     return this.responseAdapter.oneEntityResponse<RosterResponseDto>(
       this.mapper.fromRosterToRosterResponseDto(roster),
     );
   }
 
-  async saveOne(createDto: ICreateDto): Promise<Roster> {
+  async saveOne(createRosterDto: ICreateRosterDto): Promise<Roster> {
     return await this.repository.saveOne(
-      this.mapper.fromCreateRosterDtoToRoster(createDto),
+      this.mapper.fromCreateRosterDtoToRoster(createRosterDto),
     );
   }
 
