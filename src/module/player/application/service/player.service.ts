@@ -80,7 +80,9 @@ export class PlayerService {
       options.include,
     );
   }
-
+  async getOneByUuid(uuid: string, relations?: PlayerRelation[]) {
+    return await this.playerRepository.getOneByUuIdOrFail(uuid, relations);
+  }
   async getOneById(
     id: number,
     relations?: PlayerRelation[],
