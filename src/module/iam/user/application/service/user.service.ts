@@ -35,4 +35,8 @@ export class UserService {
 
     return this.userResponseAdapter.manyEntitiesResponse(collectionDto);
   }
+
+  async updateOne(id: number, updates: Partial<Omit<User, 'id'>>) {
+    this.userRepository.updateOneOrFail(id, updates);
+  }
 }

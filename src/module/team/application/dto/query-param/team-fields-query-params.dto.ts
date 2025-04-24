@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { IsIn } from 'class-validator';
 
 import { getDtoProperties } from '@common/base/application/dto/base.dto';
@@ -15,5 +15,7 @@ export class TeamFieldsQueryParamsDto extends FieldsQueryParamsDto<TeamResponseD
   @IsIn(getDtoProperties(TeamResponseDto), {
     each: true,
   })
-  target = getDtoProperties(TeamResponseDto) as FieldOptions<TeamResponseDto>;
+  target = getDtoProperties(
+    OmitType(TeamResponseDto, ['rosterId']),
+  ) as FieldOptions<Omit<TeamResponseDto, 'rosterId'>>;
 }

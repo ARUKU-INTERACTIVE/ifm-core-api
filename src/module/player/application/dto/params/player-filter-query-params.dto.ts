@@ -10,6 +10,11 @@ export class PlayerFilterQueryParamsDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  description?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
   metadataUri?: string;
 
   @ApiPropertyOptional()
@@ -26,4 +31,14 @@ export class PlayerFilterQueryParamsDto {
   @IsNumber()
   @IsOptional()
   externalId?: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  teamId?: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  rosterId?: number;
 }

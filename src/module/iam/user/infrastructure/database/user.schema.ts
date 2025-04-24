@@ -33,6 +33,7 @@ export const UserSchema = new EntitySchema<User>({
     },
     teamId: {
       type: Number,
+      unique: true,
       nullable: true,
     },
   }),
@@ -41,6 +42,9 @@ export const UserSchema = new EntitySchema<User>({
       type: 'one-to-one',
       target: 'Team',
       inverseSide: 'team',
+      joinColumn: {
+        name: 'team_id',
+      },
     },
   },
 });

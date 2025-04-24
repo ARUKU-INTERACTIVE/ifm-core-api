@@ -1,6 +1,7 @@
 import { PlayerRelation } from '@module/player/application/enum/player-relations.enum';
 import { IPlayerRepository } from '@module/player/application/repository/player.repository.interface';
 import { Player } from '@module/player/domain/player.domain';
+import { PlayerNotFoundException } from '@module/player/infrastructure/database/exception/player.exception';
 import { PlayerSChema } from '@module/player/infrastructure/database/player.schema';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
@@ -58,6 +59,25 @@ export class PlayerRepository implements IPlayerRepository {
       },
       relations,
     });
+  }
+
+  async getOneByUuIdOrFail(
+    uuid: string,
+    relations?: PlayerRelation[],
+  ): Promise<Player> {
+    const player = await this.repository.findOne({
+      where: {
+        uuid,
+      },
+      relations,
+    });
+
+    if (!player) {
+      throw new PlayerNotFoundException({
+        message: `Player with ID ${uuid} not found`,
+      });
+    }
+    return player;
   }
 
   async getOnePlayer(

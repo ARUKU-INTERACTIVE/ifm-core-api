@@ -25,6 +25,10 @@ export class TeamResponseDto {
   logoUri: string;
 
   @DtoProperty
+  @IsString()
+  rosterId: string;
+
+  @DtoProperty
   @IsDate()
   createdAt: string;
 

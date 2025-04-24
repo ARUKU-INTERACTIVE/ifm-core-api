@@ -22,6 +22,7 @@ export class User extends Base {
     updatedAt?: string,
     deletedAt?: string,
     isVerified?: boolean,
+    team?: Team,
   ) {
     super(id, createdAt, updatedAt, deletedAt);
     this.publicKey = publicKey;
@@ -29,5 +30,6 @@ export class User extends Base {
     this.externalId = externalId;
     this.roles = roles;
     this.isVerified = isVerified;
+    this.team = team;
   }
 }

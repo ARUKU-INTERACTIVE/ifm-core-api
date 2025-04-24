@@ -33,7 +33,9 @@ export class BookService {
   ): Promise<ManySerializedResponseDto<BookResponseDto>> {
     const { fields, include } = options || {};
 
-    if (include && fields && !fields.includes('id')) fields.push('id');
+    if (include && fields && !fields.includes('id')) {
+      fields.push('id');
+    }
 
     const collection = await this.bookRepository.getAll(options);
 

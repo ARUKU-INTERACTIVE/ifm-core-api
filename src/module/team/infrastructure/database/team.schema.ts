@@ -35,5 +35,10 @@ export const TeamSchema = new EntitySchema<Team>({
         name: 'user_id',
       },
     },
+    roster: {
+      type: 'one-to-one',
+      target: 'Roster',
+      inverseSide: 'team',
+    },
   },
 });

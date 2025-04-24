@@ -45,3 +45,8 @@ items:
     username: '{{internet.email}}'
     externalId: '00000000-0000-0000-0000-00000000BID4'
     roles: regular
+  user9:
+    publicKey: 'BIDDER-5'
+    username: '{{internet.email}}'
+    externalId: '00000000-0000-0000-0000-00000000BID5'
+    roles: regular

@@ -1,0 +1,11 @@
+entity: Roster
+items:
+  roster1:
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1'
+    team: '@team1'
+  roster2:
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx2'
+    team: '@team2'
+  roster3:
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx3'
+    team: '@team3'
