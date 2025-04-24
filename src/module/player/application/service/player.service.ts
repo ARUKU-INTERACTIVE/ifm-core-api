@@ -323,7 +323,7 @@ export class PlayerService {
     const team = await this.teamService.getOneByUserIdOrFail(user.id, [
       TeamRelation.ROSTER_ENTITY,
     ]);
-    if (team.roster.id !== roster.teamId) {
+    if (team.id !== roster.teamId) {
       throw new UserNotRosterOwnerException();
     }
 
