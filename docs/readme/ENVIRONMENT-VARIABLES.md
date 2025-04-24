@@ -39,13 +39,13 @@
 
 #### Stellar
 
-| Variable                     | Description                                          |
-| ---------------------------- | ---------------------------------------------------- |
-| `STELLAR_SERVER`             | Stellar Server, can be pubnet, testnet or futurenet. |
-| `STELLAR_NETWORK_PASSPHRASE` | Stellar Server network passphrase.                   |
-| `STELLAR_ADMIN`              | Soroban Contract admin.                              |
-| `STELLAR_DEFAULT_ASSET_CODE` | Default asset code to use as an asset CID.           |
-| `NATIVE_ASSET_ADDRESS`       | Native asset (XLM) asset address.                    |
+| Variable                     | Description                                                        |
+| ---------------------------- | ------------------------------------------------------------------ |
+| `STELLAR_SERVER`             | Stellar Server, can be pubnet, testnet or futurenet.               |
+| `STELLAR_NETWORK_PASSPHRASE` | Stellar Server network passphrase.                                 |
+| `STELLAR_ADMIN`              | Soroban Contract admin.                                            |
+| `STELLAR_DEFAULT_ASSET_CODE` | Default asset code for composing NFT asset identifiers on Stellar. |
+| `NATIVE_ASSET_ADDRESS`       | Native asset (XLM) asset address.                                  |
 
 #### Soroban
 
