@@ -11,7 +11,8 @@ import { createAccessToken } from '@test/test.util';
 
 import { CreateFormationDto } from '@/module/formation/application/dto/create-formation.dto';
 import { FormationResponseDto } from '@/module/formation/application/dto/formation-response.dto';
-import { UpdateDto } from '@/module/formation/application/dto/update-formation.dto';
+import { UpdateFormationDto } from '@/module/formation/application/dto/update-formation.dto';
+import { Position } from '@/module/formation/application/enum/formation-position.enum';
 import { FORMATION_ENTITY_NAME } from '@/module/formation/domain/formation.name';
 
 describe('Formation Module', () => {
@@ -49,10 +50,12 @@ describe('Formation Module', () => {
               expect.objectContaining({
                 attributes: expect.objectContaining({
                   name: expect.any(String),
-                  uuid:
-                    expect.stringMatching(
-                      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
-                    ) || expect(undefined),
+                  forwards: expect.any(Number),
+                  midfielders: expect.any(Number),
+                  defenders: expect.any(Number),
+                  uuid: expect.stringMatching(
+                    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+                  ),
                   createdAt: expect.any(String),
                   updatedAt: expect.any(String),
                   deletedAt: null,
@@ -72,8 +75,14 @@ describe('Formation Module', () => {
           expect(body).toEqual(expectedResponse);
         });
     });
+
     it('should allow to select specific attributes', async () => {
-      const attributes = ['name'] as (keyof FormationResponseDto)[];
+      const attributes = [
+        'name',
+        'forwards',
+        'midfielders',
+        'defenders',
+      ] as (keyof FormationResponseDto)[];
 
       await request(app.getHttpServer())
         .get(`/api/v1/formation?fields[target]=${attributes.join(',')}`)
@@ -86,11 +95,15 @@ describe('Formation Module', () => {
           );
           expect(resourceAttributes).toEqual({
             name: expect.any(String),
+            forwards: expect.any(Number),
+            midfielders: expect.any(Number),
+            defenders: expect.any(Number),
           });
         });
     });
+
     it('should allow to filter by attributes', async () => {
-      const name = 'John';
+      const name = '4-4-2';
 
       await request(app.getHttpServer())
         .get(`/api/v1/formation?filter[name]=${name}`)
@@ -102,6 +115,9 @@ describe('Formation Module', () => {
               expect.objectContaining({
                 attributes: expect.objectContaining({
                   name,
+                  forwards: 2,
+                  midfielders: 4,
+                  defenders: 4,
                 }),
               }),
             ]),
@@ -109,11 +125,24 @@ describe('Formation Module', () => {
           expect(body).toEqual(expectedResponse);
         });
     });
+
+    it('should allow to sort by attributes', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/formation?sort[name]=asc')
+        .auth(adminToken, { type: 'bearer' })
+        .expect(HttpStatus.OK)
+        .then(({ body }) => {
+          expect(body.data.length).toBeGreaterThan(0);
+          const names = body.data.map((item) => item.attributes.name);
+          const sortedNames = [...names].sort();
+          expect(names).toEqual(sortedNames);
+        });
+    });
   });
 
   describe('GET - /formation/:id', () => {
     it('should return a specific formation', async () => {
-      const formationId = 1;
+      const formationId = '3c848713-18df-4c04-b445-46e55df00029';
 
       await request(app.getHttpServer())
         .get(`/api/v1/formation/${formationId}`)
@@ -122,7 +151,18 @@ describe('Formation Module', () => {
         .then(({ body }) => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
-              id: formationId.toString(),
+              id: expect.any(String),
+              type: 'formation',
+              attributes: {
+                uuid: '3c848713-18df-4c04-b445-46e55df00029',
+                name: '4-4-2',
+                forwards: 2,
+                midfielders: 4,
+                defenders: 4,
+                createdAt: '2025-04-25T16:42:10.000Z',
+                updatedAt: '2025-04-25T16:42:10.000Z',
+                deletedAt: null,
+              },
             }),
           });
           expect(body).toEqual(expectedResponse);
@@ -135,14 +175,28 @@ describe('Formation Module', () => {
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
-          expect(body.error.detail).toBe('Formation with ID 9999 not found');
+          expect(body.error.detail).toBe('Formation with UUID 9999 not found');
         });
     });
   });
 
   describe('POST - /formation', () => {
     it('should create a new formation', async () => {
-      const createFormationDto = { name: 'Mary' } as CreateFormationDto;
+      const createFormationDto = {
+        name: '5-3-2',
+        description: 'Formación defensiva con dos delanteros',
+        forwards: 2,
+        midfielders: 3,
+        defenders: 5,
+        rosterUuid: '00000000-0000-0000-0000-000000000001',
+        formationPlayers: [
+          {
+            playerUuid: '00000000-0000-0000-0000-000000000001',
+            position: Position.Forward,
+            positionIndex: 0,
+          },
+        ],
+      } as CreateFormationDto;
 
       await request(app.getHttpServer())
         .post('/api/v1/formation/')
@@ -152,9 +206,16 @@ describe('Formation Module', () => {
         .then(({ body }) => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
-              attributes: expect.objectContaining({
-                name: createFormationDto.name,
-              }),
+              attributes: {
+                uuid: expect.any(String),
+                name: '5-3-2',
+                forwards: 2,
+                midfielders: 3,
+                defenders: 5,
+                createdAt: expect.any(String),
+                updatedAt: expect.any(String),
+                deletedAt: null,
+              },
             }),
           });
           expect(body).toEqual(expectedResponse);
@@ -162,11 +223,25 @@ describe('Formation Module', () => {
     });
   });
 
-  describe('PATCH - /formation/:id', () => {
+  describe('PATCH - /formation', () => {
     it('should update an existing formation', async () => {
-      const createFormationDto = { name: 'Mary' } as CreateFormationDto;
-      const updateFormationDto = { name: 'Jane' } as UpdateDto;
-      let formationId: number;
+      const createFormationDto = {
+        name: '4-2-3-1',
+        description: 'Formación con un delantero centro',
+        forwards: 1,
+        midfielders: 5,
+        defenders: 4,
+        rosterUuid: '00000000-0000-0000-0000-000000000001',
+        formationPlayers: [
+          {
+            playerUuid: '00000000-0000-0000-0000-000000000001',
+            position: Position.Forward,
+            positionIndex: 0,
+          },
+        ],
+      } as CreateFormationDto;
+
+      let formationUuid: string;
 
       await request(app.getHttpServer())
         .post('/api/v1/formation')
@@ -174,29 +249,45 @@ describe('Formation Module', () => {
         .send(createFormationDto)
         .expect(HttpStatus.CREATED)
         .then(({ body }) => {
-          const expectedResponse = expect.objectContaining({
-            data: expect.objectContaining({
-              id: expect.any(String),
-              attributes: expect.objectContaining({
-                name: createFormationDto.name,
-              }),
-            }),
-          });
-          expect(body).toEqual(expectedResponse);
-          formationId = body.data.id;
+          formationUuid = body.data.attributes.uuid;
         });
 
+      const updateFormationDto = {
+        formationUuid,
+        name: '4-2-3-1',
+        description: 'Formación modificada con un delantero centro',
+        forwards: 1,
+        midfielders: 5,
+        defenders: 4,
+        formationPlayers: [
+          {
+            playerFormationUuid: '00000000-0000-0000-0000-000000000001',
+            position: Position.Forward,
+            positionIndex: 0,
+          },
+        ],
+        newFormationPlayers: [
+          {
+            playerUuid: '00000000-0000-0000-0000-000000000002',
+            position: Position.Forward,
+            positionIndex: 1,
+          },
+        ],
+      } as UpdateFormationDto;
+
       await request(app.getHttpServer())
-        .patch(`/api/v1/formation/${formationId}`)
+        .patch('/api/v1/formation')
         .auth(adminToken, { type: 'bearer' })
         .send(updateFormationDto)
         .expect(HttpStatus.OK)
         .then(({ body }) => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
-              id: formationId.toString(),
               attributes: expect.objectContaining({
                 name: updateFormationDto.name,
+                forwards: updateFormationDto.forwards,
+                midfielders: updateFormationDto.midfielders,
+                defenders: updateFormationDto.defenders,
               }),
             }),
           });
@@ -205,49 +296,27 @@ describe('Formation Module', () => {
     });
 
     it('should throw an error if formation is not found', async () => {
+      const updateFormationDto = {
+        formationUuid: '00000000-0000-0000-0000-000000000999',
+        name: 'non-existing-formation',
+        description: 'Non-existing formation',
+        forwards: 3,
+        midfielders: 4,
+        defenders: 3,
+        formationPlayers: [],
+        newFormationPlayers: [],
+      } as UpdateFormationDto;
+
       await request(app.getHttpServer())
-        .patch('/api/v1/formation/9999')
-        .send({ name: 'non-existing-formation' } as UpdateDto)
+        .patch('/api/v1/formation')
+        .send(updateFormationDto)
         .auth(adminToken, { type: 'bearer' })
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
-          expect(body.error.detail).toBe('Formation with ID 9999 not found');
+          expect(body.error.detail).toBe(
+            'Formation with uuid 00000000-0000-0000-0000-000000000999 not found',
+          );
         });
-    });
-  });
-
-  describe('DELETE - /formation/:id', () => {
-    it('should delete a formation', async () => {
-      const createFormationDto = { name: 'Mary' } as CreateFormationDto;
-      let formationId: number;
-
-      await request(app.getHttpServer())
-        .post('/api/v1/formation')
-        .auth(adminToken, { type: 'bearer' })
-        .send(createFormationDto)
-        .expect(HttpStatus.CREATED)
-        .then(({ body }) => {
-          const expectedResponse = expect.objectContaining({
-            data: expect.objectContaining({
-              id: expect.any(String),
-              attributes: expect.objectContaining({
-                name: createFormationDto.name,
-              }),
-            }),
-          });
-          expect(body).toEqual(expectedResponse);
-          formationId = body.data.id;
-        });
-
-      await request(app.getHttpServer())
-        .delete(`/api/v1/formation/${formationId}`)
-        .auth(adminToken, { type: 'bearer' })
-        .expect(HttpStatus.OK);
-
-      await request(app.getHttpServer())
-        .get(`/api/v1/formation/${formationId}`)
-        .auth(adminToken, { type: 'bearer' })
-        .expect(HttpStatus.NOT_FOUND);
     });
   });
 });
