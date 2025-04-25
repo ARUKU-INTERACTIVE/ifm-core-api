@@ -74,7 +74,7 @@ export class FormationService {
   }
 
   async getOneByIdOrFail(
-    id: number,
+    id: string,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
     const formation = await this.repository.getOneByIdOrFail(id);
     return this.responseAdapter.oneEntityResponse<FormationResponseDto>(
