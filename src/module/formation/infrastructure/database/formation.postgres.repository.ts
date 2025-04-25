@@ -48,7 +48,6 @@ export class FormationPostgresRepository implements IFormationRepository {
         },
       },
     });
-    console.log(formation, 'formation');
     if (!formation) {
       throw new FormationNotFoundException({
         message: `Formation with UUID ${uuid} not found`,

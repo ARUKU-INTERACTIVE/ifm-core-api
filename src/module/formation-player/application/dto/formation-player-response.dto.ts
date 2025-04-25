@@ -1,6 +1,14 @@
+import { Position } from '@module/formation/application/enum/formation-position.enum';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { Type } from 'class-transformer';
-import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 import { DtoProperty } from '@common/base/application/dto/base.dto';
 import { EntityName } from '@common/decorators/entity-name.decorator';
@@ -26,6 +34,14 @@ export class FormationPlayerResponseDto {
   @IsOptional()
   @Type(() => PlayerResponseDto)
   player: PlayerResponseDto;
+
+  @DtoProperty
+  @IsEnum(Position)
+  position: Position;
+
+  @DtoProperty
+  @IsNumber()
+  positionIndex: number;
 
   @DtoProperty
   @IsDate()

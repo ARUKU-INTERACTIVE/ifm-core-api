@@ -51,6 +51,8 @@ export class FormationPlayerMapper {
       formationPlayerResponseDto.player =
         this.playerMapper.fromPlayerToPlayerResponseDto(formationPlayer.player);
     }
+    formationPlayerResponseDto.position = formationPlayer.position;
+    formationPlayerResponseDto.positionIndex = formationPlayer.positionIndex;
     formationPlayerResponseDto.createdAt = formationPlayer.createdAt;
     formationPlayerResponseDto.updatedAt = formationPlayer.updatedAt;
     formationPlayerResponseDto.deletedAt = formationPlayer.deletedAt;

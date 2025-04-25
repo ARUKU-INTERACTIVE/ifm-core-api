@@ -31,7 +31,6 @@ export class FormationMapper {
     formationResponseDto.name = formation.name;
     formationResponseDto.forwards = formation.forwards;
     formationResponseDto.midfielders = formation.midfielders;
-    console.log(formation.formationPlayers);
     if (formation.formationPlayers) {
       formationResponseDto.formationPlayers = formation.formationPlayers.map(
         (formationPlayer) =>
