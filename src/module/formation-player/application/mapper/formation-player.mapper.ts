@@ -18,13 +18,14 @@ export class Mapper {
   }
 
   fromCreateFormationPlayerDtoToFormationPlayers(
-    formationPlayerDto: ICreateFormationPlayerIdDto[],
+    formationPlayersDto: ICreateFormationPlayerIdDto[],
   ): FormationPlayer[] {
-    return formationPlayerDto.map(({ playerId, position, formationId }) => {
+    return formationPlayersDto.map((formationPlayerDto) => {
       const formationPlayer = new FormationPlayer();
-      formationPlayer.position = position;
-      formationPlayer.formationId = formationId;
-      formationPlayer.playerId = playerId;
+      formationPlayer.position = formationPlayerDto.position;
+      formationPlayer.positionIndex = formationPlayerDto.positionIndex;
+      formationPlayer.formationId = formationPlayerDto.formationId;
+      formationPlayer.playerId = formationPlayerDto.playerId;
       return formationPlayer;
     });
   }
@@ -34,8 +35,7 @@ export class Mapper {
   ): FormationPlayer {
     const formationPlayer = new FormationPlayer();
     formationPlayer.position = formationPlayerDto.position;
-    formationPlayer.formationId = formationPlayerDto.formationId;
-    formationPlayer.playerId = formationPlayerDto.playerId;
+    formationPlayer.formationId = formationPlayerDto.positionIndex;
     return formationPlayer;
   }
 

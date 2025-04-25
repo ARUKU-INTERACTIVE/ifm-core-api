@@ -2,6 +2,7 @@ import { Position } from '@module/formation/application/enum/formation-position.
 
 export interface ICreateFormationPlayerDto {
   position: Position;
+  positionIndex: number;
 }
 
 export interface ICreateFormationPlayerUuidDto
