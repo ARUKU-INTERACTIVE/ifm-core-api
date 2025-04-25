@@ -73,17 +73,18 @@ export class FormationService {
     );
   }
 
-  async getOneByIdOrFail(
-    id: string,
+  async getOneByUuidOrFail(uuid: string): Promise<Formation> {
+    return await this.repository.getOneByUuidOrFail(uuid);
+  }
+
+  async getOneMappedByUuidOrFail(
+    uuid: string,
+    relations: FormationRelation[],
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
-    const formation = await this.repository.getOneByIdOrFail(id);
+    const formation = await this.repository.getOneByUuidOrFail(uuid, relations);
     return this.responseAdapter.oneEntityResponse<FormationResponseDto>(
       this.formationMapper.fromFormationToFormationResponseDto(formation),
     );
-  }
-
-  async getOneByUuidOrFail(uuid: string): Promise<Formation> {
-    return await this.repository.getOneByUuidOrFail(uuid);
   }
 
   async saveOne(

@@ -6,8 +6,8 @@ import { OneSerializedResponseDto } from '@common/base/application/dto/one-seria
 
 import { ResponseAdapter } from '@/module/formation-player/application/adapter/formation-player-response.adapter';
 import { ICreateFormationPlayerIdDto } from '@/module/formation-player/application/dto/create-formation-player.dto.interface';
-import { ResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
-import { Mapper } from '@/module/formation-player/application/mapper/formation-player.mapper';
+import { PlayerFormationResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
+import { PlayerFormationMapper } from '@/module/formation-player/application/mapper/formation-player.mapper';
 import {
   FORMATION_PLAYER_REPOSITORY_KEY,
   IPlayerFormationRepository,
@@ -19,7 +19,7 @@ export class FormationPlayerService {
   constructor(
     @Inject(FORMATION_PLAYER_REPOSITORY_KEY)
     private readonly repository: IPlayerFormationRepository,
-    private readonly mapper: Mapper,
+    private readonly mapper: PlayerFormationMapper,
     private readonly responseAdapter: ResponseAdapter,
     @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
@@ -35,9 +35,9 @@ export class FormationPlayerService {
 
   async saveOneFormationPlayer(
     playerFormation: FormationPlayer,
-  ): Promise<OneSerializedResponseDto<ResponseDto>> {
+  ): Promise<OneSerializedResponseDto<PlayerFormationResponseDto>> {
     const formationPlayer = await this.repository.saveOne(playerFormation);
-    return this.responseAdapter.oneEntityResponse<ResponseDto>(
+    return this.responseAdapter.oneEntityResponse<PlayerFormationResponseDto>(
       this.mapper.fromFormationPlayerToFormationPlayerResponseDto(
         formationPlayer,
       ),

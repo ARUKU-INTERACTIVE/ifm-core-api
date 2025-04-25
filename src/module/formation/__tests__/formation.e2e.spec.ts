@@ -1,3 +1,4 @@
+import { UpdateFormationDto } from '@module/formation/application/dto/update-formation.dto';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 
@@ -11,7 +12,6 @@ import { createAccessToken } from '@test/test.util';
 
 import { CreateFormationDto } from '@/module/formation/application/dto/create-formation.dto';
 import { FormationResponseDto } from '@/module/formation/application/dto/formation-response.dto';
-import { UpdateFormationDto } from '@/module/formation/application/dto/update-formation.dto';
 import { Position } from '@/module/formation/application/enum/formation-position.enum';
 import { FORMATION_ENTITY_NAME } from '@/module/formation/domain/formation.name';
 
@@ -153,7 +153,7 @@ describe('Formation Module', () => {
             data: expect.objectContaining({
               id: expect.any(String),
               type: 'formation',
-              attributes: {
+              attributes: expect.objectContaining({
                 uuid: '3c848713-18df-4c04-b445-46e55df00029',
                 name: '4-4-2',
                 forwards: 2,
@@ -162,7 +162,7 @@ describe('Formation Module', () => {
                 createdAt: '2025-04-25T16:42:10.000Z',
                 updatedAt: '2025-04-25T16:42:10.000Z',
                 deletedAt: null,
-              },
+              }),
             }),
           });
           expect(body).toEqual(expectedResponse);
@@ -212,6 +212,7 @@ describe('Formation Module', () => {
                 forwards: 2,
                 midfielders: 3,
                 defenders: 5,
+                formationPlayers: expect.arrayContaining([]),
                 createdAt: expect.any(String),
                 updatedAt: expect.any(String),
                 deletedAt: null,
@@ -314,7 +315,7 @@ describe('Formation Module', () => {
         .expect(HttpStatus.NOT_FOUND)
         .then(({ body }) => {
           expect(body.error.detail).toBe(
-            'Formation with uuid 00000000-0000-0000-0000-000000000999 not found',
+            'Formation with UUID 00000000-0000-0000-0000-000000000999 not found',
           );
         });
     });

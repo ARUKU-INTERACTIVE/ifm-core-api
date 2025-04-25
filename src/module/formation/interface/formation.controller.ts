@@ -54,14 +54,18 @@ export class FormationController {
     });
   }
 
-  @Get(':id')
-  @ApiParam({ name: 'id', type: 'string' })
+  @Get(':formationUuid')
+  @ApiParam({ name: 'formationUuid', type: String })
   @ApiOperation({ summary: 'Get one Formation by id or throw not found' })
   @GetOneSwaggerDecorator(FormationResponseDto)
   getOneByIdOrFail(
-    @Param('id') id: string,
+    @Param('formationUuid') formationUuid: string,
+    @Query('include') include: IncludeQueryParamsDto,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
-    return this.formationService.getOneByIdOrFail(id);
+    return this.formationService.getOneMappedByUuidOrFail(
+      formationUuid,
+      include.fields,
+    );
   }
 
   @Post()

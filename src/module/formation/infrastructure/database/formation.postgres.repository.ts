@@ -39,36 +39,19 @@ export class FormationPostgresRepository implements IFormationRepository {
     };
   }
 
-  async getOneByIdOrFail(
-    id: string,
-    relations: FormationRelation[] = [],
-  ): Promise<Formation> {
-    const Formation = await this.repository.findOne({
-      where: { uuid: id },
-      relations,
-    });
-
-    if (!Formation) {
-      throw new FormationNotFoundException({
-        message: `Formation with UUID ${id} not found`,
-      });
-    }
-
-    return Formation;
-  }
-
-  async getOneByUuidOrFail(
-    uuid: string,
-    relations: FormationRelation[] = [],
-  ): Promise<Formation> {
+  async getOneByUuidOrFail(uuid: string): Promise<Formation> {
     const formation = await this.repository.findOne({
       where: { uuid },
-      relations,
+      relations: {
+        formationPlayers: {
+          player: true,
+        },
+      },
     });
-
+    console.log(formation, 'formation');
     if (!formation) {
       throw new FormationNotFoundException({
-        message: `Formation with uuid ${uuid} not found`,
+        message: `Formation with UUID ${uuid} not found`,
       });
     }
 

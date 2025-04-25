@@ -10,7 +10,9 @@ export interface IFormationRepository {
   getAll(
     options?: IGetAllOptions<Formation, FormationRelation[]>,
   ): Promise<ICollection<Formation>>;
-  getOneByIdOrFail(id: string): Promise<Formation>;
-  getOneByUuidOrFail(uuid: string): Promise<Formation>;
+  getOneByUuidOrFail(
+    uuid: string,
+    relations?: FormationRelation[],
+  ): Promise<Formation>;
   saveOne(formation: Formation): Promise<Formation>;
 }

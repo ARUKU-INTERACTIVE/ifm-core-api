@@ -1,12 +1,14 @@
 import { ICreateFormationPlayerIdDto } from '@module/formation-player/application/dto/create-formation-player.dto.interface';
+import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import { Injectable } from '@nestjs/common';
 
-import { ResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
+import { PlayerFormationResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
 import { IUpdateFormationPlayerDto } from '@/module/formation-player/application/dto/update-formation-player.dto.interface';
 import { FormationPlayer } from '@/module/formation-player/domain/formation-player.entity';
 
 @Injectable()
-export class Mapper {
+export class PlayerFormationMapper {
+  constructor(private readonly playerMapper: PlayerMapper) {}
   fromCreateFormationPlayerDtoToFormationPlayer(
     formationPlayerDto: ICreateFormationPlayerIdDto,
   ): FormationPlayer {
@@ -41,10 +43,14 @@ export class Mapper {
 
   fromFormationPlayerToFormationPlayerResponseDto(
     formationPlayer: FormationPlayer,
-  ): ResponseDto {
-    const formationPlayerResponseDto = new ResponseDto();
+  ): PlayerFormationResponseDto {
+    const formationPlayerResponseDto = new PlayerFormationResponseDto();
     formationPlayerResponseDto.id = formationPlayer.id;
     formationPlayerResponseDto.uuid = formationPlayer.uuid;
+    if (formationPlayer.player) {
+      formationPlayerResponseDto.player =
+        this.playerMapper.fromPlayerToPlayerResponseDto(formationPlayer.player);
+    }
     formationPlayerResponseDto.createdAt = formationPlayer.createdAt;
     formationPlayerResponseDto.updatedAt = formationPlayer.updatedAt;
     formationPlayerResponseDto.deletedAt = formationPlayer.deletedAt;
