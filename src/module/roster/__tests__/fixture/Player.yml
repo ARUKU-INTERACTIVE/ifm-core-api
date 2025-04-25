@@ -1,0 +1,208 @@
+entity: Player
+items:
+  player1:
+    id: 1
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1'
+    name: 'player'
+    description: 'description'
+    metadataCid: 'http://example.com.ar'
+    imageCid: 'http://image.com.ar'
+    issuer: 'ISSUER'
+    address: 'CXXXXXX'
+    team: '@team1'
+  player2:
+    id: 2
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx2'
+    name: 'player2'
+    description: 'description'
+    metadataCid: 'metadataCid2'
+    imageCid: 'imageCid2'
+    issuer: '{{string.alpha}}'
+  player3:
+    id: 3
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx3'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid3'
+    imageCid: 'imageCid3'
+    issuer: '{{string.alpha}}'
+    address: 'CXXXXXXX3'
+  player4:
+    id: 4
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx4'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid4'
+    imageCid: 'imageCid4'
+    issuer: 'ISSUER4'
+    address: 'CXXXXXXX4'
+  player5:
+    id: 5
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx5'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid5'
+    imageCid: 'imageCid5'
+    issuer: 'ISSUER5'
+    address: 'CXXXXXXX5'
+    team: '@team2'
+  player6:
+    id: 6
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx6'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid6'
+    imageCid: 'imageCid6'
+    issuer: 'ISSUER6'
+    address: 'CXXXXXXX6'
+    team: '@team1'
+  player7:
+    id: 7
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx7'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid7'
+    imageCid: 'imageCid7'
+    issuer: 'ISSUER7'
+    address: 'CXXXXXXX7'
+    team: '@team1'
+    roster: '@roster1'
+  player8:
+    id: 8
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx8'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid8'
+    imageCid: 'imageCid8'
+    issuer: 'ISSUER8'
+    address: 'CXXXXXXX8'
+    team: '@team1'
+  player9:
+    id: 9
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx9'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid9'
+    imageCid: 'imageCid9'
+    issuer: 'ISSUER9'
+    address: 'CXXXXXXX9'
+    team: '@team1'
+    roster: '@roster1'
+  player10:
+    id: 10
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx10'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid10'
+    imageCid: 'imageCid10'
+    issuer: 'ISSUER10'
+    address: 'CXXXXXXX10'
+    team: '@team1'
+    roster: '@roster1'
+  player11:
+    id: 11
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx11'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid11'
+    imageCid: 'imageCid11'
+    issuer: 'ISSUER11'
+    address: 'CXXXXXXX11'
+    team: '@team1'
+    roster: '@roster1'
+  player12:
+    id: 12
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx12'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid12'
+    imageCid: 'imageCid12'
+    issuer: 'ISSUER12'
+    address: 'CXXXXXXX12'
+    team: '@team1'
+    roster: '@roster1'
+  player13:
+    id: 13
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx13'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid13'
+    imageCid: 'imageCid13'
+    issuer: 'ISSUER13'
+    address: 'CXXXXXXX13'
+    team: '@team1'
+    roster: '@roster1'
+  player14:
+    id: 14
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx14'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid14'
+    imageCid: 'imageCid14'
+    issuer: 'ISSUER14'
+    address: 'CXXXXXXX14'
+    team: '@team1'
+    roster: '@roster1'
+  player15:
+    id: 15
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx15'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid15'
+    imageCid: 'imageCid15'
+    issuer: 'ISSUER15'
+    address: 'CXXXXXXX15'
+    team: '@team1'
+    roster: '@roster1'
+  player16:
+    id: 16
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx16'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid16'
+    imageCid: 'imageCid16'
+    issuer: 'ISSUER16'
+    address: 'CXXXXXXX16'
+    team: '@team1'
+    roster: '@roster1'
+  player17:
+    id: 17
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx17'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid17'
+    imageCid: 'imageCid17'
+    issuer: 'ISSUER17'
+    address: 'CXXXXXXX17'
+    team: '@team1'
+    roster: '@roster1'
+  player18:
+    id: 18
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx18'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid18'
+    imageCid: 'imageCid18'
+    issuer: 'ISSUER18'
+    address: 'CXXXXXXX18'
+    team: '@team1'
+  player19:
+    id: 19
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx19'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid19'
+    imageCid: 'imageCid19'
+    issuer: 'ISSUER19'
+    address: 'CXXXXXXX19'
+    team: '@team3'
+  player20:
+    id: 20
+    uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx20'
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid20'
+    imageCid: 'imageCid20'
+    issuer: 'ISSUER20'
+    address: 'CXXXXXXX20'
+    team: '@team1'

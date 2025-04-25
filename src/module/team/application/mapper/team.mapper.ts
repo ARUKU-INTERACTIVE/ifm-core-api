@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 import { ICreateTeamDto } from '@/module/team/application/dto/create-team.dto.interface';
 import { TeamResponseDto } from '@/module/team/application/dto/team-response.dto';
-import { IUpdateDto } from '@/module/team/application/dto/update-team.dto.interface';
+import { IUpdateTeamDto } from '@/module/team/application/dto/update-team.dto.interface';
 import { Team } from '@/module/team/domain/team.entity';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class TeamMapper {
     return team;
   }
 
-  fromUpdateTeamDtoToTeam(teamDto: IUpdateDto): Team {
+  fromUpdateTeamDtoToTeam(teamDto: IUpdateTeamDto): Team {
     const team = new Team();
     team.name = teamDto.name;
     team.logoUri = teamDto.logoUri;
@@ -33,6 +33,7 @@ export class TeamMapper {
     teamResponseDto.id = team.id;
     teamResponseDto.uuid = team.uuid;
     teamResponseDto.name = team.name;
+    teamResponseDto.rosterId = team?.roster?.uuid;
     teamResponseDto.logoUri = team.logoUri;
     teamResponseDto.createdAt = team.createdAt;
     teamResponseDto.updatedAt = team.updatedAt;

@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { StrKey, TransactionBuilder, WebAuth } from '@stellar/stellar-sdk';
 import request from 'supertest';
 
@@ -28,6 +29,8 @@ describe('Authentication Module', () => {
     setupApp(app);
 
     await app.init();
+
+    jwtServiceMock = moduleRef.get<JwtService>(JwtService);
   });
 
   afterEach(() => {
@@ -164,6 +167,7 @@ describe('Authentication Module', () => {
           });
       });
     });
+
     describe('GET - /auth/challenge', () => {
       it('Should return a transaction challenge', async () => {
         const queryParam = '?publicKey=publicKey';

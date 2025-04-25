@@ -38,7 +38,6 @@ describe('Player Module', () => {
   });
 
   beforeAll(async () => {
-    await loadFixtures(`${__dirname}/fixture`, datasourceOptions);
     const moduleRef = await testModuleBootstrapper();
     app = moduleRef.createNestApplication({ logger: false });
 
@@ -46,7 +45,9 @@ describe('Player Module', () => {
 
     await app.init();
   });
-  beforeEach(() => {
+  beforeEach(async () => {
+    await loadFixtures(`${__dirname}/fixture`, datasourceOptions);
+
     TransactionBuilder.fromXDR = jest.fn().mockReturnValue({
       sign: jest.fn(),
       toXDR: jest.fn().mockReturnValue('xdr'),
@@ -95,7 +96,7 @@ describe('Player Module', () => {
             links: expect.objectContaining({
               self: expect.any(String),
               last: expect.any(String),
-              next: null,
+              next: expect.any(String),
             }),
           };
 

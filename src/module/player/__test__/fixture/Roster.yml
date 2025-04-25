@@ -1,0 +1,11 @@
+entity: Roster
+items:
+  roster1:
+    id: 1
+    team: '@team1'
+  roster2:
+    id: 2
+    team: '@team2'
+  roster3:
+    id: 3
+    team: '@team3'

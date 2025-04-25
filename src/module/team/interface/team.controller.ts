@@ -72,10 +72,10 @@ export class TeamController {
   @ApiBody({ type: CreateTeamDto })
   @GetOneSwaggerDecorator(TeamResponseDto)
   saveOne(
-    @Body() createDto: CreateTeamDto,
+    @Body() createTeamDto: CreateTeamDto,
     @CurrentUser() currentUser: User,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    return this.teamService.saveOne(createDto, currentUser);
+    return this.teamService.saveOne(createTeamDto, currentUser);
   }
 
   @Patch(':id')
@@ -87,8 +87,8 @@ export class TeamController {
   @GetOneSwaggerDecorator(TeamResponseDto)
   updateOneOrFail(
     @Param('id') id: number,
-    @Body() updateDto: UpdateTeamDto,
+    @Body() updateTeamDto: UpdateTeamDto,
   ): Promise<OneSerializedResponseDto<TeamResponseDto>> {
-    return this.teamService.updateOneOrFail(id, updateDto);
+    return this.teamService.updateOneOrFail(id, updateTeamDto);
   }
 }

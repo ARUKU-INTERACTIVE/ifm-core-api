@@ -14,6 +14,10 @@ export interface IPlayerRepository {
     options: IGetAllOptions<Player, PlayerRelation[]>,
   ): Promise<ICollection<Player>>;
   getOneById(id: number, relations?: PlayerRelation[]): Promise<Player>;
+  getOneByUuIdOrFail(
+    uuid: string,
+    relations?: PlayerRelation[],
+  ): Promise<Player>;
   getOnePlayer(
     filter: FilterOptions<Player>,
     relations?: PlayerRelation[],

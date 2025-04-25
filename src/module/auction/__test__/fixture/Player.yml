@@ -55,3 +55,12 @@ items:
     imageCid: 'imageCid8'
     issuer: '{{string.alpha}}'
     address: 'CXXXXXXX8'    
+  player9:
+    name: '{{string.alpha}}'
+    description: '{{string.alpha}}'
+    metadataCid: 'metadataCid9'
+    imageCid: 'imageCid9'
+    issuer: '{{string.alpha}}'
+    address: 'CXXXXXXX9' 
+    team: '@team2'   
+    roster: '@roster1'

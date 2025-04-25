@@ -1,4 +1,5 @@
 import { Player } from '@module/player/domain/player.domain';
+import { Roster } from '@module/roster/domain/roster.entity';
 
 import { Base } from '@common/base/domain/base.entity';
 
@@ -10,4 +11,5 @@ export class Team extends Base {
   players: Player[];
   user: User;
   userId: number;
+  roster: Roster;
 }

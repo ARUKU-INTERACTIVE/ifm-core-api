@@ -1,4 +1,5 @@
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
+import { AddPlayerToRosterDto } from '@module/player/application/dto/add-player-roster.dto';
 import { UpdatePlayerResponseDto } from '@module/player/application/dto/player-response-update-dto';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { SubmitMintPlayerDto } from '@module/player/application/dto/submit-mint-player.dto';
@@ -9,9 +10,17 @@ import {
   PLAYER_REPOSITORY_KEY,
 } from '@module/player/application/repository/player.repository.interface';
 import { Player } from '@module/player/domain/player.domain';
-import { PlayerAddressAlreadyExistsException } from '@module/player/infrastructure/database/exception/player.exception';
+import { PlayerAlreadyInRoster } from '@module/player/infrastructure/database/exception/player-already-in-roster.exception';
+import {
+  PlayerAddressAlreadyExistsException,
+  PlayerNotOwnedByUserException,
+} from '@module/player/infrastructure/database/exception/player.exception';
+import { RosterRelation } from '@module/roster/application/enum/roster-relation.enum';
+import { RosterService } from '@module/roster/application/service/roster.service';
+import { RosterCapacityExceeded } from '@module/roster/infrastructure/database/exception/roster-capacity-exceeded.exception';
 import { TeamRelation } from '@module/team/application/enum/team-relation.enum';
 import { TeamService } from '@module/team/application/service/team.service';
+import { TeamBadRequestException } from '@module/team/infrastructure/database/exception/team-bad-request.exception';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
@@ -32,6 +41,7 @@ import { StellarNftAdapter } from '@common/infrastructure/stellar/stellar-nft.ad
 import { StellarTransactionAdapter } from '@common/infrastructure/stellar/stellar-transaction.adapter';
 
 import { User } from '@iam/user/domain/user.entity';
+import { UserNotRosterOwnerException } from '@iam/user/infrastructure/database/exception/user-not-roster-owner.exception';
 
 @Injectable()
 export class PlayerService {
@@ -45,6 +55,8 @@ export class PlayerService {
     private readonly sorobanContractAdapter: SorobanContractAdapter,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
     private readonly pinataAdapter: PinataAdapter,
+    @Inject(forwardRef(() => RosterService))
+    private readonly rosterService: RosterService,
     @Inject(forwardRef(() => StellarNftAdapter))
     private readonly stellarNFTAdapter: StellarNftAdapter,
     @Inject(forwardRef(() => TeamService))
@@ -222,6 +234,8 @@ export class PlayerService {
         ...player,
         team: null,
         teamId: null,
+        roster: null,
+        rosterId: null,
       }),
     );
 
@@ -240,5 +254,83 @@ export class PlayerService {
 
   async unsetPlayersFromTeam(players: Player[]) {
     return await this.playerRepository.unsetPlayersFromTeam(players);
+  }
+
+  async addPlayerToRoster(
+    user: User,
+    updatePlayerRosterDto: AddPlayerToRosterDto,
+  ) {
+    const team = await this.teamService.getOneByUserIdOrFail(user.id, [
+      TeamRelation.ROSTER_ENTITY,
+    ]);
+    const player = await this.playerRepository.getOneByUuIdOrFail(
+      updatePlayerRosterDto.playerUuid,
+    );
+    const playerIsOwnedByUser = await this.stellarNFTAdapter.checkNFTBalance(
+      user.publicKey,
+      player.issuer,
+    );
+    if (!playerIsOwnedByUser) {
+      throw new PlayerNotOwnedByUserException();
+    }
+    if (player.teamId !== team.id) {
+      throw new TeamBadRequestException({
+        message: `The player with ID ${player.id} is not part of the team of the user with ID ${user.id}.`,
+      });
+    }
+    const roster = await this.rosterService.getOneRosterOrFail(
+      {
+        uuid: updatePlayerRosterDto.rosterUuid,
+      },
+      [RosterRelation.Player],
+    );
+    if (team.id !== roster.teamId) {
+      throw new UserNotRosterOwnerException();
+    }
+
+    if (player.rosterId && player.rosterId === roster.id) {
+      throw new PlayerAlreadyInRoster({
+        playerUuid: player.uuid,
+        rosterUuid: roster.uuid,
+      });
+    }
+    if (roster.players.length >= this.rosterService.MAX_PLAYERS) {
+      throw new RosterCapacityExceeded({
+        maxPlayers: this.rosterService.MAX_PLAYERS,
+      });
+    }
+
+    player.rosterId = roster.id;
+    const savedPlayer = await this.saveOnePlayer(player);
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+      this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
+    );
+  }
+
+  async removePlayerFromRoster(
+    user: User,
+    updatePlayerRosterDto: AddPlayerToRosterDto,
+  ) {
+    const player = await this.playerRepository.getOneByUuIdOrFail(
+      updatePlayerRosterDto.playerUuid,
+    );
+    const roster = await this.rosterService.getOneRosterOrFail({
+      uuid: updatePlayerRosterDto.rosterUuid,
+    });
+
+    const team = await this.teamService.getOneByUserIdOrFail(user.id, [
+      TeamRelation.ROSTER_ENTITY,
+    ]);
+    if (team.id !== roster.teamId) {
+      throw new UserNotRosterOwnerException();
+    }
+
+    player.rosterId = null;
+    player.roster = null;
+    const savedPlayer = await this.saveOnePlayer(player);
+
+    return this.playerResponseAdapter.oneEntityResponse<PlayerResponseDto>(
+      this.playerMapper.fromPlayerToPlayerResponseDto(savedPlayer),
+    );
   }
 }
