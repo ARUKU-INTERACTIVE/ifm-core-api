@@ -9,5 +9,6 @@ export class FormationPlayer extends Base {
   playerId: number;
   formation?: Formation;
   formationId?: number;
+  positionIndex: number;
   position: Position;
 }

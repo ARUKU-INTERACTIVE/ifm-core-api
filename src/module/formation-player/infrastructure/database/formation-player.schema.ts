@@ -33,6 +33,10 @@ export const FormationPlayerSchema = new EntitySchema<FormationPlayer>({
           enum: Position,
           nullable: false,
         },
+    positionIndex: {
+      type: Number,
+      nullable: false,
+    },
   }),
   relations: {
     player: {
