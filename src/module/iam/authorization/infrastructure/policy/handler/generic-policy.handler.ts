@@ -24,7 +24,7 @@ export class GenericPolicyHandler implements IPolicyHandler {
   async handle(request: Request): Promise<void> {
     const currentUser = this.getCurrentUser(request);
 
-    const isAllowed = await this.authorizationService.isAllowed(
+    const isAllowed = this.authorizationService.isAllowed(
       currentUser,
       this.action,
       this.entityType,
