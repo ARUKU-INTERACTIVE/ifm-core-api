@@ -1,0 +1,101 @@
+entity: FormationPlayer
+items:
+  player-formation1:
+    id: 1
+    uuid: '00000000-0000-0000-0000-000000000001'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player1'
+    position: 'DEFENDER'
+    positionIndex: 0
+
+  player-formation2:
+    id: 2
+    uuid: '00000000-0000-0000-0000-000000000002'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player2'
+    position: 'DEFENDER'
+    positionIndex: 1
+
+  player-formation3:
+    id: 3
+    uuid: '00000000-0000-0000-0000-000000000003'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player3'
+    position: 'DEFENDER'
+    positionIndex: 2
+
+  player-formation4:
+    id: 4
+    uuid: '00000000-0000-0000-0000-000000000004'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player4'
+    position: 'DEFENDER'
+    positionIndex: 3
+
+  player-formation5:
+    id: 5
+    uuid: '00000000-0000-0000-0000-000000000005'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player5'
+    position: 'MIDFIELDER'
+    positionIndex: 4
+
+  player-formation6:
+    id: 6
+    uuid: '00000000-0000-0000-0000-000000000006'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player6'
+    position: 'MIDFIELDER'
+    positionIndex: 5
+
+  player-formation7:
+    id: 7
+    uuid: '00000000-0000-0000-0000-000000000007'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player7'
+    position: 'MIDFIELDER'
+    positionIndex: 6
+
+  player-formation8:
+    id: 8
+    uuid: '00000000-0000-0000-0000-000000000008'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player8'
+    position: 'MIDFIELDER'
+    positionIndex: 7
+
+  player-formation9:
+    id: 9
+    uuid: '00000000-0000-0000-0000-000000000009'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player9'
+    position: 'FORWARD'
+    positionIndex: 8
+
+  player-formation10:
+    id: 10
+    uuid: '00000000-0000-0000-0000-000000000010'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    formation: '@formation1'
+    player: '@player10'
+    position: 'FORWARD'
+    positionIndex: 9

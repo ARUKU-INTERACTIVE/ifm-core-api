@@ -1,0 +1,17 @@
+entity: Team
+items:
+  team1:
+    id: 1
+    name: 'John'
+    logoUri: "{{string.alpha}}"
+    user: '@admin-user'
+  team2:
+    id: 2
+    name: '{{string.alpha}}'
+    logoUri: '{{string.alpha}}'
+    user: '@user1'
+  team3:
+    id: 3
+    name: '{{string.alpha}}'
+    logoUri: '{{string.alpha}}'
+    user: '@user7'
