@@ -1,9 +1,44 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
-import { FilterOptions } from '@common/base/application/interface/get-all-options.interface';
+export class FormationFilterQueryParamsDto {
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  name?: string;
 
-import { FormationResponseDto } from '@/module/formation/application/dto/formation-response.dto';
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  description?: string;
 
-export class FormationFilterQueryParamsDto
-  extends PartialType(FormationResponseDto)
-  implements FilterOptions<FormationResponseDto> {}
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  rosterUuid?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  rosterId?: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  forwards?: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  midfielders?: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  defenders?: number;
+}
