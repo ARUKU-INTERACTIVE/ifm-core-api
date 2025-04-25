@@ -9,6 +9,7 @@ export class Formation extends Base {
   forwards: number;
   midfielders: number;
   defenders: number;
+  isActive: boolean;
   roster: Roster;
   rosterId: number;
   formationPlayers: FormationPlayer[];

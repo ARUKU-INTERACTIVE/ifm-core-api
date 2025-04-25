@@ -17,6 +17,7 @@ export const FormationSchema = new EntitySchema<Formation>({
     description: { type: String, nullable: true },
     forwards: { type: Number, nullable: false },
     midfielders: { type: Number, nullable: false },
+    isActive: { type: Boolean, nullable: false, default: false },
     rosterId: { type: Number, nullable: false },
   }),
   relations: {
