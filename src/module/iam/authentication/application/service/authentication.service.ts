@@ -1,9 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
-import { IBaseErrorInfoParams } from '@common/base/application/interface/base-error.interface';
 
 import { AuthenticationResponseAdapter } from '@iam/authentication/application/adapter/authentication-response.adapter';
 import { JWTPayloadDto } from '@iam/authentication/application/dto/jwt-payload.dto';
@@ -12,6 +10,8 @@ import { IRefreshSessionDto } from '@iam/authentication/application/dto/refresh-
 import { ISignInResponse } from '@iam/authentication/application/dto/sign-in-response.interface';
 import { SignInWithTransactionDto } from '@iam/authentication/application/dto/sign-in-with-transaction.dto';
 import { TransactionChallengeResponseDto } from '@iam/authentication/application/dto/transaction-challenge-response.dto';
+import { INVALID_REFRESH_TOKEN_ERROR } from '@iam/authentication/application/exception/authentication-exception-messages';
+import { InvalidRefreshTokenException } from '@iam/authentication/application/exception/invalid-refresh-token.exception';
 import { AUTHENTICATION_NAME } from '@iam/authentication/domain/authtentication.name';
 import {
   IUserRepository,
@@ -22,16 +22,6 @@ import { PublicKeyNotFoundException } from '@iam/user/infrastructure/database/ex
 
 import { StellarService } from '../../../../stellar/application/service/stellar.service';
 
-export const INVALID_REFRESH_TOKEN_ERROR = 'Invalid or malformed refresh token';
-export class InvalidRefreshTokenException extends UnauthorizedException {
-  constructor(params: IBaseErrorInfoParams) {
-    const pointer = params.pointer ?? '/refreshSession/code';
-    super({
-      ...params,
-      pointer,
-    });
-  }
-}
 @Injectable()
 export class AuthenticationService {
   constructor(
