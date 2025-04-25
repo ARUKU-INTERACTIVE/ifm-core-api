@@ -13,16 +13,11 @@ import { PinataModule } from '@common/infrastructure/ipfs/pinata.module';
 import { environmentConfig } from '@config/environment.config';
 import { datasourceOptions } from '@config/orm.config';
 
-import { BookModule } from '@book/book.module';
-
-import { GenreModule } from '@genre/genre.module';
-
 import { IamModule } from '@iam/iam.module';
 
 import { AppService } from '@/module/app/application/service/app.service';
 import { ResponseSerializerService } from '@/module/app/application/service/response-serializer.service';
 import { HealthController } from '@/module/health/interface/health.controller';
-import { PaymentModule } from '@/module/payment/payment.module';
 import { TeamModule } from '@/module/team/team.module';
 import { StellarModule } from '@/stellar/stellar.module';
 
@@ -43,10 +38,7 @@ import { StellarModule } from '@/stellar/stellar.module';
       },
     }),
     IamModule,
-    BookModule,
-    GenreModule,
     DiscoveryModule,
-    PaymentModule,
     StellarModule,
     PlayerModule,
     AuctionModule,
