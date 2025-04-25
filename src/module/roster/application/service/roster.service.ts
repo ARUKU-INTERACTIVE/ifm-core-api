@@ -68,6 +68,13 @@ export class RosterService {
     );
   }
 
+  async getOneByUuid(
+    uuid: string,
+    relations?: RosterRelation[],
+  ): Promise<Roster> {
+    return await this.repository.getOneByUuid(uuid, relations);
+  }
+
   async saveOne(createRosterDto: ICreateRosterDto): Promise<Roster> {
     return await this.repository.saveOne(
       this.rosterMapper.fromCreateRosterDtoToRoster(createRosterDto),

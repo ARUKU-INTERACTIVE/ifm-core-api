@@ -60,6 +60,16 @@ export class RosterPostgresRepository implements IRosterPostgresRepository {
     return rooster;
   }
 
+  async getOneByUuid(
+    uuid: string,
+    relations: RosterRelation[] = [],
+  ): Promise<Roster> {
+    return await this.repository.findOne({
+      where: { uuid },
+      relations,
+    });
+  }
+
   async getOneRosterOrFail(
     where: FilterOptions<Roster>,
     relations?: RosterRelation[],
