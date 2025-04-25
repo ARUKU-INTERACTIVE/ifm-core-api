@@ -31,7 +31,6 @@
     "fixtures": "cross-env NODE_ENV=development fixtures load ./data/fixture --sync --debug --dataSource=./src/config/orm.config.ts --require=ts-node/register --require=tsconfig-paths/register",
     "prepare": "husky install",
     "generate:crud": "yo generators/app/crud --force",
-    "cognito:prepare": "cross-env ./data/scripts/create_user_pool.sh",
     "dev:prepare": "cross-env ./data/scripts/create_default_env.sh",
     "sentry:sourcemaps": "npx sentry-cli sourcemaps inject ./dist && npx sentry-cli sourcemaps upload ./dist"
   },
@@ -42,7 +41,6 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.496.0",
     "@casl/ability": "^6.5.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
@@ -69,7 +67,6 @@
     "pinata": "^2.2.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "stripe": "^16.11.0",
     "typeorm": "^0.3.17",
     "typeorm-naming-strategies": "^4.1.0",
     "typeorm-transactional": "^0.5.0"
@@ -84,7 +81,6 @@
     "@types/jsonapi-serializer": "^3.6.8",
     "@types/multer": "^1.4.12",
     "@types/node": "^20.17.24",
-    "@types/stripe": "^8.0.417",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
