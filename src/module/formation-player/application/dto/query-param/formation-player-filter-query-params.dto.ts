@@ -2,8 +2,8 @@ import { PartialType } from '@nestjs/swagger';
 
 import { FilterOptions } from '@common/base/application/interface/get-all-options.interface';
 
-import { PlayerFormationResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
+import { FormationPlayerResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
 
 export class FormationPlayerFilterQueryParamsDto
-  extends PartialType(PlayerFormationResponseDto)
-  implements FilterOptions<PlayerFormationResponseDto> {}
+  extends PartialType(FormationPlayerResponseDto)
+  implements FilterOptions<FormationPlayerResponseDto> {}

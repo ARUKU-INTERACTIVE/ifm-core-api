@@ -1,4 +1,4 @@
-import { PlayerFormationResponseDto } from '@module/formation-player/application/dto/formation-player-response.dto';
+import { FormationPlayerResponseDto } from '@module/formation-player/application/dto/formation-player-response.dto';
 import { Type } from 'class-transformer';
 import { IsArray, IsDate, IsInt, IsOptional, IsString } from 'class-validator';
 
@@ -36,8 +36,8 @@ export class FormationResponseDto {
 
   @DtoProperty
   @IsArray()
-  @Type(() => PlayerFormationResponseDto)
-  formationPlayers: PlayerFormationResponseDto[];
+  @Type(() => FormationPlayerResponseDto)
+  formationPlayers: FormationPlayerResponseDto[];
 
   @DtoProperty
   @IsDate()

@@ -1,4 +1,4 @@
-import { PlayerFormationMapper } from '@module/formation-player/application/mapper/formation-player.mapper';
+import { FormationPlayerMapper } from '@module/formation-player/application/mapper/formation-player.mapper';
 import { Injectable } from '@nestjs/common';
 
 import { ICreateFormationDto } from '@/module/formation/application/dto/create-formation.dto.interface';
@@ -7,7 +7,7 @@ import { Formation } from '@/module/formation/domain/formation.entity';
 
 @Injectable()
 export class FormationMapper {
-  constructor(private readonly playerFormationMapper: PlayerFormationMapper) {}
+  constructor(private readonly formationPlayerMapper: FormationPlayerMapper) {}
   fromCreateFormationDtoToFormation(
     formationDto: ICreateFormationDto,
     rosterId: number,
@@ -35,7 +35,7 @@ export class FormationMapper {
     if (formation.formationPlayers) {
       formationResponseDto.formationPlayers = formation.formationPlayers.map(
         (formationPlayer) =>
-          this.playerFormationMapper.fromFormationPlayerToFormationPlayerResponseDto(
+          this.formationPlayerMapper.fromFormationPlayerToFormationPlayerResponseDto(
             formationPlayer,
           ),
       );

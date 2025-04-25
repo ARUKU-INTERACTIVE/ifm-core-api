@@ -5,17 +5,17 @@ import { getDtoProperties } from '@common/base/application/dto/base.dto';
 import { FieldsQueryParamsDto } from '@common/base/application/dto/query-param/fields-query-params.dto';
 import { FieldOptions } from '@common/base/application/interface/get-all-options.interface';
 
-import { PlayerFormationResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
+import { FormationPlayerResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
 
-export class FormationPlayerFieldsQueryParamsDto extends FieldsQueryParamsDto<PlayerFormationResponseDto> {
+export class FormationPlayerFieldsQueryParamsDto extends FieldsQueryParamsDto<FormationPlayerResponseDto> {
   @ApiPropertyOptional({
     description: 'List of attributes of ResponseDto',
     type: 'object',
   })
-  @IsIn(getDtoProperties(PlayerFormationResponseDto), {
+  @IsIn(getDtoProperties(FormationPlayerResponseDto), {
     each: true,
   })
   target = getDtoProperties(
-    PlayerFormationResponseDto,
-  ) as FieldOptions<PlayerFormationResponseDto>;
+    FormationPlayerResponseDto,
+  ) as FieldOptions<FormationPlayerResponseDto>;
 }

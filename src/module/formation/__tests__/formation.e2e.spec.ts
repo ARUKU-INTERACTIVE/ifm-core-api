@@ -262,7 +262,7 @@ describe('Formation Module', () => {
         defenders: 4,
         formationPlayers: [
           {
-            playerFormationUuid: '00000000-0000-0000-0000-000000000001',
+            formationPlayerUuid: '00000000-0000-0000-0000-000000000001',
             position: Position.Forward,
             positionIndex: 0,
           },

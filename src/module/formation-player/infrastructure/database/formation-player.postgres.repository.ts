@@ -2,13 +2,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { FormationPlayerRelation } from '@/module/formation-player/application/enum/formation-player-relation.enum';
-import { IPlayerFormationRepository } from '@/module/formation-player/application/repository/formation-player.repository.interface';
+import { IFormationPlayerRepository } from '@/module/formation-player/application/repository/formation-player.repository.interface';
 import { FormationPlayer } from '@/module/formation-player/domain/formation-player.entity';
 import { FormationPlayerNotFoundException } from '@/module/formation-player/infrastructure/database/exception/formation-player-not-found.exception';
 import { FormationPlayerSchema } from '@/module/formation-player/infrastructure/database/formation-player.schema';
 
-export class PlayerFormationPostgresRepository
-  implements IPlayerFormationRepository
+export class FormationPlayerPostgresRepository
+  implements IFormationPlayerRepository
 {
   constructor(
     @InjectRepository(FormationPlayerSchema)

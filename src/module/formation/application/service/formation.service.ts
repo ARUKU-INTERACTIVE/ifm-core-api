@@ -129,7 +129,7 @@ export class FormationService {
       updateFormationDto.formationPlayers.map(async (formationPlayer) => {
         const formationPlayerEntity =
           await this.formationPlayerService.getOneByUuidOrFail(
-            formationPlayer.playerFormationUuid,
+            formationPlayer.formationPlayerUuid,
           );
         const formationPlayerMapped = {
           ...formationPlayerEntity,

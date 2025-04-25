@@ -8,7 +8,7 @@ import { EntityName } from '@common/decorators/entity-name.decorator';
 import { FORMATION_PLAYER_ENTITY_NAME } from '@/module/formation-player/domain/formation-player.name';
 
 @EntityName(FORMATION_PLAYER_ENTITY_NAME)
-export class PlayerFormationResponseDto {
+export class FormationPlayerResponseDto {
   @DtoProperty
   @IsInt()
   id: number;

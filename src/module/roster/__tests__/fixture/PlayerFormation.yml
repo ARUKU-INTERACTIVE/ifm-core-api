@@ -47,7 +47,7 @@ items:
     updatedAt: '2025-04-25T16:42:10.000Z'
     formation: '@formation1'
     player: '@player5'
-    position: 'MIDFIELDER'
+    position: 'midfielder'
     positionIndex: 4
 
   player-formation6:
@@ -57,7 +57,7 @@ items:
     updatedAt: '2025-04-25T16:42:10.000Z'
     formation: '@formation1'
     player: '@player6'
-    position: 'MIDFIELDER'
+    position: 'midfielder'
     positionIndex: 5
 
   player-formation7:
@@ -67,7 +67,7 @@ items:
     updatedAt: '2025-04-25T16:42:10.000Z'
     formation: '@formation1'
     player: '@player7'
-    position: 'MIDFIELDER'
+    position: 'midfielder'
     positionIndex: 6
 
   player-formation8:
@@ -77,7 +77,7 @@ items:
     updatedAt: '2025-04-25T16:42:10.000Z'
     formation: '@formation1'
     player: '@player8'
-    position: 'MIDFIELDER'
+    position: 'midfielder'
     positionIndex: 7
 
   player-formation9:

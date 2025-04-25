@@ -2,5 +2,5 @@ import { ICreateFormationPlayerDto } from '@module/formation-player/application/
 
 export interface IUpdateFormationPlayerDto
   extends Partial<ICreateFormationPlayerDto> {
-  playerFormationUuid?: string;
+  formationPlayerUuid?: string;
 }

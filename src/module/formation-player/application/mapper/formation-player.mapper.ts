@@ -2,12 +2,12 @@ import { ICreateFormationPlayerIdDto } from '@module/formation-player/applicatio
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import { Injectable } from '@nestjs/common';
 
-import { PlayerFormationResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
+import { FormationPlayerResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
 import { IUpdateFormationPlayerDto } from '@/module/formation-player/application/dto/update-formation-player.dto.interface';
 import { FormationPlayer } from '@/module/formation-player/domain/formation-player.entity';
 
 @Injectable()
-export class PlayerFormationMapper {
+export class FormationPlayerMapper {
   constructor(private readonly playerMapper: PlayerMapper) {}
   fromCreateFormationPlayerDtoToFormationPlayer(
     formationPlayerDto: ICreateFormationPlayerIdDto,
@@ -43,8 +43,8 @@ export class PlayerFormationMapper {
 
   fromFormationPlayerToFormationPlayerResponseDto(
     formationPlayer: FormationPlayer,
-  ): PlayerFormationResponseDto {
-    const formationPlayerResponseDto = new PlayerFormationResponseDto();
+  ): FormationPlayerResponseDto {
+    const formationPlayerResponseDto = new FormationPlayerResponseDto();
     formationPlayerResponseDto.id = formationPlayer.id;
     formationPlayerResponseDto.uuid = formationPlayer.uuid;
     if (formationPlayer.player) {

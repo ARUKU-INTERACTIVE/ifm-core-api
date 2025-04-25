@@ -6,11 +6,11 @@ import { OneSerializedResponseDto } from '@common/base/application/dto/one-seria
 
 import { ResponseAdapter } from '@/module/formation-player/application/adapter/formation-player-response.adapter';
 import { ICreateFormationPlayerIdDto } from '@/module/formation-player/application/dto/create-formation-player.dto.interface';
-import { PlayerFormationResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
-import { PlayerFormationMapper } from '@/module/formation-player/application/mapper/formation-player.mapper';
+import { FormationPlayerResponseDto } from '@/module/formation-player/application/dto/formation-player-response.dto';
+import { FormationPlayerMapper } from '@/module/formation-player/application/mapper/formation-player.mapper';
 import {
   FORMATION_PLAYER_REPOSITORY_KEY,
-  IPlayerFormationRepository,
+  IFormationPlayerRepository,
 } from '@/module/formation-player/application/repository/formation-player.repository.interface';
 import { FormationPlayer } from '@/module/formation-player/domain/formation-player.entity';
 
@@ -18,8 +18,8 @@ import { FormationPlayer } from '@/module/formation-player/domain/formation-play
 export class FormationPlayerService {
   constructor(
     @Inject(FORMATION_PLAYER_REPOSITORY_KEY)
-    private readonly repository: IPlayerFormationRepository,
-    private readonly mapper: PlayerFormationMapper,
+    private readonly repository: IFormationPlayerRepository,
+    private readonly mapper: FormationPlayerMapper,
     private readonly responseAdapter: ResponseAdapter,
     @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
@@ -28,18 +28,18 @@ export class FormationPlayerService {
   ) {}
 
   async getOneByUuidOrFail(
-    playerFormationUuid: string,
+    formationPlayerUuid: string,
   ): Promise<FormationPlayer> {
-    return await this.repository.getOneByUuidOrFail(playerFormationUuid);
+    return await this.repository.getOneByUuidOrFail(formationPlayerUuid);
   }
 
   async saveOneFormationPlayer(
-    playerFormation: FormationPlayer,
-  ): Promise<OneSerializedResponseDto<PlayerFormationResponseDto>> {
-    const formationPlayer = await this.repository.saveOne(playerFormation);
-    return this.responseAdapter.oneEntityResponse<PlayerFormationResponseDto>(
+    formationPlayer: FormationPlayer,
+  ): Promise<OneSerializedResponseDto<FormationPlayerResponseDto>> {
+    const savedFormationPlayer = await this.repository.saveOne(formationPlayer);
+    return this.responseAdapter.oneEntityResponse<FormationPlayerResponseDto>(
       this.mapper.fromFormationPlayerToFormationPlayerResponseDto(
-        formationPlayer,
+        savedFormationPlayer,
       ),
     );
   }

@@ -14,5 +14,5 @@ export class UpdateFormationPlayerDto
   })
   @IsString()
   @IsNotEmpty()
-  playerFormationUuid: string;
+  formationPlayerUuid: string;
 }
