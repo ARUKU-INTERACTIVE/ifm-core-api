@@ -17,7 +17,6 @@ export class FormationMapper {
     formation.midfielders = formationDto.midfielders;
     formation.defenders = formationDto.defenders;
     formation.rosterId = rosterId;
-    console.log(formation);
     return formation;
   }
 
