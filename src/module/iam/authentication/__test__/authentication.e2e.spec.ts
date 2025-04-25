@@ -1,4 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { StrKey, TransactionBuilder, WebAuth } from '@stellar/stellar-sdk';
 import request from 'supertest';
 
@@ -10,7 +11,6 @@ import { datasourceOptions } from '@config/orm.config';
 import { IConfirmPasswordDto } from '@iam/authentication/application/dto/confirm-password.dto.interface';
 import { IConfirmUserDto } from '@iam/authentication/application/dto/confirm-user.dto.interface';
 import { IForgotPasswordDto } from '@iam/authentication/application/dto/forgot-password.dto.interface';
-import { IRefreshSessionResponse } from '@iam/authentication/application/dto/refresh-session-response.interface';
 import { IRefreshSessionDto } from '@iam/authentication/application/dto/refresh-session.dto.interface';
 import { IResendConfirmationCodeDto } from '@iam/authentication/application/dto/resend-confirmation-code.dto.interface';
 import { SignInWithTransactionDto } from '@iam/authentication/application/dto/sign-in-with-transaction.dto';
@@ -34,6 +34,7 @@ import { ExpiredCodeException } from '@iam/authentication/infrastructure/cognito
 import { InvalidRefreshTokenException } from '@iam/authentication/infrastructure/cognito/exception/invalid-refresh-token.exception';
 import { PasswordValidationException } from '@iam/authentication/infrastructure/cognito/exception/password-validation.exception';
 import { UnexpectedErrorCodeException } from '@iam/authentication/infrastructure/cognito/exception/unexpected-code.exception';
+import { PublicKeyNotFoundException } from '@iam/user/infrastructure/database/exception/public-key-not-found.exception';
 import { UsernameNotFoundException } from '@iam/user/infrastructure/database/exception/username-not-found.exception';
 
 import {
@@ -46,6 +47,7 @@ import { STELLAR_ERROR } from '../../../stellar/application/exceptions/stellar.e
 
 describe('Authentication Module', () => {
   let app: INestApplication;
+  let jwtServiceMock: JwtService;
 
   beforeAll(async () => {
     process.env.AUTH_ALLOWED_EMAIL_DOMAINS = 'test.com,example.com,account.com';
@@ -55,6 +57,8 @@ describe('Authentication Module', () => {
     setupApp(app);
 
     await app.init();
+
+    jwtServiceMock = moduleRef.get<JwtService>(JwtService);
   });
 
   afterEach(() => {
@@ -620,20 +624,16 @@ describe('Authentication Module', () => {
     describe('POST - /auth/refresh', () => {
       const url = '/api/v1/auth/refresh';
       it('Should refresh the session when provided a valid refresh token', async () => {
-        const successProviderResponse: IRefreshSessionResponse = {
-          accessToken: 'accessToken',
-        };
-        identityProviderServiceMock.refreshSession.mockResolvedValueOnce(
-          successProviderResponse,
-        );
+        jest.spyOn(jwtServiceMock, 'verify').mockReturnValue(() => true);
         const refreshTokenDto: IRefreshSessionDto = {
           refreshToken: 'refreshToken',
-          username: 'admin@test.com',
+          publicKey: 'publicKey1',
         };
         const expectedResponse = expect.objectContaining({
           data: expect.objectContaining({
             attributes: expect.objectContaining({
-              accessToken: 'accessToken',
+              accessToken: expect.any(String),
+              refreshToken: expect.any(String),
             }),
           }),
         });
@@ -646,13 +646,13 @@ describe('Authentication Module', () => {
           });
       });
       it('Should respond with an InvalidRefreshTokenError when provided an invalid refresh token', async () => {
+        jest.spyOn(jwtServiceMock, 'verify').mockReturnValue(null);
         const error = new InvalidRefreshTokenException({
           message: INVALID_REFRESH_TOKEN_ERROR,
         });
-        identityProviderServiceMock.refreshSession.mockRejectedValueOnce(error);
         const refreshTokenDto: IRefreshSessionDto = {
           refreshToken: 'fakeRefreshToken',
-          username: 'admin@test.com',
+          publicKey: 'publicKey1',
         };
         await request(app.getHttpServer())
           .post(url)
@@ -663,35 +663,18 @@ describe('Authentication Module', () => {
           });
       });
       it("Should respond with an UserNotFoundException when the user doesn't exist", async () => {
-        const username = 'fakeUsername';
-        const error = new UsernameNotFoundException({
-          username,
+        const publicKey = 'fakePublicKey';
+        const error = new PublicKeyNotFoundException({
+          publicKey,
         });
         const refreshTokenDto: IRefreshSessionDto = {
           refreshToken: 'fakeRefreshToken',
-          username,
+          publicKey,
         };
         await request(app.getHttpServer())
           .post(url)
           .send(refreshTokenDto)
           .expect(HttpStatus.NOT_FOUND)
-          .then(({ body }) => {
-            expect(body.error.detail).toEqual(error.message);
-          });
-      });
-      it('Should respond with an UnexpectedCodeError over unexpected errors', async () => {
-        const error = new UnexpectedErrorCodeException({
-          code: UNEXPECTED_ERROR_CODE_ERROR,
-        });
-        identityProviderServiceMock.refreshSession.mockRejectedValueOnce(error);
-        const refreshSessionDto: IRefreshSessionDto = {
-          username: 'admin@test.com',
-          refreshToken: 'refreshToken',
-        };
-        return request(app.getHttpServer())
-          .post(url)
-          .send(refreshSessionDto)
-          .expect(HttpStatus.INTERNAL_SERVER_ERROR)
           .then(({ body }) => {
             expect(body.error.detail).toEqual(error.message);
           });

@@ -144,16 +144,6 @@ export class AuthenticationController {
     return this.authenticationService.handleRefreshSession(refreshSessionDto);
   }
 
-  @Post('admin/refresh')
-  @HttpCode(HttpStatus.OK)
-  async handleRefreshAdminSession(
-    @Body() refreshSessionDto: RefreshSessionDto,
-  ): Promise<OneSerializedResponseDto<IRefreshSessionResponse>> {
-    return this.authenticationService.handleRefreshAdminSession(
-      refreshSessionDto,
-    );
-  }
-
   @Get('/challenge')
   async getTransactionChallenge(
     @Query('publicKey') publicKey: string,
