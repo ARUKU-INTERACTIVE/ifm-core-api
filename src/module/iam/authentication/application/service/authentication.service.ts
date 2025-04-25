@@ -35,6 +35,8 @@ import {
   IIdentityProviderService,
 } from '@iam/authentication/application/service/identity-provider.service.interface';
 import { AUTHENTICATION_NAME } from '@iam/authentication/domain/authtentication.name';
+import { INVALID_REFRESH_TOKEN_ERROR } from '@iam/authentication/infrastructure/cognito/exception/cognito-exception-messages';
+import { InvalidRefreshTokenException } from '@iam/authentication/infrastructure/cognito/exception/invalid-refresh-token.exception';
 import { AppRole } from '@iam/authorization/domain/app-role.enum';
 import { UserResponseDto } from '@iam/user/application/dto/user-response.dto';
 import { UserMapper } from '@iam/user/application/mapper/user.mapper';
@@ -44,6 +46,7 @@ import {
 } from '@iam/user/application/repository/user.repository.interface';
 import { User } from '@iam/user/domain/user.entity';
 import { USER_ENTITY_NAME } from '@iam/user/domain/user.name';
+import { PublicKeyNotFoundException } from '@iam/user/infrastructure/database/exception/public-key-not-found.exception';
 
 import { StellarService } from '../../../../stellar/application/service/stellar.service';
 
@@ -390,37 +393,42 @@ export class AuthenticationService {
   async handleRefreshSession(
     refreshSessionDto: IRefreshSessionDto,
   ): Promise<OneSerializedResponseDto<IRefreshSessionResponse>> {
-    const { username, refreshToken } = refreshSessionDto;
-    const existingUser =
-      await this.userRepository.getOneByUsernameOrFail(username);
+    const { refreshToken, publicKey } = refreshSessionDto;
+    const existingUser = await this.userRepository.getOneByPublicKey(publicKey);
 
-    const response = await this.identityProviderService.refreshSession(
-      existingUser.username,
-      refreshToken,
-    );
+    if (!existingUser) {
+      throw new PublicKeyNotFoundException({
+        publicKey,
+        pointer: '/user/refreshToken',
+      });
+    }
 
-    return this.authenticationResponseAdapter.oneEntityResponseAuth<IRefreshSessionResponse>(
-      AUTHENTICATION_NAME,
-      response,
-    );
-  }
+    try {
+      const isValid = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
 
-  async handleRefreshAdminSession(
-    refreshSessionDto: IRefreshSessionDto,
-  ): Promise<OneSerializedResponseDto<IRefreshSessionResponse>> {
-    const { username, refreshToken } = refreshSessionDto;
-    const existingUser =
-      await this.adminRepository.getOneByAdminUsernameOrFail(username);
+      if (!isValid) {
+        throw new InvalidRefreshTokenException({
+          message: INVALID_REFRESH_TOKEN_ERROR,
+          pointer: '/user/refreshToken',
+        });
+      }
 
-    const response = await this.identityProviderService.refreshSession(
-      existingUser.username,
-      refreshToken,
-    );
+      const tokenResponse = this.signJwt({
+        publicKey,
+      });
 
-    return this.authenticationResponseAdapter.oneEntityResponseAuth<IRefreshSessionResponse>(
-      AUTHENTICATION_NAME,
-      response,
-    );
+      return this.authenticationResponseAdapter.oneEntityResponseAuth<IRefreshSessionResponse>(
+        AUTHENTICATION_NAME,
+        tokenResponse,
+      );
+    } catch {
+      throw new InvalidRefreshTokenException({
+        message: INVALID_REFRESH_TOKEN_ERROR,
+        pointer: '/user/refreshToken',
+      });
+    }
   }
 
   async getTransactionChallenge(

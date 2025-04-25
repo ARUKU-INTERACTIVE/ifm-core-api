@@ -1,4 +1,4 @@
 export interface IRefreshSessionDto {
-  username: string;
+  publicKey: string;
   refreshToken: string;
 }

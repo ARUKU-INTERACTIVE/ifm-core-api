@@ -7,7 +7,7 @@ export class RefreshSessionDto implements IRefreshSessionDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  username: string;
+  publicKey: string;
 
   @ApiProperty()
   @IsString()
