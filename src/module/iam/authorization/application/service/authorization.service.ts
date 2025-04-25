@@ -4,18 +4,13 @@ import { AppAction } from '@iam/authorization/domain/app-action.enum';
 import { CaslAbilityFactory } from '@iam/authorization/infrastructure/casl/factory/casl-ability.factory';
 import { AppSubjects } from '@iam/authorization/infrastructure/casl/type/app-subjects.type';
 
-import { Admin } from '@/module/iam/admin/domain/admin.entity';
 import { User } from '@/module/iam/user/domain/user.entity';
 
 @Injectable()
 export class AuthorizationService {
   constructor(private readonly abilityFactory: CaslAbilityFactory) {}
 
-  isAllowed(
-    user: User | Admin,
-    action: AppAction,
-    subject: AppSubjects,
-  ): boolean {
+  isAllowed(user: User, action: AppAction, subject: AppSubjects): boolean {
     if (!user) {
       return false;
     }

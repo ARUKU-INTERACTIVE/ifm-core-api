@@ -5,10 +5,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ENVIRONMENT } from '@config/environment.enum';
 
-import {
-  ADMIN_REPOSITORY_KEY,
-  IAdminRepository,
-} from '@iam/admin/application/repository/admin.repository.interface';
 import { IAccessTokenPayload } from '@iam/authentication/infrastructure/passport/access-token-payload.interface';
 import {
   IUserRepository,
@@ -24,8 +20,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
     @Inject(USER_REPOSITORY_KEY)
     private readonly userRepository: IUserRepository,
-    @Inject(ADMIN_REPOSITORY_KEY)
-    private readonly adminRepository: IAdminRepository,
   ) {
     /* istanbul ignore next */
     const options =
@@ -54,17 +48,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         accessTokenPayload.sub,
       );
     }
-    let currentAdminUser = await this.adminRepository.getOneByPublicKey(
-      accessTokenPayload.publicKey,
-    );
-    if (!currentAdminUser) {
-      currentAdminUser = await this.userRepository.getOneByExternalId(
-        accessTokenPayload.sub,
-      );
-    }
-    if (!currentUser && !currentAdminUser) {
+    if (!currentUser) {
       throw new ForbiddenException();
     }
-    return currentUser || currentAdminUser;
+    return currentUser;
   }
 }
