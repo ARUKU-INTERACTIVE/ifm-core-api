@@ -71,7 +71,6 @@ export class FormationController {
   saveOne(
     @Body() createFormationDto: CreateFormationDto,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
-    console.log(createFormationDto, 'createFormationDto');
     return this.formationService.saveOne(createFormationDto);
   }
 
@@ -82,7 +81,6 @@ export class FormationController {
   updateOne(
     @Body() updateFormationDto: UpdateFormationDto,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
-    console.log(updateFormationDto, 'updateFormationDto');
     return this.formationService.updateOne(updateFormationDto);
   }
 }

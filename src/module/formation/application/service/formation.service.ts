@@ -111,7 +111,6 @@ export class FormationService {
         };
       }),
     );
-    console.log(formationPlayerMapped, 'formationPlayerMapped');
 
     this.formationPlayerService.saveMany(formationPlayerMapped);
     return this.responseAdapter.oneEntityResponse<FormationResponseDto>(
