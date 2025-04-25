@@ -40,17 +40,17 @@ export class FormationPostgresRepository implements IFormationRepository {
   }
 
   async getOneByIdOrFail(
-    id: number,
+    id: string,
     relations: FormationRelation[] = [],
   ): Promise<Formation> {
     const Formation = await this.repository.findOne({
-      where: { id },
+      where: { uuid: id },
       relations,
     });
 
     if (!Formation) {
       throw new FormationNotFoundException({
-        message: `Formation with ID ${id} not found`,
+        message: `Formation with UUID ${id} not found`,
       });
     }
 

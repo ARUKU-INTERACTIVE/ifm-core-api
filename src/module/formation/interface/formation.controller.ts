@@ -55,11 +55,11 @@ export class FormationController {
   }
 
   @Get(':id')
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: 'string' })
   @ApiOperation({ summary: 'Get one Formation by id or throw not found' })
   @GetOneSwaggerDecorator(FormationResponseDto)
   getOneByIdOrFail(
-    @Param('id') id: number,
+    @Param('id') id: string,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
     return this.formationService.getOneByIdOrFail(id);
   }
@@ -71,7 +71,6 @@ export class FormationController {
   saveOne(
     @Body() createFormationDto: CreateFormationDto,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
-    console.log(createFormationDto, 'createFormationDto');
     return this.formationService.saveOne(createFormationDto);
   }
 
@@ -82,7 +81,6 @@ export class FormationController {
   updateOne(
     @Body() updateFormationDto: UpdateFormationDto,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
-    console.log(updateFormationDto, 'updateFormationDto');
     return this.formationService.updateOne(updateFormationDto);
   }
 }
