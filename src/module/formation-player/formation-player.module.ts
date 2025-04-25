@@ -9,7 +9,6 @@ import { Mapper } from '@/module/formation-player/application/mapper/formation-p
 import { FORMATION_PLAYER_REPOSITORY_KEY } from '@/module/formation-player/application/repository/formation-player.repository.interface';
 import { FormationPlayerService } from '@/module/formation-player/application/service/formation-player.service';
 import { FormationPlayerSchema } from '@/module/formation-player/infrastructure/database/formation-player.schema';
-import { FormationPlayerController as Controller } from '@/module/formation-player/interface/formation-player.controller';
 
 const RepositoryProvider: Provider = {
   provide: FORMATION_PLAYER_REPOSITORY_KEY,
@@ -19,7 +18,7 @@ const RepositoryProvider: Provider = {
 @Module({
   imports: [
     TypeOrmModule.forFeature([FormationPlayerSchema]),
-    PlayerModule,
+    forwardRef(() => PlayerModule),
     forwardRef(() => FormationModule),
   ],
   providers: [
@@ -28,7 +27,7 @@ const RepositoryProvider: Provider = {
     ResponseAdapter,
     RepositoryProvider,
   ],
-  controllers: [Controller],
+  controllers: [],
   exports: [FormationPlayerService, Mapper, RepositoryProvider],
 })
 export class FormationPlayerModule {}
