@@ -10,12 +10,7 @@ import { AppModule } from '@/module/app/app.module';
 
 export const identityProviderServiceMock: jest.MockedObject<IIdentityProviderService> =
   {
-    signUp: jest.fn(),
     signIn: jest.fn(),
-    confirmUser: jest.fn(),
-    forgotPassword: jest.fn(),
-    confirmPassword: jest.fn(),
-    resendConfirmationCode: jest.fn(),
     refreshSession: jest.fn(),
   };
 
