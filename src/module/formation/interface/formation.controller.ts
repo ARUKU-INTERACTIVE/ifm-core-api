@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { UpdateFormationDto } from '@module/formation/application/dto/update-formation.dto';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
@@ -64,5 +73,16 @@ export class FormationController {
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
     console.log(createFormationDto, 'createFormationDto');
     return this.formationService.saveOne(createFormationDto);
+  }
+
+  @Patch()
+  @ApiOperation({ summary: 'Create new Formation' })
+  @ApiBody({ type: UpdateFormationDto })
+  @GetOneSwaggerDecorator(UpdateFormationDto)
+  updateOne(
+    @Body() updateFormationDto: UpdateFormationDto,
+  ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
+    console.log(updateFormationDto, 'updateFormationDto');
+    return this.formationService.updateOne(updateFormationDto);
   }
 }
