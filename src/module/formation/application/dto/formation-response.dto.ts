@@ -18,6 +18,18 @@ export class FormationResponseDto {
 
   @DtoProperty
   @IsString()
+  forwards: number;
+
+  @DtoProperty
+  @IsString()
+  midfielders: number;
+
+  @DtoProperty
+  @IsString()
+  defenders: number;
+
+  @DtoProperty
+  @IsString()
   name: string;
 
   @DtoProperty

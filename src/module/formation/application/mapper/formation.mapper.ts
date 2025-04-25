@@ -5,7 +5,7 @@ import { FormationResponseDto } from '@/module/formation/application/dto/formati
 import { Formation } from '@/module/formation/domain/formation.entity';
 
 @Injectable()
-export class Mapper {
+export class FormationMapper {
   fromCreateFormationDtoToFormation(
     formationDto: ICreateFormationDto,
     rosterId: number,
@@ -28,6 +28,9 @@ export class Mapper {
     formationResponseDto.id = formation.id;
     formationResponseDto.uuid = formation.uuid;
     formationResponseDto.name = formation.name;
+    formationResponseDto.forwards = formation.forwards;
+    formationResponseDto.midfielders = formation.midfielders;
+    formationResponseDto.defenders = formation.defenders;
     formationResponseDto.createdAt = formation.createdAt;
     formationResponseDto.updatedAt = formation.updatedAt;
     formationResponseDto.deletedAt = formation.deletedAt;
