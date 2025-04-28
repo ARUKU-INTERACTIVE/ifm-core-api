@@ -17,15 +17,7 @@ export class TomlService {
     );
   }
   private getNftTemplate(player: Partial<PlayerResponseDto>): string {
-    return `
-   [[CURRENCIES]]
-   code=${this.codeMint}
-   issuer=${player.issuer}
-   display_decimals=7
-   name=${player.name}
-   desc=${player.description}
-   image=${player.imageUri}
-   `;
+    return `\n[[CURRENCIES]]\nissuer="${player.issuer}"\ncode="${this.codeMint}"\nname="${player.name}"\ndesc="${player.description}"\nimage="${player.imageUri}"\nfixed_number=1\ndisplay_decimals=7`;
   }
 
   async getToml(): Promise<string> {
@@ -40,11 +32,10 @@ export class TomlService {
         imageUri: player.attributes.imageUri,
       });
     });
-    const tomlContent = `
-   [DOCUMENTATION]
-   
-   ORG_URL="https://${this.homeDomain}"
-      `.concat(template.join('\n\n'));
+    const tomlContent =
+      `[DOCUMENTATION]\n\nORG_URL="https://${this.homeDomain}"\n`.concat(
+        template.join('\n'),
+      );
 
     return tomlContent;
   }
