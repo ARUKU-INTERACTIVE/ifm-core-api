@@ -5,6 +5,9 @@
   "author": "BIGGER",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "22.4.0"
+  },
   "scripts": {
     "build": "nest build",
     "build:prod": "nest build && npm run sentry:sourcemaps",

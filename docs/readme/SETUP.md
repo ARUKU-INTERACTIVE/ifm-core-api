@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-- [Node >= 18](https://github.com/nvm-sh/nvm)
+- [Node >= 22](https://github.com/nvm-sh/nvm)
 
 ## Setting up the project
 
