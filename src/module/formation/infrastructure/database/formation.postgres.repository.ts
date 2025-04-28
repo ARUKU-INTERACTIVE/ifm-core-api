@@ -74,24 +74,16 @@ export class FormationPostgresRepository implements IFormationRepository {
     id: number,
     updates: Partial<Omit<Formation, 'id'>>,
   ): Promise<Formation> {
-    try {
-      console.log(id, updates);
-
-      const formationToUpdate = await this.repository.preload({
-        ...updates,
-        id,
+    const formationToUpdate = await this.repository.preload({
+      ...updates,
+      id,
+    });
+    if (!formationToUpdate) {
+      throw new FormationNotFoundException({
+        message: `Formation with ID ${id} not found`,
       });
-      console.log(formationToUpdate, 'formationToUpdate');
-      if (!formationToUpdate) {
-        throw new FormationNotFoundException({
-          message: `Formation with ID ${id} not found`,
-        });
-      }
-
-      return this.repository.save(formationToUpdate);
-    } catch (error) {
-      console.log(error);
-      throw error;
     }
+
+    return this.repository.save(formationToUpdate);
   }
 }
