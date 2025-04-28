@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 
 import { ICollection } from '@common/base/application/dto/collection.interface';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
@@ -58,10 +58,40 @@ export class FormationPostgresRepository implements IFormationRepository {
   }
 
   async saveOne(formation: Formation): Promise<Formation> {
-    const savedFormation = await this.repository.save(formation);
-    return this.repository.findOne({
-      where: { id: savedFormation.id },
-      relations: [FormationRelation.FORMATION_PLAYER_ENTITY],
-    });
+    return await this.repository.save(formation);
+  }
+
+  async updateMany(rosterId: number): Promise<UpdateResult> {
+    return await this.repository.update(
+      { rosterId },
+      {
+        isActive: false,
+      },
+    );
+  }
+
+  async updateOneOrFail(
+    id: number,
+    updates: Partial<Omit<Formation, 'id'>>,
+  ): Promise<Formation> {
+    try {
+      console.log(id, updates);
+
+      const formationToUpdate = await this.repository.preload({
+        ...updates,
+        id,
+      });
+      console.log(formationToUpdate, 'formationToUpdate');
+      if (!formationToUpdate) {
+        throw new FormationNotFoundException({
+          message: `Formation with ID ${id} not found`,
+        });
+      }
+
+      return this.repository.save(formationToUpdate);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }

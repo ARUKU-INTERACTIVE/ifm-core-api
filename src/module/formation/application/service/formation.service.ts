@@ -93,6 +93,9 @@ export class FormationService {
     const roster = await this.rosterService.getOneByUuidOrFail(
       createFormationDto.rosterUuid,
     );
+    if (createFormationDto.isActive) {
+      await this.repository.updateMany(+roster.data.id);
+    }
     const formation = await this.repository.saveOne(
       this.formationMapper.fromCreateFormationDtoToFormation(
         createFormationDto,
@@ -112,19 +115,37 @@ export class FormationService {
         };
       }),
     );
-
-    this.formationPlayerService.saveMany(formationPlayerMapped);
+    await this.formationPlayerService.saveMany(formationPlayerMapped);
+    const foundedFormation = await this.repository.getOneByUuidOrFail(
+      formation.uuid,
+    );
+    console.log(foundedFormation);
     return this.responseAdapter.oneEntityResponse<FormationResponseDto>(
-      this.formationMapper.fromFormationToFormationResponseDto(formation),
+      this.formationMapper.fromFormationToFormationResponseDto(
+        foundedFormation,
+      ),
     );
   }
 
   async updateOne(
     updateFormationDto: IUpdateFormationDto,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
+    console.log(updateFormationDto, 'updateFormationDto');
     const formation = await this.repository.getOneByUuidOrFail(
       updateFormationDto.formationUuid,
     );
+    if (updateFormationDto.isActive) {
+      await this.repository.updateMany(formation.rosterId);
+    }
+    console.log(formation, 'formation');
+
+    await this.repository.updateOneOrFail(
+      formation.id,
+      this.formationMapper.fromUpdateFormationDtoToFormation(
+        updateFormationDto,
+      ),
+    );
+    console.log('PASO LA ACTUALIZACION');
     await Promise.all(
       updateFormationDto.formationPlayers.map(async (formationPlayer) => {
         const formationPlayerEntity =
@@ -156,6 +177,7 @@ export class FormationService {
           };
         }),
       );
+
       this.formationPlayerService.saveMany(formationPlayerMapped);
     }
     return this.responseAdapter.oneEntityResponse<FormationResponseDto>(

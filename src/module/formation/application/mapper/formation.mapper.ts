@@ -1,4 +1,5 @@
 import { FormationPlayerMapper } from '@module/formation-player/application/mapper/formation-player.mapper';
+import { IUpdateFormationDto } from '@module/formation/application/dto/update-formation.dto.interface';
 import { Injectable } from '@nestjs/common';
 
 import { ICreateFormationDto } from '@/module/formation/application/dto/create-formation.dto.interface';
@@ -20,6 +21,17 @@ export class FormationMapper {
     formation.defenders = formationDto.defenders;
     formation.isActive = formationDto.isActive;
     formation.rosterId = rosterId;
+    return formation;
+  }
+
+  fromUpdateFormationDtoToFormation(updateFormationDto: IUpdateFormationDto) {
+    const formation = new Formation();
+    formation.name = updateFormationDto.name;
+    formation.description = updateFormationDto.description;
+    formation.forwards = updateFormationDto.forwards;
+    formation.midfielders = updateFormationDto.midfielders;
+    formation.defenders = updateFormationDto.defenders;
+    formation.isActive = updateFormationDto.isActive;
     return formation;
   }
 

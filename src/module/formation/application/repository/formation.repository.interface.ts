@@ -1,3 +1,5 @@
+import { UpdateResult } from 'typeorm';
+
 import { ICollection } from '@common/base/application/dto/collection.interface';
 import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 
@@ -15,4 +17,9 @@ export interface IFormationRepository {
     relations?: FormationRelation[],
   ): Promise<Formation>;
   saveOne(formation: Formation): Promise<Formation>;
+  updateMany(rosterId: number): Promise<UpdateResult>;
+  updateOneOrFail(
+    id: number,
+    updates: Partial<Omit<Formation, 'id'>>,
+  ): Promise<Formation>;
 }

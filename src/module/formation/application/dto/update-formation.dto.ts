@@ -5,6 +5,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -35,6 +36,11 @@ export class UpdateFormationDto implements IUpdateFormationDto {
   @IsString()
   @IsNotEmpty()
   formationUuid: string;
+
+  @ApiPropertyOptional({ type: Boolean, example: false })
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
 
   @ApiPropertyOptional({ type: Number, example: 3 })
   @IsNumber()
