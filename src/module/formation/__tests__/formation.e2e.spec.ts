@@ -53,6 +53,7 @@ describe('Formation Module', () => {
                   forwards: expect.any(Number),
                   midfielders: expect.any(Number),
                   defenders: expect.any(Number),
+                  isActive: expect.any(Boolean),
                   uuid: expect.stringMatching(
                     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
                   ),
@@ -162,6 +163,7 @@ describe('Formation Module', () => {
                 createdAt: '2025-04-25T16:42:10.000Z',
                 updatedAt: '2025-04-25T16:42:10.000Z',
                 deletedAt: null,
+                isActive: expect.any(Boolean),
               }),
             }),
           });
@@ -206,17 +208,18 @@ describe('Formation Module', () => {
         .then(({ body }) => {
           const expectedResponse = expect.objectContaining({
             data: expect.objectContaining({
-              attributes: {
+              attributes: expect.objectContaining({
                 uuid: expect.any(String),
                 name: '5-3-2',
                 forwards: 2,
                 midfielders: 3,
                 defenders: 5,
                 formationPlayers: expect.arrayContaining([]),
+                isActive: expect.any(Boolean),
                 createdAt: expect.any(String),
                 updatedAt: expect.any(String),
                 deletedAt: null,
-              },
+              }),
             }),
           });
           expect(body).toEqual(expectedResponse);

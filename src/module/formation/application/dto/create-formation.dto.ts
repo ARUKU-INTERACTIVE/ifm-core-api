@@ -3,8 +3,10 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -37,6 +39,11 @@ export class CreateFormationDto implements ICreateFormationDto {
   @IsNumber()
   @IsNotEmpty()
   forwards: number;
+
+  @ApiPropertyOptional({ type: Boolean, example: false })
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
 
   @ApiPropertyOptional({ type: Number, example: 3 })
   @IsNumber()

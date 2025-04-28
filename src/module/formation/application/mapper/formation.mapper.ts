@@ -18,6 +18,7 @@ export class FormationMapper {
     formation.forwards = formationDto.forwards;
     formation.midfielders = formationDto.midfielders;
     formation.defenders = formationDto.defenders;
+    formation.isActive = formationDto.isActive;
     formation.rosterId = rosterId;
     return formation;
   }
@@ -31,6 +32,7 @@ export class FormationMapper {
     formationResponseDto.name = formation.name;
     formationResponseDto.forwards = formation.forwards;
     formationResponseDto.midfielders = formation.midfielders;
+    formationResponseDto.isActive = formation.isActive;
     if (formation.formationPlayers) {
       formationResponseDto.formationPlayers = formation.formationPlayers.map(
         (formationPlayer) =>

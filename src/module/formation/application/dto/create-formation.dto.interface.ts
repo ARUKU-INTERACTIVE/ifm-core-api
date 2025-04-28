@@ -7,5 +7,6 @@ export interface ICreateFormationDto {
   midfielders: number;
   defenders: number;
   rosterUuid: string;
+  isActive?: boolean;
   formationPlayers: CreateFormationPlayerUuidDto[];
 }

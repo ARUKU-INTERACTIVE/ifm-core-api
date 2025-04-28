@@ -1,6 +1,13 @@
 import { FormationPlayerResponseDto } from '@module/formation-player/application/dto/formation-player-response.dto';
 import { Type } from 'class-transformer';
-import { IsArray, IsDate, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsDate,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 import { DtoProperty } from '@common/base/application/dto/base.dto';
 import { EntityName } from '@common/decorators/entity-name.decorator';
@@ -38,6 +45,10 @@ export class FormationResponseDto {
   @IsArray()
   @Type(() => FormationPlayerResponseDto)
   formationPlayers: FormationPlayerResponseDto[];
+
+  @DtoProperty
+  @IsBoolean()
+  isActive: boolean;
 
   @DtoProperty
   @IsDate()
