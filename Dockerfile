@@ -1,12 +1,16 @@
-FROM node:18-alpine AS build
+FROM public.ecr.aws/docker/library/node:22.12.0-alpine AS build
 
 WORKDIR /usr/src/app
+
+RUN apk add \
+    python3 \
+    make \
+    g++ \
+    curl
 
 COPY package*.json ./
 
 COPY . .
-
-RUN apk --no-cache add curl
 
 RUN npm ci
 
