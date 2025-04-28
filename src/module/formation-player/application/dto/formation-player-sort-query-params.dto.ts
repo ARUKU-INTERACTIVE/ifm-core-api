@@ -3,7 +3,7 @@ import { IsEnum, IsOptional } from 'class-validator';
 
 import { SortType } from '@common/base/application/enum/sort-type.enum';
 
-export class SortQueryParamsDto {
+export class FormationPlayerSortQueryParamsDto {
   @ApiPropertyOptional({ enum: SortType, example: 'ASC' })
   @IsEnum(SortType)
   @IsOptional()

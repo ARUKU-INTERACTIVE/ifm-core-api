@@ -14,7 +14,7 @@ import {
   SortOptions,
 } from '@common/base/application/interface/get-all-options.interface';
 
-import { ResponseAdapter } from '@/module/formation/application/adapter/formation-response.adapter';
+import { FormationResponseAdapter } from '@/module/formation/application/adapter/formation-response.adapter';
 import { ICreateFormationDto } from '@/module/formation/application/dto/create-formation.dto.interface';
 import { FormationResponseDto } from '@/module/formation/application/dto/formation-response.dto';
 import { FormationRelation } from '@/module/formation/application/enum/formation-relation.enum';
@@ -29,9 +29,9 @@ import { Formation } from '@/module/formation/domain/formation.entity';
 export class FormationService {
   constructor(
     @Inject(FORMATION_REPOSITORY_KEY)
-    private readonly repository: IFormationRepository,
+    private readonly formationRepository: IFormationRepository,
     private readonly formationMapper: FormationMapper,
-    private readonly responseAdapter: ResponseAdapter,
+    private readonly responseAdapter: FormationResponseAdapter,
     @Inject(forwardRef(() => PlayerService))
     private readonly playerService: PlayerService,
     private readonly rosterService: RosterService,
@@ -57,9 +57,11 @@ export class FormationService {
 
     options.filter.rosterUuid = undefined;
 
-    if (include && fields && !fields.includes('id')) fields.push('id');
+    if (include && fields && !fields.includes('id')) {
+      fields.push('id');
+    }
 
-    const collection = await this.repository.getAll(options);
+    const collection = await this.formationRepository.getAll(options);
     const collectionDto = new CollectionDto({
       ...collection,
       data: collection.data.map((formation: Formation) =>
@@ -74,14 +76,17 @@ export class FormationService {
   }
 
   async getOneByUuidOrFail(uuid: string): Promise<Formation> {
-    return await this.repository.getOneByUuidOrFail(uuid);
+    return await this.formationRepository.getOneByUuidOrFail(uuid);
   }
 
   async getOneMappedByUuidOrFail(
     uuid: string,
     relations: FormationRelation[],
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
-    const formation = await this.repository.getOneByUuidOrFail(uuid, relations);
+    const formation = await this.formationRepository.getOneByUuidOrFail(
+      uuid,
+      relations,
+    );
     return this.responseAdapter.oneEntityResponse<FormationResponseDto>(
       this.formationMapper.fromFormationToFormationResponseDto(formation),
     );
@@ -94,9 +99,9 @@ export class FormationService {
       createFormationDto.rosterUuid,
     );
     if (createFormationDto.isActive) {
-      await this.repository.updateMany(+roster.data.id);
+      await this.formationRepository.updateMany(+roster.data.id);
     }
-    const formation = await this.repository.saveOne(
+    const formation = await this.formationRepository.saveOne(
       this.formationMapper.fromCreateFormationDtoToFormation(
         createFormationDto,
         +roster.data.id,
@@ -116,7 +121,7 @@ export class FormationService {
       }),
     );
     await this.formationPlayerService.saveMany(formationPlayerMapped);
-    const foundedFormation = await this.repository.getOneByUuidOrFail(
+    const foundedFormation = await this.formationRepository.getOneByUuidOrFail(
       formation.uuid,
     );
     return this.responseAdapter.oneEntityResponse<FormationResponseDto>(
@@ -129,14 +134,14 @@ export class FormationService {
   async updateOne(
     updateFormationDto: IUpdateFormationDto,
   ): Promise<OneSerializedResponseDto<FormationResponseDto>> {
-    const formation = await this.repository.getOneByUuidOrFail(
+    const formation = await this.formationRepository.getOneByUuidOrFail(
       updateFormationDto.formationUuid,
     );
     if (updateFormationDto.isActive) {
-      await this.repository.updateMany(formation.rosterId);
+      await this.formationRepository.updateMany(formation.rosterId);
     }
 
-    await this.repository.updateOneOrFail(
+    await this.formationRepository.updateOneOrFail(
       formation.id,
       this.formationMapper.fromUpdateFormationDtoToFormation(
         updateFormationDto,

@@ -1,12 +1,5 @@
-/**
- * Enum for defining relations between entities in the external module.
- *
- * Add relations here by specifying the name of the related entity on the domain,
- * as defined in the corresponding entity file (e.g. `module/domain/entity.name.ts`).
- *
- * Example:
- * RELATED_ENTITY = 'related-entity-name',
- */
+import { PLAYER_ENTITY_NAME } from '@module/player/domain/player.name';
+
 export enum FormationPlayerRelation {
-  RELATED_ENTITY = 'related-entity-name',
+  PLAYER_ENTITY = PLAYER_ENTITY_NAME,
 }

@@ -6,7 +6,7 @@ import { fromCommaSeparatedToArray } from '@common/base/application/mapper/base.
 
 import { FormationPlayerRelation } from '@/module/formation-player/application/enum/formation-player-relation.enum';
 
-export class IncludeQueryParamsDto {
+export class FormationPlayerIncludeQueryParamsDto {
   @ApiPropertyOptional({
     enum: FormationPlayerRelation,
     isArray: true,

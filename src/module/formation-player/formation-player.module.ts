@@ -4,7 +4,7 @@ import { PlayerModule } from '@module/player/player.module';
 import { Module, Provider, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ResponseAdapter } from '@/module/formation-player/application/adapter/formation-player-response.adapter';
+import { FormationPlayerResponseAdapter } from '@/module/formation-player/application/adapter/formation-player-response.adapter';
 import { FormationPlayerMapper } from '@/module/formation-player/application/mapper/formation-player.mapper';
 import { FORMATION_PLAYER_REPOSITORY_KEY } from '@/module/formation-player/application/repository/formation-player.repository.interface';
 import { FormationPlayerService } from '@/module/formation-player/application/service/formation-player.service';
@@ -24,7 +24,7 @@ const RepositoryProvider: Provider = {
   providers: [
     FormationPlayerService,
     FormationPlayerMapper,
-    ResponseAdapter,
+    FormationPlayerResponseAdapter,
     RepositoryProvider,
   ],
   controllers: [],

@@ -5,7 +5,7 @@ import { RosterModule } from '@module/roster/roster.module';
 import { Module, Provider, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ResponseAdapter } from '@/module/formation/application/adapter/formation-response.adapter';
+import { FormationResponseAdapter } from '@/module/formation/application/adapter/formation-response.adapter';
 import { FormationMapper } from '@/module/formation/application/mapper/formation.mapper';
 import { FORMATION_REPOSITORY_KEY } from '@/module/formation/application/repository/formation.repository.interface';
 import { FormationService } from '@/module/formation/application/service/formation.service';
@@ -27,7 +27,7 @@ const RepositoryProvider: Provider = {
   providers: [
     FormationService,
     FormationMapper,
-    ResponseAdapter,
+    FormationResponseAdapter,
     RepositoryProvider,
   ],
   controllers: [Controller],
