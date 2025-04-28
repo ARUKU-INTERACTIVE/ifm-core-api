@@ -1,0 +1,20 @@
+entity: Roster
+items:
+  roster1:
+    id: 1
+    uuid: '00000000-0000-0000-0000-000000000001'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    team: '@team1'
+  roster2:
+    id: 2
+    uuid: '00000000-0000-0000-0000-000000000002'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    team: '@team2'
+  roster3:
+    id: 3
+    uuid: '00000000-0000-0000-0000-000000000003'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    team: '@team3'

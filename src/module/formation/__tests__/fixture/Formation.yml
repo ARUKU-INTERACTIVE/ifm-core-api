@@ -1,0 +1,40 @@
+entity: Formation
+items:
+  formation1:
+    id: 1
+    uuid: '3c848713-18df-4c04-b445-46e55df00029'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    name: '4-4-2'
+    defenders: 4
+    midfielders: 4
+    forwards: 2
+    description: 'Formación clásica con equilibrio entre defensa y ataque'
+    isActive: true
+    roster: '@roster1'
+
+  formation2:
+    id: 2
+    uuid: 'eb2586ac-f1b9-41d0-84a1-9a49d9f564cf'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    name: '4-3-3'
+    defenders: 4
+    midfielders: 3
+    forwards: 3
+    description: 'Ofensiva, ideal para equipos con buenos delanteros'
+    isActive: false
+    roster: '@roster2'
+
+  formation3:
+    id: 3
+    uuid: '227e510f-b850-4782-a27c-daacf752c55b'
+    createdAt: '2025-04-25T16:42:10.000Z'
+    updatedAt: '2025-04-25T16:42:10.000Z'
+    name: '3-5-2'
+    defenders: 3
+    midfielders: 5
+    forwards: 2
+    description: 'Control del medio campo con dos delanteros'
+    isActive: false
+    roster: '@roster1'

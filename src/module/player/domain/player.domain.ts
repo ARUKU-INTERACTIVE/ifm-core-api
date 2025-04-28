@@ -1,4 +1,5 @@
 import { Auction } from '@module/auction/domain/auction.domain';
+import { FormationPlayer } from '@module/formation-player/domain/formation-player.entity';
 import { Roster } from '@module/roster/domain/roster.entity';
 import { Team } from '@module/team/domain/team.entity';
 
@@ -16,4 +17,5 @@ export class Player extends Base {
   teamId?: number;
   roster?: Roster;
   rosterId?: number;
+  formationsPlayers: FormationPlayer[];
 }

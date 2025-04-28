@@ -17,6 +17,7 @@ export interface IRosterPostgresRepository {
     uuid: string,
     relations: RosterRelation[],
   ): Promise<Roster>;
+  getOneByUuid(uuid: string, relations?: RosterRelation[]): Promise<Roster>;
   getOneById(id: number, relations?: RosterRelation[]): Promise<Roster>;
   getOneRosterOrFail(
     where: FilterOptions<Roster>,

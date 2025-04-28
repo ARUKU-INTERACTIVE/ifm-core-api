@@ -1,3 +1,4 @@
+import { FormationPlayerModule } from '@module/formation-player/formation-player.module';
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
 import { PlayerMapper } from '@module/player/application/mapper/player.mapper';
 import { PLAYER_REPOSITORY_KEY } from '@module/player/application/repository/player.repository.interface';
@@ -27,6 +28,7 @@ export const playerRepositoryProvider: Provider = {
     forwardRef(() => TeamModule),
     UserModule,
     PinataModule,
+    forwardRef(() => FormationPlayerModule),
     forwardRef(() => RosterModule),
   ],
   providers: [

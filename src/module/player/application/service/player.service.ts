@@ -1,3 +1,4 @@
+import { FormationPlayerService } from '@module/formation-player/application/service/formation-player.service';
 import { PlayerResponseAdapter } from '@module/player/application/adapter/player-response.adapter';
 import { AddPlayerToRosterDto } from '@module/player/application/dto/add-player-roster.dto';
 import { UpdatePlayerResponseDto } from '@module/player/application/dto/player-response-update-dto';
@@ -54,6 +55,7 @@ export class PlayerService {
     private readonly stellarTransactionAdapter: StellarTransactionAdapter,
     private readonly sorobanContractAdapter: SorobanContractAdapter,
     private readonly stellarAccountAdapter: StellarAccountAdapter,
+    private readonly formationPlayerService: FormationPlayerService,
     private readonly pinataAdapter: PinataAdapter,
     @Inject(forwardRef(() => RosterService))
     private readonly rosterService: RosterService,
@@ -80,7 +82,9 @@ export class PlayerService {
       options.include,
     );
   }
-
+  async getOneByUuid(uuid: string, relations?: PlayerRelation[]) {
+    return await this.playerRepository.getOneByUuIdOrFail(uuid, relations);
+  }
   async getOneById(
     id: number,
     relations?: PlayerRelation[],
@@ -317,7 +321,7 @@ export class PlayerService {
     const roster = await this.rosterService.getOneRosterOrFail({
       uuid: updatePlayerRosterDto.rosterUuid,
     });
-
+    await this.formationPlayerService.deleteManyByPlayerIdOrFail(player.id);
     const team = await this.teamService.getOneByUserIdOrFail(user.id, [
       TeamRelation.ROSTER_ENTITY,
     ]);
