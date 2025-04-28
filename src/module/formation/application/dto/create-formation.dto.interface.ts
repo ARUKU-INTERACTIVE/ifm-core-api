@@ -2,7 +2,7 @@ import { CreateFormationPlayerUuidDto } from '@module/formation-player/applicati
 
 export interface ICreateFormationDto {
   name: string;
-  description: string;
+  description?: string;
   forwards: number;
   midfielders: number;
   defenders: number;

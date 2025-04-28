@@ -24,8 +24,8 @@ export class CreateFormationDto implements ICreateFormationDto {
     example: 'That formation is for going on the offensive.',
   })
   @IsString()
-  @IsNotEmpty()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @ApiPropertyOptional({
     type: String,
