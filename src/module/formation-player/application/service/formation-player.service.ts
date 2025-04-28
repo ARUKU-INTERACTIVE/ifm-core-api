@@ -1,6 +1,4 @@
-import { FormationService } from '@module/formation/application/service/formation.service';
-import { PlayerService } from '@module/player/application/service/player.service';
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
 
@@ -18,27 +16,26 @@ import { FormationPlayer } from '@/module/formation-player/domain/formation-play
 export class FormationPlayerService {
   constructor(
     @Inject(FORMATION_PLAYER_REPOSITORY_KEY)
-    private readonly repository: IFormationPlayerRepository,
-    private readonly mapper: FormationPlayerMapper,
+    private readonly formationPlayerRepository: IFormationPlayerRepository,
+    private readonly formationPlayerMapper: FormationPlayerMapper,
     private readonly responseAdapter: FormationPlayerResponseAdapter,
-    @Inject(forwardRef(() => PlayerService))
-    private readonly playerService: PlayerService,
-    @Inject(forwardRef(() => FormationService))
-    private readonly formationService: FormationService,
   ) {}
 
   async getOneByUuidOrFail(
     formationPlayerUuid: string,
   ): Promise<FormationPlayer> {
-    return await this.repository.getOneByUuidOrFail(formationPlayerUuid);
+    return await this.formationPlayerRepository.getOneByUuidOrFail(
+      formationPlayerUuid,
+    );
   }
 
   async saveOneFormationPlayer(
     formationPlayer: FormationPlayer,
   ): Promise<OneSerializedResponseDto<FormationPlayerResponseDto>> {
-    const savedFormationPlayer = await this.repository.saveOne(formationPlayer);
+    const savedFormationPlayer =
+      await this.formationPlayerRepository.saveOne(formationPlayer);
     return this.responseAdapter.oneEntityResponse<FormationPlayerResponseDto>(
-      this.mapper.fromFormationPlayerToFormationPlayerResponseDto(
+      this.formationPlayerMapper.fromFormationPlayerToFormationPlayerResponseDto(
         savedFormationPlayer,
       ),
     );
@@ -47,8 +44,8 @@ export class FormationPlayerService {
   async saveMany(
     createFormationPlayerDto: ICreateFormationPlayerIdDto[],
   ): Promise<FormationPlayer[]> {
-    return await this.repository.saveMany(
-      this.mapper.fromCreateFormationPlayerDtoToFormationPlayers(
+    return await this.formationPlayerRepository.saveMany(
+      this.formationPlayerMapper.fromCreateFormationPlayerDtoToFormationPlayers(
         createFormationPlayerDto,
       ),
     );
@@ -57,10 +54,10 @@ export class FormationPlayerService {
   async updateMany(
     formationPlayer: FormationPlayer[],
   ): Promise<FormationPlayer[]> {
-    return await this.repository.saveMany(formationPlayer);
+    return await this.formationPlayerRepository.saveMany(formationPlayer);
   }
 
   async deleteManyByPlayerIdOrFail(playerId: number) {
-    return this.repository.deleteManyByPlayerIdOrFail(playerId);
+    return this.formationPlayerRepository.deleteManyByPlayerIdOrFail(playerId);
   }
 }
