@@ -67,6 +67,7 @@ export class GenreMysqlRepository implements IGenreRepository {
       ...updates,
       id,
     });
+
     if (!genreToUpdate) {
       throw new GenreNotFoundException({
         message: `Genre with ID ${id} not found`,
