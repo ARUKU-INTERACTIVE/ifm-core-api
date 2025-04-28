@@ -57,7 +57,7 @@
     "@sentry/nestjs": "^8.30.0",
     "@sentry/profiling-node": "^8.30.0",
     "@stellar/stellar-sdk": "^13.1.0",
-    "better-sqlite3": "^8.7.0",
+    "better-sqlite3": "^9.0.0",
     "change-case-all": "^2.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
