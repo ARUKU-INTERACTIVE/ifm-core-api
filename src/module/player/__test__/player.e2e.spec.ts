@@ -96,7 +96,7 @@ describe('Player Module', () => {
             links: expect.objectContaining({
               self: expect.any(String),
               last: expect.any(String),
-              next: expect.any(String),
+              next: null,
             }),
           };
 

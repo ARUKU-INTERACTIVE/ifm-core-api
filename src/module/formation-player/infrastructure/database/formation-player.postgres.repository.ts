@@ -51,15 +51,6 @@ export class FormationPlayerPostgresRepository
   }
 
   async deleteManyByPlayerIdOrFail(playerId: number): Promise<void> {
-    const formationPlayersToDelete = await this.repository.find({
-      where: { player: { id: playerId } },
-    });
-    if (!formationPlayersToDelete.length) {
-      throw new FormationPlayerNotFoundException({
-        message: `FormationPlayer with player ID ${playerId} not found`,
-      });
-    }
-
     await this.repository.softDelete({ playerId });
   }
 }
