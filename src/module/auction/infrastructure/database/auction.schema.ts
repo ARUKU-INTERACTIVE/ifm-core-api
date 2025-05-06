@@ -1,3 +1,4 @@
+import { AuctionStatus } from '@module/auction/application/enum/auction-status.enum';
 import { Auction } from '@module/auction/domain/auction.domain';
 import { EntitySchema } from 'typeorm';
 
@@ -15,6 +16,11 @@ export const AuctionSchema = new EntitySchema<Auction>({
     playerId: {
       type: Number,
       nullable: false,
+    },
+    status: {
+      type: String,
+      nullable: false,
+      default: AuctionStatus.Open,
     },
   }),
   relations: {
