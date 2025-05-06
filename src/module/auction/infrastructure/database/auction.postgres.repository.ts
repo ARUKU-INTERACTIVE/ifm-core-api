@@ -1,12 +1,13 @@
 import { AuctionRelation } from '@module/auction/application/enum/auction-relations.enum';
+import { AuctionStatus } from '@module/auction/application/enum/auction-status.enum';
+import { IGetAllAuctionsOptions } from '@module/auction/application/interface/get-all-auctions-options.interface';
 import { IAuctionRepository } from '@module/auction/application/repository/auction.repository.interface';
 import { Auction } from '@module/auction/domain/auction.domain';
 import { AuctionSchema } from '@module/auction/infrastructure/database/auction.schema';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, In, Not, Repository } from 'typeorm';
 
 import { ICollection } from '@common/base/application/dto/collection.interface';
-import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 
 export class AuctionRepository implements IAuctionRepository {
   constructor(
@@ -14,11 +15,15 @@ export class AuctionRepository implements IAuctionRepository {
     private readonly repository: Repository<Auction>,
   ) {}
 
-  async getAll(
-    options: IGetAllOptions<Auction, AuctionRelation[]>,
-  ): Promise<ICollection<Auction>> {
-    const { filter, page, sort, fields, include } = options || {};
-    const whereClause = { ...filter };
+  async getAll(options: IGetAllAuctionsOptions): Promise<ICollection<Auction>> {
+    const {
+      filter: { excludeCompleted = true, ...filter },
+      page,
+      sort,
+      fields,
+      include,
+    } = options || {};
+    const whereClause: FindOptionsWhere<Auction> = { ...filter };
 
     if (filter) {
       Object.entries(filter).forEach(([key, value]) => {
@@ -29,6 +34,17 @@ export class AuctionRepository implements IAuctionRepository {
         }
       });
     }
+
+    if (excludeCompleted) {
+      whereClause.status = Not(
+        In([
+          AuctionStatus.Completed,
+          AuctionStatus.NFTTransferred,
+          AuctionStatus.Cancelled,
+        ]),
+      );
+    }
+
     const [items, itemCount] = await this.repository.findAndCount({
       where: whereClause,
       order: sort,

@@ -1,6 +1,6 @@
 import { AuctionStatus } from '@module/auction/application/enum/auction-status.enum';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export class AuctionFilterQueryParamsDto {
   @ApiPropertyOptional()
@@ -17,4 +17,9 @@ export class AuctionFilterQueryParamsDto {
   @IsNumber()
   @IsOptional()
   number?: number;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  excludeCompleted?: boolean;
 }

@@ -7,12 +7,12 @@ import { CreateAuctionTransactionDto } from '@module/auction/application/dto/cre
 import { SubmitClaimDto } from '@module/auction/application/dto/submit-claim.dto';
 import { SubmitPlaceBidDto } from '@module/auction/application/dto/submit-place-bid.dto';
 import { AuctionRelation } from '@module/auction/application/enum/auction-relations.enum';
+import { IGetAllAuctionsOptions } from '@module/auction/application/interface/get-all-auctions-options.interface';
 import { AuctionMapper } from '@module/auction/application/mapper/auction.mapper';
 import {
   AUCTION_REPOSITORY_KEY,
   IAuctionRepository,
 } from '@module/auction/application/repository/auction.repository.interface';
-import { Auction } from '@module/auction/domain/auction.domain';
 import { PlayerResponseDto } from '@module/player/application/dto/player-response.dto';
 import { PlayerService } from '@module/player/application/service/player.service';
 import { PlayerNotOwnedByUserException } from '@module/player/infrastructure/database/exception/player.exception';
@@ -29,7 +29,6 @@ import { scValToNative, xdr } from '@stellar/stellar-sdk';
 import { CollectionDto } from '@common/base/application/dto/collection.dto';
 import { ManySerializedResponseDto } from '@common/base/application/dto/many-serialized-response.dto';
 import { OneSerializedResponseDto } from '@common/base/application/dto/one-serialized-response.dto';
-import { IGetAllOptions } from '@common/base/application/interface/get-all-options.interface';
 import { TransactionMapper } from '@common/infrastructure/stellar/application/mapper/transaction.mapper';
 import { TransactionXDRDTO } from '@common/infrastructure/stellar/dto/transaction-xdr.dto';
 import { SorobanContractAdapter } from '@common/infrastructure/stellar/soroban-contract.adapter';
@@ -58,7 +57,7 @@ export class AuctionService {
 
   async getAll(
     user: User,
-    options: IGetAllOptions<Auction, AuctionRelation[]>,
+    options: IGetAllAuctionsOptions,
   ): Promise<ManySerializedResponseDto<AuctionResponseDto>> {
     const collection = await this.auctionRepository.getAll(options);
     const sourceAccount = await this.stellarAccountAdapter.getAccount(
@@ -206,6 +205,10 @@ export class AuctionService {
     const txReturnValue = returnValue as unknown as xdr.ScVal;
 
     const auctionSC: ISCAuctionDto = scValToNative(txReturnValue);
+
+    auction.status = auctionSC.status[0];
+
+    await this.auctionRepository.saveOne(auction);
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
       this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSC),
     );
@@ -255,6 +258,9 @@ export class AuctionService {
     const player = await this.playerService.getPlayerEntity({
       address: auctionSc.player_address,
     });
+
+    auction.status = auctionSc.status[0];
+
     if (team) {
       player.teamId = team.id;
     } else {
@@ -263,6 +269,8 @@ export class AuctionService {
       player.rosterId = null;
       player.roster = null;
     }
+
+    await this.auctionRepository.saveOne(auction);
     await this.playerService.saveOnePlayer(player);
     return this.auctionResponseAdapter.oneEntityResponse<AuctionResponseDto>(
       this.auctionMapper.fromAuctionToAuctionResponseDto(auction, auctionSc),
